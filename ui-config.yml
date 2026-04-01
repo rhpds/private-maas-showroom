@@ -5,13 +5,10 @@ default_width: 30
 persist_url_state: true
 
 tabs:
-  - name: Terminal
-    path: /wetty
-    port: 443
   - name: OpenShift AI Dashboard
-    url: 'https://rhods-dashboard-redhat-ods-applications.apps.cluster-guid.guid.sandbox.opentlc.com/'
+    url: 'https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}/'
   - name: OpenShift Console
-    url: 'https://console-openshift-console.apps.cluster-guid.guid.sandbox.opentlc.com'
+    url: '{openshift_console_url}'
 
 modules:
   - name: Module 1 — Introduction
