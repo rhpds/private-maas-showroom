@@ -4,20 +4,18 @@
   connection: local
   gather_facts: false
   tasks:
-    - name: Verify qwen model service exists in llm namespace
-      kubernetes.core.k8s_info:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+    - name: Verify qwen model endpoint is reachable (internal)
+      ansible.builtin.uri:
+        url: "http://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000/v1/models"
+        method: GET
+        return_content: true
         validate_certs: false
-        api_version: v1
-        kind: Service
-        name: qwen3-4b-instruct-kserve-workload-svc
-        namespace: llm
-      register: r_model_svc
+        timeout: 10
+      register: r_model_endpoint
+      ignore_errors: true
 
-    - name: Confirm model service is available
+    - name: Report model status
       ansible.builtin.debug:
         msg: >-
-          Model service qwen3-4b-instruct-kserve-workload-svc is
-          {{ 'available' if r_model_svc.resources | length > 0 else 'NOT found — check llm namespace' }}
-          in the llm namespace. This is a read-only exploration module;
-          no resources need to be created.
+          Model endpoint is {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}.
+          This is a read-only exploration module — no resources to create.
