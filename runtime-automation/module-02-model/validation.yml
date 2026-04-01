@@ -5,7 +5,8 @@
   gather_facts: false
   vars:
     maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
-    student_group: "tier-enterprise-users"
+    student_groups:
+      - "tier-enterprise-users"
   tasks:
     - name: Check Task 1 — qwen model endpoint is reachable
       ansible.builtin.uri:
@@ -27,7 +28,7 @@
         method: GET
         headers:
           X-MaaS-Username: "{{ student_user | default('') }}"
-          X-MaaS-Group: '["{{ student_group }}"]'
+          X-MaaS-Group: "{{ student_groups | to_json }}"
         return_content: true
         timeout: 10
       register: r_api_keys
