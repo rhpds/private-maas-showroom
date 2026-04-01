@@ -1,9 +1,62 @@
 ---
-- name: Module 2 Validation — Deploying Your First Model
+- name: Module 2 Validation — Introduction to your environment
   hosts: localhost
   connection: local
   gather_facts: false
   tasks:
-    - name: TODO — implement validation tasks
-      ansible.builtin.debug:
-        msg: "Stub — replace with real validation tasks"
+    - name: Check Task 1 — qwen model service exists in llm namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        validate_certs: false
+        api_version: v1
+        kind: Service
+        name: qwen3-4b-instruct-kserve-workload-svc
+        namespace: llm
+      register: r_model_svc
+
+    - name: Check Task 2 — qwen model pod is running
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        validate_certs: false
+        api_version: v1
+        kind: Pod
+        namespace: llm
+        label_selectors:
+          - "app.kubernetes.io/name=qwen3-4b-instruct"
+      register: r_model_pod
+
+    - name: Check Task 3 — data-science-gateway route exists
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        validate_certs: false
+        api_version: route.openshift.io/v1
+        kind: Route
+        name: data-science-gateway
+        namespace: openshift-ingress
+      register: r_gateway_route
+
+    - name: Build task results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_model_svc.resources | length > 0 }}"
+        _task2_ok: >-
+          {{ r_model_pod.resources | length > 0 and
+             r_model_pod.resources[0].status.phase | default('') == 'Running' }}
+        _task3_ok: "{{ r_gateway_route.resources | length > 0 }}"
+
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok and _task3_ok }}"
+        pass_msg: |
+          ✅ Task 1: Model service qwen3-4b-instruct exists in llm namespace
+          ✅ Task 2: Model pod is running
+          ✅ Task 3: Data science gateway route is available
+
+          ⚠️ Note: This module is browser-based exploration. The checks above
+          confirm your environment is correctly set up with the MaaS model.
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Task 1: Model service qwen3-4b-instruct exists in llm namespace
+          {{ '✅' if _task2_ok else '❌' }} Task 2: Model pod is running
+          {{ '✅' if _task3_ok else '❌' }} Task 3: Data science gateway route is available
+
+          ⚠️ This module checks pre-provisioned infrastructure.
+          If tasks are failing, contact your lab administrator.
