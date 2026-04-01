@@ -1,8 +1,0 @@
----
-- name: Setup — no-op (zerotouch chart handles content serving)
-  hosts: localhost
-  connection: local
-  gather_facts: false
-  tasks:
-    - ansible.builtin.debug:
-        msg: "Setup complete."
