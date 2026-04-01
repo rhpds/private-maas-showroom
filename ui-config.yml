@@ -12,28 +12,28 @@ tabs:
 
 modules:
   - name: Module 1 — Introduction
-    page: modules/main/module-01-introduction.html
+    page: module-01-introduction.html
   - name: Module 2 — Deploying Your First Model
-    page: modules/main/module-02-model.html
+    page: module-02-model.html
     solve: true
     validate: true
   - name: Module 3 — AI-Assisted Development
-    page: modules/main/module-03-code.html
+    page: module-03-code.html
     solve: true
     validate: true
   - name: Module 4 — Game Time
-    page: modules/main/module-04-code.html
+    page: module-04-code.html
     solve: true
     validate: true
   - name: Module 5 — Agentic AI
-    page: modules/main/module-05-agentic.html
+    page: module-05-agentic.html
     solve: true
     validate: true
   - name: Module 6 — Usage Analytics
-    page: modules/main/module-06-analytics.html
+    page: module-06-analytics.html
     solve: true
     validate: true
   - name: Module 7 — Closing Summary
-    page: modules/main/module-07-closing.html
+    page: module-07-closing.html
   - name: Module 8 — Resources
-    page: modules/main/module-08-resources.html
+    page: module-08-resources.html

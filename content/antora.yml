@@ -1,6 +1,6 @@
 name: modules
 title: Private Models-as-a-Service - A Practical Introduction with Red Hat AI
-version: main
+version: ~
 nav:
   - modules/ROOT/nav.adoc
 
