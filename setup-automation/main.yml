@@ -1,11 +1,8 @@
 ---
-- name: Setup showroom content symlinks
+- name: Setup — no-op (zerotouch chart handles content serving)
   hosts: localhost
   connection: local
   gather_facts: false
   tasks:
-    - name: Create antora symlink for nookbag SPA content discovery
-      ansible.builtin.file:
-        src: /showroom/www
-        dest: /showroom/www/antora
-        state: link
+    - ansible.builtin.debug:
+        msg: "Setup complete."
