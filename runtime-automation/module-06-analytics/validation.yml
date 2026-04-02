@@ -3,7 +3,74 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars:
+    grafana_url: "http://grafana-service.grafana.svc.cluster.local:3000"
+    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    student_groups:
+      - "tier-enterprise-users"
   tasks:
-    - name: TODO — implement validation tasks
-      ansible.builtin.debug:
-        msg: "Stub — replace with real validation tasks"
+    # -------------------------------------------------------
+    # Check 1 — Grafana service reachable
+    # -------------------------------------------------------
+    - name: Check Task 1 — Grafana service is reachable
+      ansible.builtin.uri:
+        url: "{{ grafana_url }}/api/health"
+        method: GET
+        return_content: true
+        timeout: 10
+      register: r_grafana
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Check 2 — MaaS API has user data (proves model was used)
+    # -------------------------------------------------------
+    - name: Check Task 2 — user has API key (proves model usage)
+      ansible.builtin.uri:
+        url: "{{ maas_api_url }}/v1/api-keys"
+        method: GET
+        headers:
+          X-MaaS-Username: "{{ student_user }}"
+          X-MaaS-Group: "{{ student_groups | to_json }}"
+        return_content: true
+        timeout: 10
+      register: r_maas_usage
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Check 3 — Grafana has the MaaS dashboard
+    # -------------------------------------------------------
+    - name: Check Task 3 — MaaS Token Metrics dashboard exists
+      ansible.builtin.uri:
+        url: "{{ grafana_url }}/api/search?query=MaaS%20Token%20Metrics"
+        method: GET
+        return_content: true
+        timeout: 10
+      register: r_dashboard
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Build results
+    # -------------------------------------------------------
+    - name: Build task results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_grafana.status | default(0) == 200 }}"
+        _task2_ok: "{{ r_maas_usage.status | default(0) == 200 and (r_maas_usage.json | default([]) | length > 0) }}"
+        _task3_ok: "{{ r_dashboard.status | default(0) == 200 and (r_dashboard.json | default([]) | length > 0) }}"
+
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok and _task3_ok }}"
+        pass_msg: |
+          ✅ Task 1: Grafana service is reachable
+          ✅ Task 2: User {{ student_user }} has API key — model usage is tracked
+          ✅ Task 3: MaaS Token Metrics Dashboard exists in Grafana
+          ⚠️ Task 4: Opened Grafana dashboard — verify manually in browser
+          ⚠️ Task 5: Reviewed usage metrics (Total Hits, Top Users, Hourly Hits) — verify manually
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Task 1: Grafana service {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
+          {{ '✅' if _task2_ok else '❌' }} Task 2: User {{ student_user }} {{ 'has API key — model usage tracked' if _task2_ok else 'has no API key — complete previous modules first' }}
+          {{ '✅' if _task3_ok else '❌' }} Task 3: MaaS Token Metrics Dashboard {{ 'exists in Grafana' if _task3_ok else 'not found — contact cluster admin' }}
+          ⚠️ Task 4: Opened Grafana dashboard — verify manually in browser
+          ⚠️ Task 5: Reviewed usage metrics (Total Hits, Top Users, Hourly Hits) — verify manually
+
+          {{ '' if (_task1_ok and _task2_ok and _task3_ok) else 'Fix: Complete previous modules first to generate usage data. If Grafana is down, contact cluster admin.' }}

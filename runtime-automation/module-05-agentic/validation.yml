@@ -3,7 +3,93 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars:
+    model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
+    llama_stack_url: "http://lsd-genai-playground-service.{{ student_user }}.svc.cluster.local:8321"
+    ocp_mcp_url: "http://ocp-mcp-server.lls-demo.svc.cluster.local:8080"
+    slack_mcp_url: "http://slack-mcp-server.lls-demo.svc.cluster.local:80"
   tasks:
-    - name: TODO — implement validation tasks
-      ansible.builtin.debug:
-        msg: "Stub — replace with real validation tasks"
+    # -------------------------------------------------------
+    # Check 1 — Model endpoint reachable
+    # -------------------------------------------------------
+    - name: Check Task 1 — qwen model endpoint is reachable
+      ansible.builtin.uri:
+        url: "{{ model_internal_url }}/v1/models"
+        method: GET
+        return_content: true
+        validate_certs: false
+        timeout: 10
+      register: r_model_endpoint
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Check 2 — Llama Stack playground reachable
+    # -------------------------------------------------------
+    - name: Check Task 2 — Llama Stack playground service
+      ansible.builtin.uri:
+        url: "{{ llama_stack_url }}/v1/models"
+        method: GET
+        return_content: true
+        timeout: 10
+      register: r_llama_stack
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Check 3 — OCP MCP server reachable
+    # -------------------------------------------------------
+    - name: Check Task 3 — OCP MCP server
+      ansible.builtin.uri:
+        url: "{{ ocp_mcp_url }}/sse"
+        method: GET
+        return_content: true
+        timeout: 5
+        status_code: [200, 405, 404]
+      register: r_ocp_mcp
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Check 4 — Slack MCP server reachable
+    # -------------------------------------------------------
+    - name: Check Task 4 — Slack MCP server
+      ansible.builtin.uri:
+        url: "{{ slack_mcp_url }}/sse"
+        method: GET
+        return_content: true
+        timeout: 5
+        status_code: [200, 405, 404]
+      register: r_slack_mcp
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Build results
+    # -------------------------------------------------------
+    - name: Build task results
+      ansible.builtin.set_fact:
+        _task1_ok: "{{ r_model_endpoint.status | default(0) == 200 }}"
+        _task2_ok: "{{ r_llama_stack.status | default(0) == 200 }}"
+        _task3_ok: "{{ r_ocp_mcp.status | default(0) in [200, 405, 404] }}"
+        _task4_ok: "{{ r_slack_mcp.status | default(0) in [200, 405, 404] }}"
+
+    - name: Validate all tasks
+      validation_check:
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok }}"
+        pass_msg: |
+          ✅ Task 1: Model endpoint qwen3-4b-instruct is reachable
+          ✅ Task 2: Llama Stack playground service is running
+          ✅ Task 3: OCP MCP server is reachable
+          ✅ Task 4: Slack MCP server is reachable
+          ⚠️ Task 5: Playground chat — list pods in workspace namespace — verify manually
+          ⚠️ Task 6: Playground chat — get pod logs — verify manually
+          ⚠️ Task 7: Playground chat — list Slack channels — verify manually
+          ⚠️ Task 8: Playground chat — post message to Slack — verify manually
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint qwen3-4b-instruct {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
+          {{ '✅' if _task2_ok else '❌' }} Task 2: Llama Stack playground {{ 'is running' if _task2_ok else 'is NOT reachable — check if playground pod is running in your namespace' }}
+          {{ '✅' if _task3_ok else '❌' }} Task 3: OCP MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable — contact cluster admin' }}
+          {{ '✅' if _task4_ok else '❌' }} Task 4: Slack MCP server {{ 'is reachable' if _task4_ok else 'is NOT reachable — contact cluster admin' }}
+          ⚠️ Task 5: Playground chat — list pods in workspace namespace — verify manually
+          ⚠️ Task 6: Playground chat — get pod logs — verify manually
+          ⚠️ Task 7: Playground chat — list Slack channels — verify manually
+          ⚠️ Task 8: Playground chat — post message to Slack — verify manually
+
+          {{ '' if (_task1_ok and _task2_ok and _task3_ok and _task4_ok) else 'Fix: Ensure all services are running. Contact cluster admin if infrastructure services are down.' }}

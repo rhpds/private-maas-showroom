@@ -3,7 +3,48 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars:
+    grafana_url: "http://grafana-service.grafana.svc.cluster.local:3000"
+    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    student_groups:
+      - "tier-enterprise-users"
   tasks:
-    - name: TODO — implement solve tasks
+    # -------------------------------------------------------
+    # Task 1 — Verify Grafana service is reachable
+    # -------------------------------------------------------
+    - name: Verify Grafana service is reachable
+      ansible.builtin.uri:
+        url: "{{ grafana_url }}/api/health"
+        method: GET
+        return_content: true
+        timeout: 10
+      register: r_grafana
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 2 — Verify MaaS API has usage data for user
+    # -------------------------------------------------------
+    - name: Check MaaS API for user usage data
+      ansible.builtin.uri:
+        url: "{{ maas_api_url }}/v1/api-keys"
+        method: GET
+        headers:
+          X-MaaS-Username: "{{ student_user }}"
+          X-MaaS-Group: "{{ student_groups | to_json }}"
+        return_content: true
+        timeout: 10
+      register: r_maas_usage
+      ignore_errors: true
+
+    - name: Report solve status
       ansible.builtin.debug:
-        msg: "Stub — replace with real solve tasks"
+        msg: |
+          Grafana: {{ 'reachable' if r_grafana.status | default(0) == 200 else 'NOT reachable' }}
+          MaaS API (user data): {{ 'available' if r_maas_usage.status | default(0) == 200 else 'NOT available' }}
+
+          ⚠️ MANUAL STEPS REQUIRED — this module uses the Grafana dashboard:
+            1. Navigate to Grafana from the OpenShift console Applications menu
+            2. Select "grafana" from the dashboards page
+            3. Open "MaaS Token Metrics Dashboard"
+            4. Review: Total Authorized Hits, Hits by User/Tier, Top Users, Hourly Hits
+            5. Use filters to view your own usage data

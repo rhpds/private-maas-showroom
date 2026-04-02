@@ -3,7 +3,52 @@
   hosts: localhost
   connection: local
   gather_facts: false
+  vars:
+    model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
   tasks:
-    - name: TODO — implement solve tasks
+    # -------------------------------------------------------
+    # Task 1 — Verify model endpoint is reachable (prerequisite for Continue)
+    # -------------------------------------------------------
+    - name: Verify qwen model endpoint is reachable
+      ansible.builtin.uri:
+        url: "{{ model_internal_url }}/v1/models"
+        method: GET
+        return_content: true
+        validate_certs: false
+        timeout: 10
+      register: r_model_endpoint
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 2 — Test chat completion (proves Continue can work)
+    # -------------------------------------------------------
+    - name: Test chat completion via internal model endpoint
+      ansible.builtin.uri:
+        url: "{{ model_internal_url }}/v1/chat/completions"
+        method: POST
+        headers:
+          Content-Type: application/json
+        body_format: json
+        body:
+          model: "qwen3-4b-instruct"
+          messages:
+            - role: user
+              content: "Write a one-line Python hello world."
+          max_tokens: 30
+        return_content: true
+        validate_certs: false
+        timeout: 30
+      register: r_chat_test
+      ignore_errors: true
+
+    - name: Report solve status
       ansible.builtin.debug:
-        msg: "Stub — replace with real solve tasks"
+        msg: |
+          Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
+          Chat completion: {{ 'working' if r_chat_test.status | default(0) == 200 else 'failed' }}
+
+          ⚠️ MANUAL STEPS REQUIRED — this module is entirely browser-based:
+            1. In DevSpaces, open a game starter file from fun-and-games/game_starters/
+            2. Use Continue to build the game (highlight code → right-click → Continue)
+            3. Open a terminal (Ctrl+`) and run your game
+            4. Solutions available at fun-and-games/game_solutions/ if stuck
