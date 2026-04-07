@@ -165,67 +165,16 @@ You've now:
 * Installed Continue and configured it to connect to your private Granite model
 * Set up an AI assistant that can refactor, edit and explain your code!
 
-Next, you will use Continue to help you develop a little fun game. 
+Next, you will use Continue to help you develop a little fun game.
 
-[pass,subs="attributes"]
+include::common/solve-button.adoc[]
+
 ++++
-<style>
-.solve-section {margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 8px;}
-.solve-controls {margin-bottom: 1rem;}
-.solve-button {padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background: #28a745; color: white; transition: all 0.3s ease;}
-.solve-button:hover:not(:disabled) {background: #218838;}
-.solve-button:disabled {background: #adb5bd; cursor: not-allowed; animation: pulse 1.5s ease-in-out infinite;}
-.solve-output {margin-top: 1rem; background-color: #000; border-radius: 6px; padding: 1.5rem; max-height: 600px; overflow-y: auto; border: 2px solid #00ff00;}
-.solve-output-content {margin: 0; padding: 0; color: #00ff00; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;}
-.validate-section {margin: 2rem 0; padding: 1.5rem; background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 8px;}
-.validate-controls {margin-bottom: 1rem;}
-.validate-button {padding: 0.75rem 1.5rem; font-size: 1rem; font-weight: 600; border: none; border-radius: 6px; cursor: pointer; background: #007bff; color: white; transition: all 0.3s ease;}
-.validate-button:hover:not(:disabled) {background: #0056b3;}
-.validate-button:disabled {background: #adb5bd; cursor: not-allowed; animation: pulse 1.5s ease-in-out infinite;}
-.validate-output {margin-top: 1rem; background-color: #000; border-radius: 6px; padding: 1.5rem; max-height: 600px; overflow-y: auto; border: 2px solid #00bfff;}
-.validate-output-content {margin: 0; padding: 0; color: #00bfff; font-family: 'Courier New', monospace; font-size: 14px; line-height: 1.8; white-space: pre-wrap; word-wrap: break-word;}
-@keyframes pulse {0%, 100% {opacity: 1;} 50% {opacity: 0.5;}}
-</style>
-<script>
-(function(){
-  var mod="module-03-code";
-  function stream(type,btn,out,content){
-    out.style.display='block';content.textContent='';btn.disabled=true;
-    btn.textContent=type==='solve'?'⏳ Running...':'⏳ Validating...';
-    var e=new EventSource('/stream/'+type+'/'+mod);
-    e.onmessage=function(d){
-      if(d.data==='__DONE__'){e.close();btn.disabled=false;btn.textContent=type==='solve'?'🚀 Solve Module':'✓ Validate Module';return;}
-      try{content.textContent+=JSON.parse(d.data);}catch(x){content.textContent+=d.data+'\n';}
-      out.scrollTop=out.scrollHeight;
-    };
-    e.onerror=function(){e.close();btn.disabled=false;btn.textContent=type==='solve'?'🚀 Solve Module':'✓ Validate Module';content.textContent+='\n❌ Connection closed\n';};
-  }
-  document.addEventListener('DOMContentLoaded',function(){
-    var sb=document.getElementById('solve-btn-'+mod);
-    var so=document.getElementById('solve-out-'+mod);
-    var sc=document.getElementById('solve-content-'+mod);
-    var vb=document.getElementById('validate-btn-'+mod);
-    var vo=document.getElementById('validate-out-'+mod);
-    var vc=document.getElementById('validate-content-'+mod);
-    if(sb)sb.addEventListener('click',function(){stream('solve',sb,so,sc);});
-    if(vb)vb.addEventListener('click',function(){stream('validate',vb,vo,vc);});
-  });
-})();
-</script>
-<div class="solve-section">
-  <div class="solve-controls">
-    <button class="solve-button" id="solve-btn-module-03-code">🚀 Solve Module</button>
-  </div>
-  <div class="solve-output" id="solve-out-module-03-code" style="display:none;">
-    <pre class="solve-output-content" id="solve-content-module-03-code"></pre>
-  </div>
-</div>
-<div class="validate-section">
-  <div class="validate-controls">
-    <button class="validate-button" id="validate-btn-module-03-code">✓ Validate Module</button>
-  </div>
-  <div class="validate-output" id="validate-out-module-03-code" style="display:none;">
-    <pre class="validate-output-content" id="validate-content-module-03-code"></pre>
-  </div>
-</div>
+<div class="solve-button-placeholder" data-module="module-03-code"></div>
+++++
+
+include::common/validate-button.adoc[]
+
+++++
+<div class="validate-button-placeholder" data-module="module-03-code"></div>
 ++++
