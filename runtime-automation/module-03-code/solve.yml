@@ -147,9 +147,14 @@
         namespace: "wksp-{{ student_user }}"
         pod: "{{ workspace_pod }}"
         command:
-          - sh
+          - python3
           - -c
-          - "mkdir -p /home/user/.continue && echo {{ continue_config | b64encode }} | base64 -d > /home/user/.continue/config.yaml && echo 'config.yaml written'"
+          - |
+            import base64, os
+            os.makedirs('/home/user/.continue', exist_ok=True)
+            content = base64.b64decode('{{ continue_config | b64encode }}').decode()
+            open('/home/user/.continue/config.yaml', 'w').write(content)
+            print('config.yaml written to /home/user/.continue/config.yaml')
       register: r_config_write
       when:
         - workspace_pod is defined
