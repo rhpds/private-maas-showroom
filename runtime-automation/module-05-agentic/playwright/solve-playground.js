@@ -129,11 +129,23 @@ if (!RHOAI_URL || !USERNAME || !PASSWORD || !USER_NS) {
       }
     }
 
-    // Click "Try in Playground"
+    // Click "Try in Playground" (button name varies in RHOAI versions)
     console.log('Clicking Try in Playground...');
-    const playgroundBtn = page.getByRole('button', { name: /Try in Playground/i });
-    await playgroundBtn.waitFor({ state: 'visible', timeout: 10000 });
-    await playgroundBtn.click();
+    const playgroundBtn = page.getByRole('button', { name: /Try in Playground|Playground|Open Playground/i })
+      .or(page.getByText(/Try in Playground/i).first());
+    if (await playgroundBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
+      await playgroundBtn.first().click();
+    } else {
+      // Try any button that mentions playground
+      const anyPlayground = page.locator('button:has-text("Playground"), a:has-text("Playground")').first();
+      if (await anyPlayground.isVisible({ timeout: 5000 }).catch(() => false)) {
+        await anyPlayground.click();
+      } else {
+        console.log('WARNING: Try in Playground button not found — taking screenshot for debug');
+        await page.screenshot({ path: '/tmp/playwright-debug-module05.png' });
+        throw new Error('Try in Playground button not found');
+      }
+    }
     await page.waitForTimeout(3000);
 
     // Authorize MCP servers — click lock icons
