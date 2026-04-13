@@ -91,7 +91,7 @@
           Chat completion test: {{ 'passed' if r_chat_test.status | default(0) == 200 else 'failed' }}
 
           ⚠️ MANUAL STEPS REQUIRED — the solve cannot automate browser interactions:
-            1. Open DevSpaces (navigate via OpenShift console → Applications menu)
+            1. Open DevSpaces using the link in your Showroom lab instructions
             2. Open your workspace and click "Trust" when prompted
             3. Install the Continue extension from the Extensions marketplace
             4. Open ~/.continue/config.yaml and paste the following configuration

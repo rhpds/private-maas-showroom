@@ -44,7 +44,7 @@
           MaaS API (user data): {{ 'available' if r_maas_usage.status | default(0) == 200 else 'NOT available' }}
 
           ⚠️ MANUAL STEPS REQUIRED — this module uses the Grafana dashboard:
-            1. Navigate to Grafana from the OpenShift console Applications menu
+            1. Navigate to Grafana using the link in your Showroom lab instructions
             2. Select "grafana" from the dashboards page
             3. Open "MaaS Token Metrics Dashboard"
             4. Review: Total Authorized Hits, Hits by User/Tier, Top Users, Hourly Hits
