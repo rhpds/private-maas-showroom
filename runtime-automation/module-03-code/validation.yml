@@ -62,6 +62,17 @@
       ignore_errors: true
 
     # -------------------------------------------------------
+    # Check 4 — DevSpaces workspace pod is running
+    # -------------------------------------------------------
+    - name: Check Task 4 — DevSpaces workspace pod running
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "wksp-{{ student_user }}"
+        label_selectors: []
+      register: r_workspace_pods
+      ignore_errors: true
+
+    # -------------------------------------------------------
     # Build results
     # -------------------------------------------------------
     - name: Build task results
@@ -69,23 +80,18 @@
         _task1_ok: "{{ r_model_endpoint.status | default(0) == 200 }}"
         _task2_ok: "{{ r_api_keys.status | default(0) == 200 and (r_api_keys.json | default([]) | length > 0) }}"
         _task3_ok: "{{ r_chat_test.status | default(0) == 200 }}"
+        _task4_ok: "{{ r_workspace_pods.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0 }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "{{ _task1_ok and _task2_ok and _task3_ok }}"
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok }}"
         pass_msg: |
           ✅ Task 1: Model endpoint qwen3-4b-instruct is reachable
           ✅ Task 2: API key found for user {{ student_user }}
-          ✅ Task 3: Chat completion is working (model responds to prompts)
-          ⚠️ Task 4: DevSpaces workspace opened — verify manually in browser
-          ⚠️ Task 5: Continue extension installed — verify manually in browser
-          ⚠️ Task 6: config.yaml configured with model endpoint and API key — verify Qwen3-4B-Instruct shows in Continue sidebar
+          ✅ Task 3: Chat completion is working
+          ✅ Task 4: DevSpaces workspace is running in wksp-{{ student_user }}
         error_msg: |
-          {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint qwen3-4b-instruct {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
+          {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
           {{ '✅' if _task2_ok else '❌' }} Task 2: API key {{ 'found' if _task2_ok else 'not found — go to Gen AI Studio → AI asset endpoints → Models as a service → Generate API token' }} for user {{ student_user }}
-          {{ '✅' if _task3_ok else '❌' }} Task 3: Chat completion {{ 'is working' if _task3_ok else 'failed — model may be down, contact cluster admin' }}
-          ⚠️ Task 4: DevSpaces workspace opened — verify manually in browser
-          ⚠️ Task 5: Continue extension installed — verify manually in browser
-          ⚠️ Task 6: config.yaml configured with model endpoint and API key — verify Qwen3-4B-Instruct shows in Continue sidebar
-
-          {{ '' if (_task1_ok and _task2_ok and _task3_ok) else 'Fix: Run the Solve button first, then complete the manual steps in your browser.' }}
+          {{ '✅' if _task3_ok else '❌' }} Task 3: Chat completion {{ 'is working' if _task3_ok else 'failed — model may be down' }}
+          {{ '✅' if _task4_ok else '❌' }} Task 4: DevSpaces workspace {{ 'is running' if _task4_ok else 'not found in wksp-' + student_user + ' — open DevSpaces from the OCP console apps menu' }}

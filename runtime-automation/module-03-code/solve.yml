@@ -83,6 +83,17 @@
       ignore_errors: true
 
     # -------------------------------------------------------
+    # Task 4 — Check DevSpaces workspace pod is running
+    # -------------------------------------------------------
+    - name: Check DevSpaces workspace pod in student namespace
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "wksp-{{ student_user }}"
+        label_selectors: []
+      register: r_workspace_pods
+      ignore_errors: true
+
+    # -------------------------------------------------------
     # Report
     # -------------------------------------------------------
     - name: Report solve status
@@ -91,4 +102,5 @@
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
           API key: {{ 'exists' if (r_existing_keys.json | default([]) | length > 0) else ('generated' if r_generated_token.status | default(0) in [200, 201] else 'not found — generate from Gen AI Studio → AI asset endpoints → Models as a service → View → Generate API token') }}
           Chat completion test: {{ 'passed' if r_chat_test.status | default(0) == 200 else 'failed' }}
+          DevSpaces workspace: {{ 'running' if (r_workspace_pods.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) else 'not found in wksp-' + student_user }}
 

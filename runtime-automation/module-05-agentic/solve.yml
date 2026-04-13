@@ -43,9 +43,22 @@
       register: r_slack_mcp
       ignore_errors: true
 
+    # -------------------------------------------------------
+    # Task 4 — Check Llama Stack playground pod is running (k8s — direct API blocked by NetworkPolicy)
+    # -------------------------------------------------------
+    - name: Check lsd-genai-playground pod in student namespace
+      kubernetes.core.k8s_info:
+        kind: Pod
+        namespace: "{{ student_user }}"
+        label_selectors:
+          - "app=lsd-genai-playground"
+      register: r_playground_pod
+      ignore_errors: true
+
     - name: Report solve status
       ansible.builtin.debug:
         msg: |
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
           OCP MCP server (lls-demo): {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
           Slack MCP server (lls-demo): {{ 'reachable' if r_slack_mcp is not failed else 'NOT reachable' }}
+          Llama Stack playground ({{ student_user }}): {{ 'running' if (r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) else 'not found' }}
