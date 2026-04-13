@@ -141,6 +141,10 @@
             - provider: codebase
       when: maas_token is defined and maas_token | length > 0
 
+    - name: Debug — show workspace and config status
+      ansible.builtin.debug:
+        msg: "workspace_pod={{ workspace_pod | default('UNDEFINED') }} continue_config_len={{ continue_config | default('') | length }} maas_token_len={{ maas_token | default('') | length }}"
+
     - name: Write ~/.continue/config.yaml into DevSpaces workspace pod
       kubernetes.core.k8s_exec:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
@@ -149,17 +153,17 @@
         command:
           - python3
           - -c
-          - |
-            import base64, os
-            os.makedirs('/home/user/.continue', exist_ok=True)
-            content = base64.b64decode('{{ continue_config | b64encode }}').decode()
-            open('/home/user/.continue/config.yaml', 'w').write(content)
-            print('config.yaml written to /home/user/.continue/config.yaml')
+          - "import base64,os; os.makedirs('/home/user/.continue',exist_ok=True); open('/home/user/.continue/config.yaml','w').write(base64.b64decode('{{ continue_config | b64encode }}').decode()); print('written')"
       register: r_config_write
       when:
         - workspace_pod is defined
         - continue_config is defined
       ignore_errors: true
+
+    - name: Debug — config write result
+      ansible.builtin.debug:
+        msg: "k8s_exec rc={{ r_config_write.return_code | default('N/A') }} stdout={{ r_config_write.stdout | default('N/A') }} stderr={{ r_config_write.stderr | default('N/A') }}"
+      when: r_config_write is defined
 
     # -------------------------------------------------------
     # Report
