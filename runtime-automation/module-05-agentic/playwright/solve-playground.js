@@ -1,24 +1,27 @@
 // module-05/playwright/solve-playground.js
-// Navigate RHOAI Gen AI Studio → select MCP servers → Try in Playground
-// → authorize MCP servers → send chat messages
+// Navigate RHOAI Gen AI Studio → AI asset endpoints → MCP servers
+// → select both → Try in Playground → authorize → send chat messages
 //
-// Environment variables (from Ansible extravars / showroom userdata):
-//   RHOAI_URL      — https://data-science-gateway.apps.xxx.com
-//   USERNAME       — student Keycloak username (e.g. llmuser-lfkzj)
-//   PASSWORD       — student password
-//   USER_NS        — student namespace (e.g. llmuser-lfkzj)
+// Environment variables (from showroom userdata via Ansible extravars):
+//   RHOAI_URL    — https://data-science-gateway.apps.xxx.com
+//   USERNAME     — student username (e.g. llmuser-lfkzj)
+//   PASSWORD     — student password
+//   USER_NS      — student namespace (e.g. llmuser-lfkzj)
 
 const { chromium } = require('playwright');
 
-const RHOAI_URL  = process.env.RHOAI_URL;
-const USERNAME   = process.env.USERNAME;
-const PASSWORD   = process.env.PASSWORD;
-const USER_NS    = process.env.USER_NS;
+const RHOAI_URL = process.env.RHOAI_URL;
+const USERNAME  = process.env.USERNAME;
+const PASSWORD  = process.env.PASSWORD;
+const USER_NS   = process.env.USER_NS;
 
 if (!RHOAI_URL || !USERNAME || !PASSWORD || !USER_NS) {
-  console.error('FAILED: Missing required environment variables (RHOAI_URL, USERNAME, PASSWORD, USER_NS)');
+  console.error('FAILED: Missing required env vars (RHOAI_URL, USERNAME, PASSWORD, USER_NS)');
   process.exit(1);
 }
+
+// Workspace project name shown in RHOAI — "Workspace llmuser-lfkzj"
+const WORKSPACE_PROJECT = `Workspace ${USER_NS}`;
 
 (async () => {
   const browser = await chromium.launch({
@@ -26,7 +29,6 @@ if (!RHOAI_URL || !USERNAME || !PASSWORD || !USER_NS) {
     args: ['--disable-blink-features=AutomationControlled', '--no-sandbox', '--disable-setuid-sandbox'],
   });
   const context = await browser.newContext({ ignoreHTTPSErrors: true });
-
   await context.addInitScript(() => {
     Object.defineProperty(navigator, 'webdriver', { get: () => false });
   });
@@ -34,138 +36,124 @@ if (!RHOAI_URL || !USERNAME || !PASSWORD || !USER_NS) {
   const page = await context.newPage();
 
   try {
+    // ── 1. Navigate to RHOAI ─────────────────────────────────────────────────
     console.log('Navigating to RHOAI:', RHOAI_URL);
     await page.goto(RHOAI_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-    // Handle OCP OAuth login
-    if (page.url().includes('oauth') || page.url().includes('login') || page.url().includes('authorize')) {
-      console.log('Handling OCP OAuth login... URL:', page.url());
+    // ── 2. Login via OCP OAuth (Keycloak SSO) ────────────────────────────────
+    if (page.url().includes('oauth') || page.url().includes('login') || page.url().includes('sso')) {
+      console.log('Login page detected, authenticating...');
 
-      // Check for identity provider selection page (RHBK or htpasswd)
-      const rhbkLink = page.getByRole('link', { name: /RHBK|Sandbox user/i });
-      const htpasswdLink = page.getByRole('link', { name: /htpasswd|Local Password|OpenShift/i });
-
-      if (await rhbkLink.isVisible({ timeout: 3000 }).catch(() => false)) {
-        console.log('Selecting RHBK identity provider');
-        await rhbkLink.click();
-        await page.waitForLoadState('domcontentloaded');
-      } else if (await htpasswdLink.isVisible({ timeout: 3000 }).catch(() => false)) {
-        console.log('Selecting htpasswd identity provider');
-        await htpasswdLink.click();
-        await page.waitForLoadState('domcontentloaded');
-      }
-
-      // Fill credentials — try multiple selector strategies
-      const usernameField = page.locator('#inputUsername, [name="username"], [id="username"]').or(
-        page.getByLabel(/username/i).first()
-      ).first();
-      const passwordField = page.locator('#inputPassword, [name="password"], [id="password"]').or(
-        page.getByLabel(/password/i).first()
-      ).first();
-
-      await usernameField.waitFor({ state: 'visible', timeout: 10000 });
+      // Fill username and password — use ID-based selectors which are stable
+      const usernameField = page.locator('#username, #inputUsername, [name="username"]').first();
+      await usernameField.waitFor({ state: 'visible', timeout: 15000 });
       await usernameField.fill(USERNAME);
-      await passwordField.fill(PASSWORD);
-
-      // Submit — try button or input[type=submit]
-      const submitBtn = page.locator('input[type="submit"], button[type="submit"]').or(
-        page.getByRole('button', { name: /log.?in|sign.?in/i })
-      ).first();
-      await submitBtn.click();
+      await page.locator('#password, #inputPassword, [name="password"]').first().fill(PASSWORD);
+      await page.locator('input[type="submit"], button[type="submit"]').first().click();
       await page.waitForURL(/data-science-gateway/, { timeout: 30000 });
       console.log('Logged in successfully');
     }
 
-    // Navigate to AI asset endpoints
-    console.log('Navigating to AI asset endpoints...');
     await page.waitForTimeout(2000);
 
-    // Click "AI asset endpoints" in the nav
-    const aiAssetsLink = page.getByRole('link', { name: /AI asset endpoints/i });
-    if (await aiAssetsLink.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await aiAssetsLink.click();
-    } else {
-      // Try via Gen AI Studio nav item
-      const genAiStudio = page.getByRole('link', { name: /Gen AI Studio/i });
-      if (await genAiStudio.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await genAiStudio.click();
-        await page.waitForTimeout(1000);
-        await page.getByRole('link', { name: /AI asset endpoints/i }).click({ timeout: 10000 });
-      }
-    }
+    // ── 3. Open "Gen AI studio" section in left nav ───────────────────────────
+    console.log('Clicking Gen AI studio...');
+    await page.getByRole('button', { name: /Gen AI studio/i })
+      .or(page.getByText('Gen AI studio').first())
+      .first()
+      .click();
+    await page.waitForTimeout(1000);
+
+    // ── 4. Click "AI asset endpoints" sub-menu item ───────────────────────────
+    console.log('Clicking AI asset endpoints...');
+    await page.getByRole('link', { name: /AI asset endpoints/i })
+      .or(page.getByText('AI asset endpoints').first())
+      .first()
+      .click();
     await page.waitForTimeout(2000);
 
-    // Change project to student workspace namespace
-    console.log('Changing project to Workspace', USER_NS);
-    const projectSelector = page.locator('[data-testid="project-selector"], select[aria-label*="project"], [aria-label*="Project"]').first();
-    if (await projectSelector.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await projectSelector.click();
+    // ── 5. Change project to student workspace ────────────────────────────────
+    // The project dropdown has a search box — search by user namespace to find it
+    console.log('Changing project to workspace for user:', USER_NS);
+    const projectBtn = page.locator('[data-testid="project-selector-dropdown"], .pf-v5-c-select__toggle, .pf-c-select__toggle').first()
+      .or(page.getByRole('button', { name: /grafana|Project/i }).first());
+    if (await projectBtn.isVisible({ timeout: 5000 }).catch(() => false)) {
+      await projectBtn.click();
       await page.waitForTimeout(500);
-      // Select the workspace namespace
-      const nsOption = page.getByRole('option', { name: new RegExp(USER_NS, 'i') });
-      if (await nsOption.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await nsOption.click();
-        await page.waitForTimeout(1000);
+      // Type in search box to filter — search by user part of namespace
+      const searchBox = page.getByPlaceholder(/Project name/i)
+        .or(page.locator('input[type="search"]').first());
+      if (await searchBox.isVisible({ timeout: 3000 }).catch(() => false)) {
+        await searchBox.fill(USER_NS);
+        await page.waitForTimeout(500);
+      }
+      // Click the first matching option (Workspace <user>)
+      const option = page.getByRole('option').first()
+        .or(page.locator('.pf-v5-c-menu__item, .pf-c-select__menu-item').first());
+      if (await option.isVisible({ timeout: 5000 }).catch(() => false)) {
+        await option.click();
+        await page.waitForTimeout(1500);
+        console.log('Project changed');
       }
     }
 
-    // Navigate to MCP servers tab
-    console.log('Navigating to MCP servers...');
-    const mcpTab = page.getByRole('tab', { name: /MCP servers/i })
-      .or(page.getByRole('link', { name: /MCP servers/i }))
-      .or(page.getByText('MCP servers').first());
-    if (await mcpTab.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await mcpTab.click();
-      await page.waitForTimeout(1500);
-    }
+    // ── 6. Click "MCP servers" tab ────────────────────────────────────────────
+    console.log('Clicking MCP servers tab...');
+    await page.getByRole('tab', { name: /MCP servers/i })
+      .or(page.getByText('MCP servers').first())
+      .first()
+      .click();
+    await page.waitForTimeout(1500);
 
-    // Select both MCP servers via checkboxes
-    console.log('Selecting MCP servers...');
-    const checkboxes = await page.getByRole('checkbox').all();
-    for (const cb of checkboxes) {
-      if (!await cb.isChecked()) {
-        await cb.click();
-        await page.waitForTimeout(300);
+    // ── 7. Select both MCP server checkboxes ─────────────────────────────────
+    console.log('Selecting all MCP servers...');
+    // Click the header "select all" checkbox first
+    const headerCheckbox = page.locator('thead input[type="checkbox"], th input[type="checkbox"]').first();
+    if (await headerCheckbox.isVisible({ timeout: 3000 }).catch(() => false)) {
+      if (!await headerCheckbox.isChecked()) {
+        await headerCheckbox.click();
+        await page.waitForTimeout(500);
+      }
+    } else {
+      // Check individual checkboxes
+      const checkboxes = await page.locator('tbody input[type="checkbox"]').all();
+      for (const cb of checkboxes) {
+        if (!await cb.isChecked()) {
+          await cb.click();
+          await page.waitForTimeout(300);
+        }
       }
     }
+    await page.waitForTimeout(500);
 
-    // Click "Try in Playground" (button name varies in RHOAI versions)
+    // ── 8. Click "Try in Playground" button ───────────────────────────────────
     console.log('Clicking Try in Playground...');
-    const playgroundBtn = page.getByRole('button', { name: /Try in Playground|Playground|Open Playground/i })
-      .or(page.getByText(/Try in Playground/i).first());
-    if (await playgroundBtn.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await playgroundBtn.first().click();
-    } else {
-      // Try any button that mentions playground
-      const anyPlayground = page.locator('button:has-text("Playground"), a:has-text("Playground")').first();
-      if (await anyPlayground.isVisible({ timeout: 5000 }).catch(() => false)) {
-        await anyPlayground.click();
-      } else {
-        console.log('WARNING: Try in Playground button not found — taking screenshot for debug');
-        await page.screenshot({ path: '/tmp/playwright-debug-module05.png' });
-        throw new Error('Try in Playground button not found');
-      }
-    }
-    await page.waitForTimeout(3000);
+    const tryBtn = page.getByRole('button', { name: /Try in Playground/i });
+    await tryBtn.waitFor({ state: 'visible', timeout: 10000 });
+    await tryBtn.click();
+    await page.waitForTimeout(4000);
 
-    // Authorize MCP servers — click lock icons
+    // ── 9. Authorize both MCP servers (click lock icons) ─────────────────────
     console.log('Authorizing MCP servers...');
-    const lockButtons = await page.getByRole('button', { name: /authoriz|lock/i }).all();
-    for (const btn of lockButtons) {
-      await btn.click();
+    // Lock buttons are in the right panel under "MCP servers" section
+    const lockBtns = page.locator('[aria-label*="uthoriz"], [title*="uthoriz"], button:has([data-icon="lock"])');
+    const lockCount = await lockBtns.count();
+    console.log('Found', lockCount, 'lock buttons');
+    for (let i = 0; i < lockCount; i++) {
+      await lockBtns.nth(i).click();
       await page.waitForTimeout(500);
-      // Close the popup if it appears
+      // Close any popup
       const closeBtn = page.getByRole('button', { name: /close/i });
       if (await closeBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
         await closeBtn.click();
         await page.waitForTimeout(300);
       }
     }
+    await page.waitForTimeout(1000);
 
-    // Send chat messages
-    const chatInput = page.getByRole('textbox', { name: /message|chat|send/i })
-      .or(page.locator('textarea[placeholder*="message"]'))
-      .or(page.locator('textarea').first());
+    // ── 10. Send chat messages ─────────────────────────────────────────────────
+    const chatInput = page.locator('[placeholder*="message"], [placeholder*="Message"], textarea').first();
+    await chatInput.waitFor({ state: 'visible', timeout: 10000 });
 
     const messages = [
       `List all pods in the wksp-${USER_NS} namespace.`,
@@ -173,19 +161,18 @@ if (!RHOAI_URL || !USERNAME || !PASSWORD || !USER_NS) {
     ];
 
     for (const msg of messages) {
-      console.log('Sending:', msg);
-      await chatInput.waitFor({ state: 'visible', timeout: 10000 });
+      console.log('Sending chat:', msg.substring(0, 50) + '...');
       await chatInput.fill(msg);
-      await page.waitForTimeout(500);
-      // Press Enter or click send
+      await page.waitForTimeout(300);
       await chatInput.press('Enter');
-      // Wait for response (model thinking time)
-      await page.waitForTimeout(15000);
+      // Wait for model response (may take time)
+      await page.waitForTimeout(20000);
     }
 
-    console.log('SUCCESS: Playground chat interactions completed');
+    console.log('SUCCESS: All playground chat interactions completed');
     process.exit(0);
   } catch (err) {
+    await page.screenshot({ path: '/tmp/playwright-debug-module05.png' }).catch(() => {});
     console.error('FAILED:', err.message);
     process.exit(1);
   } finally {
