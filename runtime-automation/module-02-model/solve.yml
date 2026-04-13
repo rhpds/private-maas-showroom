@@ -36,6 +36,7 @@
       ansible.builtin.uri:
         url: "{{ maas_api_url }}/v1/api-keys"
         method: POST
+        status_code: [200, 201]
         headers:
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
@@ -57,5 +58,5 @@
         msg: >-
           Model endpoint is {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}.
           API token: {{ 'already existed' if (r_existing_keys.json | default([]) | length > 0)
-                        else ('generated successfully' if r_generated_token.status | default(0) == 200
+                        else ('generated successfully' if r_generated_token.status | default(0) in [200, 201]
                         else 'generation failed') }}.

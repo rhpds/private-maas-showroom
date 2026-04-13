@@ -43,6 +43,7 @@
       ansible.builtin.uri:
         url: "{{ maas_api_url }}/v1/api-keys"
         method: POST
+        status_code: [200, 201]
         headers:
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
@@ -88,6 +89,6 @@
       ansible.builtin.debug:
         msg: |
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
-          API key: {{ 'exists' if (r_existing_keys.json | default([]) | length > 0) else ('generated' if r_generated_token.status | default(0) == 200 else 'not found — generate from Gen AI Studio → AI asset endpoints → Models as a service → View → Generate API token') }}
+          API key: {{ 'exists' if (r_existing_keys.json | default([]) | length > 0) else ('generated' if r_generated_token.status | default(0) in [200, 201] else 'not found — generate from Gen AI Studio → AI asset endpoints → Models as a service → View → Generate API token') }}
           Chat completion test: {{ 'passed' if r_chat_test.status | default(0) == 200 else 'failed' }}
 
