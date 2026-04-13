@@ -176,13 +176,24 @@ const WORKSPACE_PROJECT = `Workspace ${USER_NS}`;
         throw new Error('Try in Playground button not found — check screenshot');
       }
     }
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(5000);
+
+    // Screenshot to see playground state
+    await page.screenshot({ path: '/tmp/playwright-playground-state.png' });
+    console.log('Playground URL:', page.url());
 
     // ── 9. Authorize both MCP servers (click lock icons) ─────────────────────
     console.log('Authorizing MCP servers...');
-    // Lock buttons are in the right panel under "MCP servers" section
-    const lockBtns = page.locator('[aria-label*="uthoriz"], [title*="uthoriz"], button:has([data-icon="lock"])');
-    const lockCount = await lockBtns.count();
+    // Lock buttons are SVG lock icons or buttons with lock aria-label
+    // From screenshot: lock icons are small buttons in the right panel MCP servers list
+    const lockBtns = page.locator('button[aria-label*="uthenticate"], button[aria-label*="uthoriz"], button svg[data-icon="lock-open"], button svg[data-icon="lock"]').locator('..');
+    let lockCount = await lockBtns.count();
+    if (lockCount === 0) {
+      // Try alternative: find any lock-related button in the right panel
+      const altLocks = page.locator('[class*="lock"], [aria-label*="lock"], [title*="uthenticate"]');
+      lockCount = await altLocks.count();
+      console.log('Alt lock buttons found:', lockCount);
+    }
     console.log('Found', lockCount, 'lock buttons');
     for (let i = 0; i < lockCount; i++) {
       await lockBtns.nth(i).click();
