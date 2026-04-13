@@ -52,7 +52,7 @@
         kind: Pod
         namespace: "{{ student_user }}"
         label_selectors:
-          - "app=lsd-genai-playground"
+          - "app=llama-stack"
       register: r_playground_pod
       ignore_errors: true
 

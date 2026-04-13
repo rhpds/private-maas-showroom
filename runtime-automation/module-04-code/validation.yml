@@ -55,14 +55,6 @@
         pass_msg: |
           ✅ Task 1: Model endpoint qwen3-4b-instruct is reachable
           ✅ Task 2: Chat completion is working (Continue can assist with coding)
-          ⚠️ Task 3: Game starter file opened in DevSpaces — verify manually
-          ⚠️ Task 4: Game built with Continue assistance — verify manually
-          ⚠️ Task 5: Game runs successfully in terminal — verify manually
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint qwen3-4b-instruct {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
           {{ '✅' if _task2_ok else '❌' }} Task 2: Chat completion {{ 'is working' if _task2_ok else 'failed — model may be down' }}
-          ⚠️ Task 3: Game starter file opened in DevSpaces — verify manually
-          ⚠️ Task 4: Game built with Continue assistance — verify manually
-          ⚠️ Task 5: Game runs successfully in terminal — verify manually
-
-          {{ '' if (_task1_ok and _task2_ok) else 'Fix: Model must be running for Continue to work. Contact cluster admin.' }}
