@@ -37,20 +37,41 @@ if (!RHOAI_URL || !USERNAME || !PASSWORD || !USER_NS) {
     console.log('Navigating to RHOAI:', RHOAI_URL);
     await page.goto(RHOAI_URL, { waitUntil: 'domcontentloaded', timeout: 30000 });
 
-    // Handle OCP OAuth → Keycloak RHBK login
-    if (page.url().includes('oauth') || page.url().includes('login')) {
-      console.log('Handling OCP OAuth login...');
+    // Handle OCP OAuth login
+    if (page.url().includes('oauth') || page.url().includes('login') || page.url().includes('authorize')) {
+      console.log('Handling OCP OAuth login... URL:', page.url());
 
-      // Check for Keycloak RHBK identity provider
-      const rhbkLink = page.getByRole('link', { name: /Sandbox user.*RHBK/i });
-      if (await rhbkLink.isVisible({ timeout: 5000 }).catch(() => false)) {
+      // Check for identity provider selection page (RHBK or htpasswd)
+      const rhbkLink = page.getByRole('link', { name: /RHBK|Sandbox user/i });
+      const htpasswdLink = page.getByRole('link', { name: /htpasswd|Local Password|OpenShift/i });
+
+      if (await rhbkLink.isVisible({ timeout: 3000 }).catch(() => false)) {
+        console.log('Selecting RHBK identity provider');
         await rhbkLink.click();
+        await page.waitForLoadState('domcontentloaded');
+      } else if (await htpasswdLink.isVisible({ timeout: 3000 }).catch(() => false)) {
+        console.log('Selecting htpasswd identity provider');
+        await htpasswdLink.click();
         await page.waitForLoadState('domcontentloaded');
       }
 
-      await page.getByLabel('Username').first().fill(USERNAME);
-      await page.getByLabel('Password').first().fill(PASSWORD);
-      await page.getByRole('button', { name: /log in/i }).first().click();
+      // Fill credentials — try multiple selector strategies
+      const usernameField = page.locator('#inputUsername, [name="username"], [id="username"]').or(
+        page.getByLabel(/username/i).first()
+      ).first();
+      const passwordField = page.locator('#inputPassword, [name="password"], [id="password"]').or(
+        page.getByLabel(/password/i).first()
+      ).first();
+
+      await usernameField.waitFor({ state: 'visible', timeout: 10000 });
+      await usernameField.fill(USERNAME);
+      await passwordField.fill(PASSWORD);
+
+      // Submit — try button or input[type=submit]
+      const submitBtn = page.locator('input[type="submit"], button[type="submit"]').or(
+        page.getByRole('button', { name: /log.?in|sign.?in/i })
+      ).first();
+      await submitBtn.click();
       await page.waitForURL(/data-science-gateway/, { timeout: 30000 });
       console.log('Logged in successfully');
     }
