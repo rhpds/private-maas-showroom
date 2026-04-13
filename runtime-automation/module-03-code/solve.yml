@@ -7,7 +7,6 @@
     student_user: "{{ user | default('') }}"
     maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
     model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
-    maas_gateway_host: "data-science-gateway.{{ lookup('env', 'DOMAIN') }}"
     student_groups:
       - "tier-enterprise-users"
   tasks:
@@ -81,37 +80,13 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Report — provide config.yaml content for the student
+    # Report
     # -------------------------------------------------------
     - name: Report solve status
       ansible.builtin.debug:
         msg: |
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
-          API key: {{ 'exists (copy from OpenShift AI dashboard)' if (r_existing_keys.json | default([]) | length > 0) else ('generated — copy from OpenShift AI dashboard' if r_generated_token.status | default(0) == 200 else 'not found — generate from OpenShift AI dashboard') }}
+          API key: {{ 'exists' if (r_existing_keys.json | default([]) | length > 0) else ('generated' if r_generated_token.status | default(0) == 200 else 'not found — generate from Gen AI Studio → AI asset endpoints → Models as a service → View → Generate API token') }}
           Chat completion test: {{ 'passed' if r_chat_test.status | default(0) == 200 else 'failed' }}
 
-          ⚠️ MANUAL STEPS REQUIRED — the solve cannot automate browser interactions:
-            1. Open DevSpaces using the link in your Showroom lab instructions
-            2. Open your workspace and click "Trust" when prompted
-            3. Install the Continue extension from the Extensions marketplace
-            4. Open ~/.continue/config.yaml and paste the following configuration
-               (replace YOUR_API_KEY with your actual API key from the dashboard):
-
-          --- config.yaml ---
-          name: Local Assistant
-          version: 1.0.0
-          schema: v1
-          models:
-            - name: Qwen3-4B-Instruct
-              provider: openai
-              model: "qwen3-4b-instruct"
-              apiBase: "https://{{ maas_gateway_host }}/llm/qwen3-4b-instruct/v1"
-              apiKey: "YOUR_API_KEY"
-          context:
-            - provider: code
-            - provider: docs
-            - provider: diff
-            - provider: terminal
-            - provider: problems
-            - provider: folder
-            - provider: codebase
+          Follow the lab instructions to open DevSpaces, install Continue, and configure config.yaml with your MaaS endpoint and API key.
