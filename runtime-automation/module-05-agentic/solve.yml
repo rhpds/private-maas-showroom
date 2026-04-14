@@ -57,60 +57,35 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 5 — Call Llama Stack via k8s API server proxy (bypasses NetworkPolicy)
-    #   Runner has cluster-admin — can proxy to any service via the k8s API
+    # Task 5 — Get Llama Stack pod name to exec into it
     # -------------------------------------------------------
-    - name: Get k8s API server URL from kubeconfig
-      ansible.builtin.command:
-        cmd: "python3 -c \"import yaml; kc=yaml.safe_load(open('{{ k8s_kubeconfig }}')); print(kc['clusters'][0]['cluster']['server'])\""
-      register: r_k8s_server
-      when: k8s_kubeconfig is defined
+    - name: Get Llama Stack pod name
+      ansible.builtin.set_fact:
+        llama_pod: "{{ (r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | first).metadata.name }}"
+      when: r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
       ignore_errors: true
 
-    - name: Get k8s service account token
-      ansible.builtin.slurp:
-        src: /var/run/secrets/kubernetes.io/serviceaccount/token
-      register: r_sa_token
-      ignore_errors: true
-
-    - name: Chat with Llama Stack — list pods via OCP MCP (k8s proxy)
-      ansible.builtin.uri:
-        url: "{{ r_k8s_server.stdout | default('https://kubernetes.default.svc') }}/api/v1/namespaces/{{ student_user }}/services/lsd-genai-playground-service:8321/proxy/v1/chat/completions"
-        method: POST
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ r_sa_token.content | default('') | b64decode }}"
-        body_format: json
-        body:
-          model: "llama3.2:3b-instruct-fp16"
-          messages:
-            - role: user
-              content: "List all pods in the wksp-{{ student_user }} namespace."
-          max_tokens: 200
-          stream: false
-        validate_certs: false
-        timeout: 60
+    # -------------------------------------------------------
+    # Task 6 — Chat with Llama Stack by exec-ing into its pod (bypasses NetworkPolicy)
+    # -------------------------------------------------------
+    - name: Chat with Llama Stack — list pods in student workspace
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b-instruct-fp16\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
       register: r_llama_chat
+      when: llama_pod is defined
       ignore_errors: true
 
-    - name: Post to Slack via Llama Stack — Slack MCP (k8s proxy)
-      ansible.builtin.uri:
-        url: "{{ r_k8s_server.stdout | default('https://kubernetes.default.svc') }}/api/v1/namespaces/{{ student_user }}/services/lsd-genai-playground-service:8321/proxy/v1/chat/completions"
-        method: POST
-        headers:
-          Content-Type: application/json
-          Authorization: "Bearer {{ r_sa_token.content | default('') | b64decode }}"
-        body_format: json
-        body:
-          model: "llama3.2:3b-instruct-fp16"
-          messages:
-            - role: user
-              content: "Post a message to the #rh1-2026 channel: Hi from {{ student_user }}"
-          max_tokens: 200
-          stream: false
-        validate_certs: false
-        timeout: 60
+    - name: Chat with Llama Stack — post to Slack #rh1-2026
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b-instruct-fp16\",\"messages\":[{\"role\":\"user\",\"content\":\"Post a message to the #rh1-2026 channel: Hi from {{ student_user }}\"}],\"max_tokens\":200,\"stream\":false}'"
       register: r_slack_chat
+      when: llama_pod is defined
       ignore_errors: true
 
     - name: Report solve status
@@ -119,6 +94,6 @@
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
           OCP MCP server (lls-demo): {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
           Slack MCP server (lls-demo): {{ 'reachable' if r_slack_mcp is not failed else 'NOT reachable' }}
-          Llama Stack playground ({{ student_user }}): {{ 'running' if (r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0) else 'not found' }}
-          Llama Stack chat (list pods): {{ 'completed' if r_llama_chat.status | default(0) == 200 else 'failed (status=' + (r_llama_chat.status | default('N/A') | string) + ')' }}
-          Slack chat (post message): {{ 'completed' if r_slack_chat.status | default(0) == 200 else 'failed (status=' + (r_slack_chat.status | default('N/A') | string) + ')' }}
+          Llama Stack playground ({{ student_user }}): {{ 'running' if llama_pod is defined else 'not found' }}
+          Llama Stack chat (list pods): {{ 'completed' if r_llama_chat is not failed else 'failed' }}
+          Slack chat (post message): {{ 'completed' if r_slack_chat is not failed else 'failed' }}
