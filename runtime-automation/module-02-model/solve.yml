@@ -4,7 +4,7 @@
   connection: local
   gather_facts: false
   vars:
-    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    maas_api_url: "https://maas-api.redhat-ods-applications.svc.cluster.local:8443"
     student_user: "{{ user | default('') }}"
     student_groups:
       - "tier-enterprise-users"
@@ -27,6 +27,7 @@
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
         return_content: true
+        validate_certs: false
         timeout: 10
       register: r_existing_keys
       ignore_errors: true
@@ -35,6 +36,7 @@
       ansible.builtin.uri:
         url: "{{ maas_api_url }}/v1/api-keys"
         method: POST
+        status_code: [200, 201]
         headers:
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
@@ -43,6 +45,7 @@
         body:
           name: "{{ student_user }}-token"
         return_content: true
+        validate_certs: false
         timeout: 10
       register: r_generated_token
       when: >
@@ -55,5 +58,5 @@
         msg: >-
           Model endpoint is {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}.
           API token: {{ 'already existed' if (r_existing_keys.json | default([]) | length > 0)
-                        else ('generated successfully' if r_generated_token.status | default(0) == 200
+                        else ('generated successfully' if r_generated_token.status | default(0) in [200, 201]
                         else 'generation failed') }}.

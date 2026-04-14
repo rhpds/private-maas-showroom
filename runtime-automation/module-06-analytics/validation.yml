@@ -6,7 +6,7 @@
   vars:
     student_user: "{{ user | default('') }}"
     grafana_url: "http://grafana-service.grafana.svc.cluster.local:3000"
-    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    maas_api_url: "https://maas-api.redhat-ods-applications.svc.cluster.local:8443"
     student_groups:
       - "tier-enterprise-users"
   tasks:
@@ -33,6 +33,7 @@
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
         return_content: true
+        validate_certs: false
         timeout: 10
       register: r_maas_usage
       ignore_errors: true
@@ -65,13 +66,7 @@
           ✅ Task 1: Grafana service is reachable
           ✅ Task 2: User {{ student_user }} has API key — model usage is tracked
           ✅ Task 3: MaaS Token Metrics Dashboard exists in Grafana
-          ⚠️ Task 4: Opened Grafana dashboard — verify manually in browser
-          ⚠️ Task 5: Reviewed usage metrics (Total Hits, Top Users, Hourly Hits) — verify manually
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Task 1: Grafana service {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
           {{ '✅' if _task2_ok else '❌' }} Task 2: User {{ student_user }} {{ 'has API key — model usage tracked' if _task2_ok else 'has no API key — complete previous modules first' }}
           {{ '✅' if _task3_ok else '❌' }} Task 3: MaaS Token Metrics Dashboard {{ 'exists in Grafana' if _task3_ok else 'not found — contact cluster admin' }}
-          ⚠️ Task 4: Opened Grafana dashboard — verify manually in browser
-          ⚠️ Task 5: Reviewed usage metrics (Total Hits, Top Users, Hourly Hits) — verify manually
-
-          {{ '' if (_task1_ok and _task2_ok and _task3_ok) else 'Fix: Complete previous modules first to generate usage data. If Grafana is down, contact cluster admin.' }}

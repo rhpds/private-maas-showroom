@@ -4,7 +4,8 @@
   connection: local
   gather_facts: false
   vars:
-    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    student_user: "{{ user | default('') }}"
+    maas_api_url: "https://maas-api.redhat-ods-applications.svc.cluster.local:8443"
     student_groups:
       - "tier-enterprise-users"
   tasks:
@@ -18,18 +19,15 @@
       register: r_model_endpoint
       ignore_errors: true
 
-    - name: Check Task 2 — student user is set
-      ansible.builtin.set_fact:
-        _student_user_ok: "{{ student_user | default('') | length > 0 }}"
-
-    - name: Check Task 3 — API token generated for user in MaaS
+    - name: Check Task 2 — API token exists for user in MaaS
       ansible.builtin.uri:
         url: "{{ maas_api_url }}/v1/api-keys"
         method: GET
         headers:
-          X-MaaS-Username: "{{ student_user | default('') }}"
+          X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
         return_content: true
+        validate_certs: false
         timeout: 10
       register: r_api_keys
       ignore_errors: true
@@ -37,15 +35,14 @@
     - name: Build task results
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_model_endpoint.status | default(0) == 200 }}"
-        _task2_ok: "{{ _student_user_ok }}"
-        _task3_ok: "{{ r_api_keys.status | default(0) == 200 and (r_api_keys.json | default([]) | length > 0) }}"
+        _task2_ok: "{{ r_api_keys.status | default(0) == 200 and (r_api_keys.json | default([]) | length > 0) }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "true"
+        check: "{{ _task1_ok and _task2_ok }}"
         pass_msg: |
-          {{ '✅' if _task1_ok else '⚠️' }} Task 1: Model endpoint qwen3-4b-instruct is {{ 'reachable' if _task1_ok else 'not reachable (check with admin)' }}
-          {{ '✅' if _task2_ok else '⚠️' }} Task 2: Student user {{ student_user | default('unknown') }} is {{ 'configured' if _task2_ok else 'not set' }}
-          {{ '✅' if _task3_ok else '⚠️' }} Task 3: API token {{ 'found' if _task3_ok else 'not yet generated — go to Gen AI Studio → AI asset endpoints → Models as a service → View → Generate API token' }}
-
-          ℹ️ Module 2 is in development — validation is informational only.
+          ✅ Task 1: Model endpoint qwen3-4b-instruct is reachable
+          ✅ Task 2: API token found for user {{ student_user }}
+        error_msg: |
+          {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint qwen3-4b-instruct {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
+          {{ '✅' if _task2_ok else '❌' }} Task 2: API token {{ 'found' if _task2_ok else 'not found for user ' + student_user + ' — go to Gen AI Studio → AI asset endpoints → Models as a service → View → Generate API token' }}

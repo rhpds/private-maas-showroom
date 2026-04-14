@@ -6,7 +6,7 @@
   vars:
     student_user: "{{ user | default('') }}"
     grafana_url: "http://grafana-service.grafana.svc.cluster.local:3000"
-    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    maas_api_url: "https://maas-api.redhat-ods-applications.svc.cluster.local:8443"
     student_groups:
       - "tier-enterprise-users"
   tasks:
@@ -33,8 +33,24 @@
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
         return_content: true
+        validate_certs: false
         timeout: 10
       register: r_maas_usage
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 3 — Playwright: open Grafana MaaS Token Metrics Dashboard
+    # -------------------------------------------------------
+    - name: Run Playwright — open Grafana dashboard
+      ansible.builtin.script:
+        executable: node
+        cmd: "{{ playbook_dir }}/playwright/solve-grafana.js"
+      environment:
+        GRAFANA_URL: "https://grafana-route-grafana.{{ openshift_cluster_ingress_domain | default('') }}"
+        USERNAME: "{{ student_user }}"
+        PASSWORD: "{{ password | default('') }}"
+        PLAYWRIGHT_BROWSERS_PATH: /app/.playwright
+      register: r_playwright
       ignore_errors: true
 
     - name: Report solve status
@@ -42,10 +58,5 @@
         msg: |
           Grafana: {{ 'reachable' if r_grafana.status | default(0) == 200 else 'NOT reachable' }}
           MaaS API (user data): {{ 'available' if r_maas_usage.status | default(0) == 200 else 'NOT available' }}
+          Grafana dashboard (Playwright): {{ 'opened' if r_playwright.rc | default(1) == 0 else 'failed — ' + (r_playwright.stderr | default('') | truncate(100)) }}
 
-          ⚠️ MANUAL STEPS REQUIRED — this module uses the Grafana dashboard:
-            1. Navigate to Grafana from the OpenShift console Applications menu
-            2. Select "grafana" from the dashboards page
-            3. Open "MaaS Token Metrics Dashboard"
-            4. Review: Total Authorized Hits, Hits by User/Tier, Top Users, Hourly Hits
-            5. Use filters to view your own usage data

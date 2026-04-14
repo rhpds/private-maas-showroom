@@ -21,13 +21,8 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 2 — Llama Stack playground (MANUAL — runner cannot reach it)
-    #   NetworkPolicy blocks cross-namespace HTTP and runner SA has no
-    #   RBAC in the user namespace. Must be verified manually.
-    # -------------------------------------------------------
-
-    # -------------------------------------------------------
-    # Task 3 — Check OCP MCP server (TCP port check — SSE endpoints stream forever)
+    # Task 2 — Check OCP MCP server (TCP — SSE endpoints stream forever)
+    #   Shared namespace: lls-demo (all students share these MCP servers)
     # -------------------------------------------------------
     - name: Check OCP MCP server is reachable
       ansible.builtin.wait_for:
@@ -38,7 +33,7 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 4 — Check Slack MCP server (TCP port check)
+    # Task 3 — Check Slack MCP server (TCP)
     # -------------------------------------------------------
     - name: Check Slack MCP server is reachable
       ansible.builtin.wait_for:
@@ -48,19 +43,57 @@
       register: r_slack_mcp
       ignore_errors: true
 
+    # -------------------------------------------------------
+    # Task 4 — Check Llama Stack playground pod is running (k8s — direct API blocked by NetworkPolicy)
+    # -------------------------------------------------------
+    - name: Check lsd-genai-playground pod in student namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Pod
+        namespace: "{{ student_user }}"
+        label_selectors:
+          - "app=llama-stack"
+      register: r_playground_pod
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 5 — Get Llama Stack pod name to exec into it
+    # -------------------------------------------------------
+    - name: Get Llama Stack pod name
+      ansible.builtin.set_fact:
+        llama_pod: "{{ (r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | first).metadata.name }}"
+      when: r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 6 — Chat with Llama Stack by exec-ing into its pod (bypasses NetworkPolicy)
+    # -------------------------------------------------------
+    - name: Chat with Llama Stack — list pods in student workspace
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b-instruct-fp16\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
+      register: r_llama_chat
+      when: llama_pod is defined
+      ignore_errors: true
+
+    - name: Chat with Llama Stack — post to Slack #rh1-2026
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b-instruct-fp16\",\"messages\":[{\"role\":\"user\",\"content\":\"Post a message to the #rh1-2026 channel: Hi from {{ student_user }}\"}],\"max_tokens\":200,\"stream\":false}'"
+      register: r_slack_chat
+      when: llama_pod is defined
+      ignore_errors: true
+
     - name: Report solve status
       ansible.builtin.debug:
         msg: |
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
-          Llama Stack playground: verify manually (runner cannot reach cross-namespace service)
-          OCP MCP server: {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
-          Slack MCP server: {{ 'reachable' if r_slack_mcp is not failed else 'NOT reachable' }}
-
-          ⚠️ MANUAL STEPS REQUIRED — this module uses the RHOAI Playground:
-            1. Go to OpenShift AI → Gen AI Studio → AI asset endpoints
-            2. Change project to your Workspace namespace
-            3. Select MCP servers and click "Try in Playground"
-            4. Authorize both MCP servers (click lock icons)
-            5. Chat: "List all pods in the wksp-{{ student_user }} namespace"
-            6. Chat: "List all Slack channels in our Slack workspace"
-            7. Chat: "Post a message to the #rh1-2026 channel"
+          OCP MCP server (lls-demo): {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
+          Slack MCP server (lls-demo): {{ 'reachable' if r_slack_mcp is not failed else 'NOT reachable' }}
+          Llama Stack playground ({{ student_user }}): {{ 'running' if llama_pod is defined else 'not found' }}
+          Llama Stack chat (list pods): {{ 'completed' if r_llama_chat is not failed else 'failed' }}
+          Slack chat (post message): {{ 'completed' if r_slack_chat is not failed else 'failed' }}

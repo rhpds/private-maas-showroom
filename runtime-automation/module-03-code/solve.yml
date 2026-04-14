@@ -5,11 +5,12 @@
   gather_facts: false
   vars:
     student_user: "{{ user | default('') }}"
-    maas_api_url: "http://maas-api.maas-api.svc.cluster.local:8080"
+    maas_api_url: "https://maas-api.redhat-ods-applications.svc.cluster.local:8443"
     model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
-    maas_gateway_host: "data-science-gateway.{{ lookup('env', 'DOMAIN') }}"
     student_groups:
       - "tier-enterprise-users"
+    ingress_domain: "{{ openshift_cluster_ingress_domain | default('') }}"
+    maas_gateway_url: "https://data-science-gateway.{{ ingress_domain }}/llm/qwen3-4b-instruct/v1"
   tasks:
     # -------------------------------------------------------
     # Task 1 — Verify model endpoint is reachable (prerequisite)
@@ -25,9 +26,9 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 2 — Ensure user has an API key from MaaS
+    # Task 2 — Revoke existing token and issue a fresh one (need token value for config.yaml)
     # -------------------------------------------------------
-    - name: Check if API key already exists for user
+    - name: Check existing API keys
       ansible.builtin.uri:
         url: "{{ maas_api_url }}/v1/api-keys"
         method: GET
@@ -35,14 +36,29 @@
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
         return_content: true
+        validate_certs: false
         timeout: 10
       register: r_existing_keys
       ignore_errors: true
 
-    - name: Generate API token for user (if none exists)
+    - name: Revoke existing token (need fresh token value for config.yaml)
+      ansible.builtin.uri:
+        url: "{{ maas_api_url }}/v1/api-keys/{{ r_existing_keys.json[0].jti | default(r_existing_keys.json[0].name) }}"
+        method: DELETE
+        headers:
+          X-MaaS-Username: "{{ student_user }}"
+          X-MaaS-Group: "{{ student_groups | to_json }}"
+        validate_certs: false
+        timeout: 10
+        status_code: [200, 204]
+      when: r_existing_keys.json | default([]) | length > 0
+      ignore_errors: true
+
+    - name: Generate fresh API token
       ansible.builtin.uri:
         url: "{{ maas_api_url }}/v1/api-keys"
         method: POST
+        status_code: [200, 201]
         headers:
           X-MaaS-Username: "{{ student_user }}"
           X-MaaS-Group: "{{ student_groups | to_json }}"
@@ -51,12 +67,15 @@
         body:
           name: "{{ student_user }}-token"
         return_content: true
+        validate_certs: false
         timeout: 10
-      register: r_generated_token
-      when: >
-        r_existing_keys.status | default(0) == 200 and
-        (r_existing_keys.json | default([]) | length == 0)
+      register: r_new_token
       ignore_errors: true
+
+    - name: Set API token fact
+      ansible.builtin.set_fact:
+        maas_token: "{{ r_new_token.json.token | default('') }}"
+      when: r_new_token.json is defined and r_new_token.json.token is defined
 
     # -------------------------------------------------------
     # Task 3 — Test chat completion via internal model endpoint
@@ -81,23 +100,54 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Report — provide config.yaml content for the student
+    # Task 4 — Find DevSpaces workspace pod
     # -------------------------------------------------------
-    - name: Report solve status
-      ansible.builtin.debug:
-        msg: |
-          Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
-          API key: {{ 'exists (copy from OpenShift AI dashboard)' if (r_existing_keys.json | default([]) | length > 0) else ('generated — copy from OpenShift AI dashboard' if r_generated_token.status | default(0) == 200 else 'not found — generate from OpenShift AI dashboard') }}
-          Chat completion test: {{ 'passed' if r_chat_test.status | default(0) == 200 else 'failed' }}
+    - name: Find DevSpaces workspace pod in student namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Pod
+        namespace: "wksp-{{ student_user }}"
+      register: r_workspace_pods
+      ignore_errors: true
 
-          ⚠️ MANUAL STEPS REQUIRED — the solve cannot automate browser interactions:
-            1. Open DevSpaces (navigate via OpenShift console → Applications menu)
-            2. Open your workspace and click "Trust" when prompted
-            3. Install the Continue extension from the Extensions marketplace
-            4. Open ~/.continue/config.yaml and paste the following configuration
-               (replace YOUR_API_KEY with your actual API key from the dashboard):
+    - name: Set workspace pod name
+      ansible.builtin.set_fact:
+        workspace_pod: "{{ (r_workspace_pods.resources | selectattr('status.phase', 'equalto', 'Running') | list | first).metadata.name }}"
+      when: r_workspace_pods.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0
+      ignore_errors: true
 
-          --- config.yaml ---
+    # -------------------------------------------------------
+    # Task 5 — Install Continue extension via Open VSX VSIX
+    # -------------------------------------------------------
+    - name: Install Continue — download linux-x64 VSIX from Open VSX
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "wksp-{{ student_user }}"
+        pod: "{{ workspace_pod }}"
+        command: "sh -c 'ls /checode/checode-linux-libc/ubi9/extensions/Continue.continue 2>/dev/null && echo already_installed || (curl -skL https://open-vsx.org/api/Continue/continue/linux-x64/1.3.38/file/Continue.continue-1.3.38@linux-x64.vsix -o /tmp/continue.vsix && echo downloaded)'"
+      register: r_continue_download
+      when: workspace_pod is defined
+      ignore_errors: true
+
+    - name: Install Continue — extract VSIX to extensions directory
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "wksp-{{ student_user }}"
+        pod: "{{ workspace_pod }}"
+        command: "sh -c 'rm -rf /tmp/continue-ext && unzip -q /tmp/continue.vsix -d /tmp/continue-ext && mv /tmp/continue-ext/extension /checode/checode-linux-libc/ubi9/extensions/Continue.continue && echo installed'"
+      register: r_continue_install
+      when:
+        - workspace_pod is defined
+        - r_continue_download.stdout is defined
+        - "'downloaded' in r_continue_download.stdout"
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 6 — Write ~/.continue/config.yaml into DevSpaces workspace
+    # -------------------------------------------------------
+    - name: Build config.yaml content
+      ansible.builtin.set_fact:
+        continue_config: |
           name: Local Assistant
           version: 1.0.0
           schema: v1
@@ -105,8 +155,8 @@
             - name: Qwen3-4B-Instruct
               provider: openai
               model: "qwen3-4b-instruct"
-              apiBase: "https://{{ maas_gateway_host }}/llm/qwen3-4b-instruct/v1"
-              apiKey: "YOUR_API_KEY"
+              apiBase: "{{ maas_gateway_url }}"
+              apiKey: "{{ maas_token | default('') }}"
           context:
             - provider: code
             - provider: docs
@@ -115,3 +165,30 @@
             - provider: problems
             - provider: folder
             - provider: codebase
+      when: maas_token is defined and maas_token | length > 0
+
+    - name: Write ~/.continue/config.yaml into DevSpaces workspace pod
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "wksp-{{ student_user }}"
+        pod: "{{ workspace_pod }}"
+        command: "python3 -c \"import base64,os; os.makedirs('/home/user/.continue',exist_ok=True); open('/home/user/.continue/config.yaml','w').write(base64.b64decode('{{ continue_config | b64encode }}').decode()); print('written')\""
+      register: r_config_write
+      when:
+        - workspace_pod is defined
+        - continue_config is defined
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Report
+    # -------------------------------------------------------
+    - name: Report solve status
+      ansible.builtin.debug:
+        msg: |
+          Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
+          API token: {{ 'generated' if r_new_token.status | default(0) in [200, 201] else 'generation failed' }}
+          Chat completion: {{ 'passed' if r_chat_test.status | default(0) == 200 else 'failed' }}
+          DevSpaces workspace: {{ workspace_pod | default('not found') }}
+          Continue extension: {{ 'installed' if (r_continue_install is defined and r_continue_install is not failed) else ('already installed' if (r_continue_download is defined and 'already_installed' in (r_continue_download.stdout | default(''))) else 'not installed') }}
+          config.yaml: {{ 'written to ' + workspace_pod if (r_config_write is defined and r_config_write is not failed) else 'not written' }}
+          apiBase: {{ maas_gateway_url }}

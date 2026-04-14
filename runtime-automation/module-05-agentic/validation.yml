@@ -4,6 +4,7 @@
   connection: local
   gather_facts: false
   vars:
+    student_user: "{{ user | default('') }}"
     model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
   tasks:
     # -------------------------------------------------------
@@ -20,15 +21,9 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Check 2 — Llama Stack playground (MANUAL — runner cannot reach it)
-    #   NetworkPolicy blocks cross-namespace HTTP and runner SA has no
-    #   RBAC in the user namespace. Must be verified manually.
+    # Check 2 — OCP MCP server (TCP — shared lls-demo namespace)
     # -------------------------------------------------------
-
-    # -------------------------------------------------------
-    # Check 3 — OCP MCP server reachable (TCP — SSE endpoints stream forever)
-    # -------------------------------------------------------
-    - name: Check Task 3 — OCP MCP server
+    - name: Check Task 2 — OCP MCP server
       ansible.builtin.wait_for:
         host: "ocp-mcp-server.lls-demo.svc.cluster.local"
         port: 8080
@@ -37,9 +32,9 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Check 4 — Slack MCP server reachable (TCP)
+    # Check 3 — Slack MCP server (TCP)
     # -------------------------------------------------------
-    - name: Check Task 4 — Slack MCP server
+    - name: Check Task 3 — Slack MCP server
       ansible.builtin.wait_for:
         host: "slack-mcp-server.lls-demo.svc.cluster.local"
         port: 80
@@ -48,34 +43,38 @@
       ignore_errors: true
 
     # -------------------------------------------------------
+    # Check 4 — Llama Stack playground pod running (k8s — direct HTTP blocked by NetworkPolicy)
+    # -------------------------------------------------------
+    - name: Check Task 4 — lsd-genai-playground pod in student namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        kind: Pod
+        namespace: "{{ student_user }}"
+        label_selectors:
+          - "app=llama-stack"
+      register: r_playground_pod
+      ignore_errors: true
+
+    # -------------------------------------------------------
     # Build results
     # -------------------------------------------------------
     - name: Build task results
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_model_endpoint.status | default(0) == 200 }}"
-        _task3_ok: "{{ r_ocp_mcp is not failed }}"
-        _task4_ok: "{{ r_slack_mcp is not failed }}"
+        _task2_ok: "{{ r_ocp_mcp is not failed }}"
+        _task3_ok: "{{ r_slack_mcp is not failed }}"
+        _task4_ok: "{{ r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0 }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "{{ _task1_ok and _task3_ok and _task4_ok }}"
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok }}"
         pass_msg: |
           ✅ Task 1: Model endpoint qwen3-4b-instruct is reachable
-          ⚠️ Task 2: Llama Stack playground service — verify manually (open Gen AI Studio)
-          ✅ Task 3: OCP MCP server is reachable
-          ✅ Task 4: Slack MCP server is reachable
-          ⚠️ Task 5: Playground chat — list pods in workspace namespace — verify manually
-          ⚠️ Task 6: Playground chat — get pod logs — verify manually
-          ⚠️ Task 7: Playground chat — list Slack channels — verify manually
-          ⚠️ Task 8: Playground chat — post message to Slack — verify manually
+          ✅ Task 2: OCP MCP server is reachable (lls-demo)
+          ✅ Task 3: Slack MCP server is reachable (lls-demo)
+          ✅ Task 4: Llama Stack playground is running in {{ student_user }}
         error_msg: |
-          {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint qwen3-4b-instruct {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
-          ⚠️ Task 2: Llama Stack playground service — verify manually (open Gen AI Studio)
-          {{ '✅' if _task3_ok else '❌' }} Task 3: OCP MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable — contact cluster admin' }}
-          {{ '✅' if _task4_ok else '❌' }} Task 4: Slack MCP server {{ 'is reachable' if _task4_ok else 'is NOT reachable — contact cluster admin' }}
-          ⚠️ Task 5: Playground chat — list pods in workspace namespace — verify manually
-          ⚠️ Task 6: Playground chat — get pod logs — verify manually
-          ⚠️ Task 7: Playground chat — list Slack channels — verify manually
-          ⚠️ Task 8: Playground chat — post message to Slack — verify manually
-
-          {{ '' if (_task1_ok and _task3_ok and _task4_ok) else 'Fix: Ensure all services are running. Contact cluster admin if infrastructure services are down.' }}
+          {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
+          {{ '✅' if _task2_ok else '❌' }} Task 2: OCP MCP server {{ 'is reachable' if _task2_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
+          {{ '✅' if _task3_ok else '❌' }} Task 3: Slack MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
+          {{ '✅' if _task4_ok else '❌' }} Task 4: Llama Stack playground {{ 'is running' if _task4_ok else 'pod not found in ' + student_user + ' namespace — contact cluster admin' }}
