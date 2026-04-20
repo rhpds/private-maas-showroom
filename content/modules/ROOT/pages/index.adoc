@@ -18,7 +18,7 @@ By the end, you'll have hands-on experience across model deployment, developer i
 == Workshop Agenda
 
 === **Module 1:** Introduction to your environment and Models-as-a-Service Infrastructure
-As a developer, get acquainted with your Red Hat AI cluster environment and navigate to the OpenShift AI dashboard to view your model deployment and retrieve your endpoint and API token.
+As a developer, get acquainted with your Red Hat AI cluster environment and navigate to the OpenShift AI dashboard to view your NVIDIA Nemotron model deployment and retrieve your endpoint and API token.
 
 === **Module 2:** AI-Assisted Development
 Set up OpenShift Dev Spaces, install an AI-powered code assistant, and connect it to your private MaaS model endpoint to enhance your coding workflow.
@@ -34,5 +34,16 @@ Take on the role of a technical decision maker or platform stakeholder. Explore 
 
 == Workshop Environment
 
-For this workshop, you are in a shared Red Hat AI cluster environment with your own assigned user access. Each participant is sharing one model deployment.
+For this workshop, you are in a shared Red Hat AI cluster environment with your own assigned user access. Each participant shares access to a centrally-deployed **NVIDIA Nemotron 3 Nano 30B A3B FP8** model.
+
+This reflects a real-world Models-as-a-Service architecture: a platform team deploys and manages the model infrastructure, while development teams consume it via standard API endpoints. The model runs on GPU-accelerated OpenShift nodes and serves requests through Red Hat AI's inference stack.
+
+**Why NVIDIA Nemotron for this workshop?**
+
+* **Enterprise-optimized**: FP8 quantization delivers high throughput on modern GPUs
+* **Versatile**: Handles code generation, reasoning, and tool-calling (MCP servers)
+* **Production-ready**: Instruction-tuned for reliable, deterministic responses
+* **Cost-effective**: 30B parameters provide strong capability without excessive resource requirements
+
+You'll use this same model across all modules - from code assistance to agentic operations to usage analytics.
 

@@ -127,9 +127,9 @@ name: Local Assistant
 version: 1.0.0
 schema: v1
 models:
-  - name: Qwen3-4B-Instruct
+  - name: NVIDIA Nemotron 3 Nano 30B A3B FP8
     provider: openai
-    model: "qwen3-4b-instruct"
+    model: "nemotron-3-nano-30b-a3b"
     apiBase: "YOUR_MAAS_ROUTE/v1"
     apiKey: "YOUR_API_KEY"
 context:
@@ -146,12 +146,12 @@ IMPORTANT: Replace the `apiBase` URL with your actual MaaS endpoint URL and `YOU
 
 For example:
 
-* **apiBase**: `https://granite-model-maas.apps.example.com/llm/qwen3-4b-instruct/v1` (Note the `v1` at the end of the URL)
+* **apiBase**: `http://maas.apps.ocp.75d7w.sandbox114.opentlc.com/llm/nemotron-3-nano-30b-a3b/v1` (Note the `v1` at the end of the URL)
 * **apiKey**: `your-actual-api-key-here`
 
 Reference the complete configuration documentation here: https://docs.continue.dev/reference[Continue Documentation]
 
-When the model is properly configured, you will see the model name, `Qwen3-4B-Instruct` in the Continue chat sidebar.
+When the model is properly configured, you will see the model name, `NVIDIA Nemotron 3 Nano 30B A3B FP8` in the Continue chat sidebar.
 
 Go ahead - test it out and chat a bit!
 

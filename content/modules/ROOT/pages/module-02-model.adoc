@@ -3,7 +3,9 @@
 [#model-deployment]
 = Introduction to your environment
 
-Our first step is to get accustomed to our environment and its components. 
+Our first step is to get accustomed to our environment and its components.
+
+In this workshop, you'll work with **NVIDIA Nemotron 3 Nano 30B A3B FP8** - a lightweight, instruction-tuned large language model designed for enterprise deployment. With FP8 quantization, it delivers production-grade inference performance while maintaining accuracy for coding assistance, reasoning tasks, and tool-calling workflows. This makes it ideal for Models-as-a-Service architectures where multiple teams share centrally-managed model infrastructure. 
 
 Our home base will be our OpenShift cluster web console:
 
