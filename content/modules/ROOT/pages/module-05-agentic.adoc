@@ -26,34 +26,29 @@ That's an example of the power of agentic AI.
 
 In this module, we'll use a preconfigured stack that includes:
 
-* **https://github.com/meta-llama/llama-stack[Llama Stack]** - a flexible open-source framework developed by Meta to simplify the creation and deployment of advanced AI applications.
-** Llama Stack provides a unified API layer for inference, RAG, agents, tools, safety, evals and telemetry.
-** **Why It Matters for Enterprises**:
-*** Codifies best practices across Gen AI tools
-*** Enables reproducible, explainable, and extensible AI workflows
-*** In short, it lets you focus on value creation, not toolchain assembly.
-
-IMPORTANT: You may use frameworks like LangChain or CrewAI in conjunction with Llama Stack in OpenShift AI. These tools, together, help you build agentic AI workflows with reasoning, tool use, and orchestration. Llama Stack is Red Hat's recommended, and supported, framework for standardizing and interweaving disparate pieces of an agentic system into one observable, secure stack.
+* **Gen AI Studio Playground** - an integrated UI feature in Red Hat AI for testing model responses, MCP server integrations, and tool invocations before committing to production code. Use it to validate that models, prompts, and external connections work together correctly, then export the validated configuration to your application.
 
 * **Kubernetes MCP Server**  - allows our LLM agent to interact with our live OpenShift cluster and deployed resources.
 
-* **Slack MCP Server** - allows our LLM agent to interact with a Slack workspace. We will use it to interact with a specific Slack workspace for which we have authorization configured.
+* **Rocket.Chat MCP Server** - allows our LLM agent to interact with a Rocket.Chat workspace. We will use it to interact with a specific Rocket.Chat workspace for which we have authorization configured.
 
-== Tying it Back to our MaaS Model Endpoint
+* **NVIDIA Nemotron 3 Nano 30B A3B FP8 Model** - a lightweight, instruction-tuned model optimized for agentic workflows and tool calling. The FP8 quantization enables efficient inference while maintaining accuracy for structured tasks like API calls and multi-step reasoning. This model drives the agent's decision-making as it translates natural language into MCP server tool invocations. 
 
-You can connect a Llama Stack server deployment to any model endpoint(s) you desire. For our workshop, our Llama Stack server instance is configured with our Qwen model and two MCP servers. 
+== Connect Your Model to MCP Servers
+
+The Gen AI Studio Playground integrates your deployed model with MCP servers. For this workshop, your Nemotron model is already configured to communicate with the Kubernetes and Rocket.Chat MCP servers. 
 
 == Test model + MCP server functionality in the playground
 
-* Go back to the Red Hat OpenShift AI dashboard. You cannot navigate there from your workspace or OpenShift Dev Spaces, so get back to the OpenShift web console first:
+* Go back to the Red Hat OpenShift AI dashboard. 
 
-image::nav-rhoai-2.png[]
+** https://data-science-gateway.{openshift_cluster_ingress_domain}/
 
 * Select `AI asset endpoints` from the navigation menu.
 
 image::nav-aiassets.png[]
 
-* Change project back to `Workspace userx` accordingly.
+* Change project back to {user}.
 
 image::aiassets-changeproject.png[]
 
@@ -61,103 +56,120 @@ image::aiassets-changeproject.png[]
 
 image::genaistudio-mcpservers.png[]
 
-* See what is available to you. Select both MCP servers and then click `Try in Playground`.
+* See what you have available, then select the Kubernetes MCP Server and click  `Try in Playground`.
 
 image::mcp-try-playground.png[]
 
 === Using the playground
 
-Welcome to the playground, where you can test your models, assets, and other connections in a user-friendly dashboard interface before integrating into your applications directly. 
+This is where the magic happens. The playground lets you test-drive your entire agentic AI stack - model, prompts, MCP servers, and tool calls - **before writing a single line of application code**.
 
-As a developer, you likely aren't using the playground as your primary way of connecting to your resources. However, it's a great way to test and validate that the model(s) you selected, the MCP servers you configured, and anything else you are integrating work together properly and as expected before you invest in further development.
+Think of it as your **sandbox for operational automation**. Instead of deploying blind and debugging in production, you validate the whole chain here:
 
-In the playground, you will see a chat interface. Our model is preselected along with a default system prompt. If you would like to change or adjust the system prompt or temperature, feel free to do so.
+* Does the model understand my prompts correctly?
+* Are the MCP servers responding with the right data?
+* Can I get pod logs, list namespaces, or post to chat channels reliably?
 
-NOTE: The temperature setting correlates to how creative the model is permitted to be. It is recommended to keep this setting low to ensure the model is as accurate when answering you as possible, particularly when using in conjunction with MCP servers.
+**The workflow:** Experiment here → validate behavior → export configuration → integrate into automation.
+
+In the playground, you'll see a chat interface with your model preselected and a default system prompt. You can adjust the system prompt or temperature as needed.
+
+NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.0-0.3) for deterministic, accurate responses - critical when invoking tools or querying infrastructure. Higher temperatures introduce randomness, which can break tool calls.
 
 image::playground.png[]
 
-Before we begin chatting with the model and MCP servers, authorize the MCP servers in the playground by clicking the lock buttons:
+**Authorize your MCP servers** before issuing commands. This establishes the secure connection between your agent and live infrastructure. The Kubernetes MCP server is already authorized.
 
 image::authorize-mcp.png[]
 
-You will see the following pop-up each time you click the lock button. Click `Close`:
+Select the RocketChat MCP server. You'll see a confirmation popup - click `Save`:
 
-image::mcp-auth-close.png[]
+image::mcp-auth-save.png[]
 
-You are now setup to use the chat interface to test the model and its functionality with our MCP servers.
+Your agent is now live and connected to both Kubernetes and Rocket.Chat. You can issue natural language commands and watch them translate into real infrastructure operations.
 
-NOTE: If you refresh the page or have to access the playground again, you will need to reset your settings as they will have been set back to the defaults.
+NOTE: Authorization is **session-based**. If you refresh or reopen the playground, you'll need to re-authorize the MCP servers and reconfigure your settings.
 
-.View Tools
+**View Tools**
 
-You may view the MCP servers' available tools by clicking on the small tool icons next to the server names:
+View the MCP servers' available tools. You can see the Kubernetes MCP server has 20 tools active and available:
 
 image::view-mcp-tools.png[]
 
 == Investigate our OpenShift Resources
 
-The tool information you just viewed will give you guidance into how to interact with the model in chat to activate the tool calls correctly. You will need to utilize the right keywords so that you're engaging with the appropriate tools.
+The tool information will give you guidance into how to interact with the model in chat to activate the tool calls correctly. You will need to utilize the right keywords so that you're engaging with the appropriate tools.
 
 In the chat, enter:
 
 [source,console,role=execute,subs=attributes+]
 ----
-List all pods in the wksp-user[x] namespace.
+List all pods in the grafana namespace.
 ----
 
-NOTE: Replace the `x` with your user number.
-
-Response output will vary slightly, but you should see it correctly list out two active pods. One for the Llama Stack playground and the other for the Dev Spaces workspace.
+Response output will vary slightly, but you should see it correctly list the active pod in the `grafana` namespace: `grafana-deployment`.
 
 Let's try something else:
 
 [source,console,role=execute,subs=attributes+]
 ----
-Get logs for the lsd-genai-playground pod in the wksp-user[x] namespace.
+Get logs for the grafana-deployment pod in the grafana namespace.
 ----
-
-NOTE: You will need to again replace the `x` with your user number.
 
 Feel free to experiment further with the tools available.
 
-=== Post a Message to our Slack Workspace
+=== Post a Message to our Rocket.Chat Workspace
 
-With our Slack MCP Server connected to Llama Stack, we can extend our agentic AI experience beyond Kubernetes and into team collaboration tools (among many other possibilities!).
+With our Rocket.Chat MCP Server, we can extend our agentic AI experience beyond Kubernetes and into team collaboration tools (among many other possibilities!).
 
-This MCP server bridges your AI agent with a Slack workspace to fetch approved data.
+This MCP server bridges your NVIDIA Nemotron model with a Rocket.Chat workspace to fetch and post approved data.
+
+Open the Rocket.Chat application at: {rocketchat_url}
+
+Login with the following credentials:
+
+* **Username**: admin
+* **Password**: admin123
+
+You will see a pop-up. Simply close it, or accept update configuration:
+
+image::rocketchat-popup.png[]
+
+NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel where your AI agents will post messages. You will observe the messages there after sending them through the playground.
 
 **Why this matters:**
 
 * SREs and DevOps teams often work across multiple collaboration channels.
 
-* By giving your AI visibility into Slack, you can use natural language to check team communication spaces without switching tools.
+* By giving your AI visibility into a collaboration space like Rocket.Chat (similar to Slack), you can use natural language to check team communication spaces or to post information without switching tools.
 
-* This is a safe, read-only example — no messages are read or posted in this activity.
+* This is a safe, controlled example — you can read channels and post messages through your authorized bot user.
 
-==== In the LlamaStack Playground chat interface, type:
-
-[source,console,role=execute,subs=attributes+]
-----
-List all Slack channels in our Slack workspace.
-----
-
-Now, let's post a message to our Slack workspace:
+==== In the Gen AI Studio Playground chat interface, type:
 
 [source,console,role=execute,subs=attributes+]
 ----
-Post a message to the #rh1-2026 channel: "Hi from <insert name>".
+List all Rocket.Chat channels in our workspace.
 ----
 
-==== Send logs to Slack
-
-Now, let's try out a very real use case for this! It may not be done through a chat UI like this, but it's a good example of how you can use agentic AI to help you with your work. In a production environment, you would likely use a more robust automation to send logs or other information from your OpenShift cluster to Slack.
-
-Let's send the logs for the lsd-genai-playground pod to the #rh1-2026 channel.
+Now, let's post a message to our Rocket.Chat workspace:
 
 [source,console,role=execute,subs=attributes+]
 ----
-Post the logs for the lsd-genai-playground pod in the wksp-user[x] namespace to the #rh1-2026 channel in Slack.
+Post a message to the #workshop channel: "Hi from <insert name>".
+----
+
+Go check the `#workshop` channel in the Rocket.Chat application to see your message.
+
+==== Send logs to Rocket.Chat
+
+Now, let's try out a real use case for this! It may not be done through a chat UI like the playground, but it's a good example of how you can use agentic AI to help you with your work. In a production environment, you would likely use a more robust automation to send logs or other information from your Red Hat AI cluster to Rocket.Chat.
+
+Let's send pod logs from your workspace to the `#workshop` channel, where you and your team can view them in the Rocket.Chat interface.
+
+[source,console,role=execute,subs=attributes+]
+----
+Get the pod logs for the grafana-deployment pod in the grafana namespace. Assess the logs and post the logs + summary message to the #workshop channel in Rocket.Chat.
 ----
 
 == Summary: What You Did
@@ -166,8 +178,7 @@ In this module, you:
 
 * Integrated your own LLM with a tool-using agent.
 * Explored OpenShift resources with natural language
-* Interacted with a Slack workspace using natural language
-* Added AI guardrails with input/output shields.
+* Interacted with a Rocket.Chat workspace using natural language
 
 You just used AI to reduce operational complexity and speed up workflows!
 

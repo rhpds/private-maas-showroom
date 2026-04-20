@@ -1,0 +1,14 @@
+apiVersion: v2
+name: rocketchat-mcp
+description: Rocket.Chat MCP Server - Model Context Protocol server for Rocket.Chat integration
+type: application
+version: 0.1.0
+appVersion: "latest"
+keywords:
+  - mcp
+  - model-context-protocol
+  - rocketchat
+  - chat
+maintainers:
+  - name: Taylor Smith
+    email: tasmith@redhat.com

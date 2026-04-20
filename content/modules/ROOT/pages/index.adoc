@@ -3,22 +3,22 @@
 
 == Welcome to the Workshop
 
-This isn't a simple tutorial, this is the beginning of an adventure into the command center of an AI-powered enterprise!
+This isn't a simple product tutorial. This workshop covers the full technical stack for deploying and operating Models-as-a-Service in an enterprise Red Hat AI environment.
 
-In this hands-on session, you will rotate between key personas critical to delivering modern, AI-infused, production-level enterprise services:
+You'll work through three operational perspectives:
 
-* As a **developer**, you will access model credentials through a Models-as-a-Service interface and integrate AI code assistants into your development workflow. Then, you will connect real applications to private LLM endpoints, use code assistant technology to build applications, and leverage AI to enhance your coding productivity.
+* **Developer**: Connect a code assistant application to a private LLM endpoint via Red Hat AI inference APIs. Install and configure a code assistant to use your deployed model. Build AI-enhanced applications without external dependencies.
 
-* As a **DevOps Practitioner or Site Reliability Engineer**, you will explore the capabilities of agentic AI to monitor your OpenShift cluster resources and interact with collaboration tools.
+* **Platform Engineer/SRE**: Test agentic workflows with MCP servers for Kubernetes and Rocket.Chat. Use the integrated UI to query cluster resources, retrieve pod logs, and push operational data to team channels—all via natural language prompts backed by real-time API calls.
 
-* As a **technical decision maker or platform stakeholder**, you will monitor and analyze model usage across the cluster to understand cost, usage patterns, and business impact. 
+* **Platform Stakeholder**: Analyze model usage through a custom Grafana dashboard: token consumption, request latency, user attribution, and cost allocation. Understand production utilization patterns before scaling investment.
 
-At the end, you will walk away with practical experience across the lifecycle of model deployment.
+By the end, you'll have hands-on experience across model deployment, developer integration, operational automation, and usage analytics.
 
 == Workshop Agenda
 
 === **Module 1:** Introduction to your environment and Models-as-a-Service Infrastructure
-As a developer, get acquainted with your OpenShift cluster environment and navigate to the OpenShift AI dashboard to view your model deployment and retrieve your endpoint and API token.
+As a developer, get acquainted with your Red Hat AI cluster environment and navigate to the OpenShift AI dashboard to view your model deployment and retrieve your endpoint and API token.
 
 === **Module 2:** AI-Assisted Development
 Set up OpenShift Dev Spaces, install an AI-powered code assistant, and connect it to your private MaaS model endpoint to enhance your coding workflow.
@@ -27,12 +27,12 @@ Set up OpenShift Dev Spaces, install an AI-powered code assistant, and connect i
 Build a simple game using AI assistance. Explore, experiment, and build confidence with AI-assisted coding through a fun, low-pressure project.
 
 === **Module 4:** System Administration with Agentic AI
-With the mindset of a site reliability engineer or DevOps practitioner, use Model Context Protocol (MCP) servers and Llama Stack to interact with your OpenShift cluster and Slack workspace using natural language.
+With the mindset of a site reliability engineer or DevOps practitioner, use Model Context Protocol (MCP) servers and Red Hat AI to interact with your OpenShift cluster and Rocket.Chat workspace using natural language.
 
 === **Module 5:** Usage Analytics and Reporting
 Take on the role of a technical decision maker or platform stakeholder. Explore Grafana dashboards to monitor model usage, track costs, and understand the business impact of your AI services.
 
 == Workshop Environment
 
-For this workshop, you are in a shared OpenShift cluster environment with your own assigned user access. Each participant is sharing one model deployment.
+For this workshop, you are in a shared Red Hat AI cluster environment with your own assigned user access. Each participant is sharing one model deployment.
 

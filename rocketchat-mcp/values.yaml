@@ -1,0 +1,43 @@
+# Rocket.Chat MCP Server Configuration
+
+image:
+  repository: ghcr.io/enyonee/rocketchat-mcp
+  tag: latest
+  pullPolicy: IfNotPresent
+
+replicaCount: 1
+
+service:
+  type: ClusterIP
+  port: 80
+  targetPort: 8000
+
+# Rocket.Chat connection settings
+rocketchat:
+  # URL to the Rocket.Chat server (internal service URL)
+  url: "http://rocketchat-rocketchat.rocketchat.svc.cluster.local"
+
+  # Option 1: Use existing secret
+  existingSecret: ""
+
+  # Option 2: Create secret with provided values (configure these)
+  # Get these from Rocket.Chat -> Profile -> Personal Access Tokens
+  authToken: ""
+  userId: ""
+
+  # Set to true to block all write operations (read-only mode)
+  readOnly: false
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+  requests:
+    cpu: "200m"
+    memory: "256Mi"
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

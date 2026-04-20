@@ -27,7 +27,8 @@ asciidoc:
     openshift_cluster_console_url: https://console-openshift-console.{openshift_cluster_ingress_domain}
     openshift_cluster_admin_username: username
     openshift_cluster_admin_password: password
-    rhoai_dashboard_url: https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}/
+    rhoai_dashboard_url: https://data-science-gateway.{openshift_cluster_ingress_domain}/
+    rocketchat_url: https://rocketchat.{openshift_cluster_ingress_domain}
     login_command: oc login --insecure-skip-tls-verify=false -u userX -p openshift https://api.MYCLUSTER.com:6443"
     rhoai: "Red Hat OpenShift AI"
     rhoai-short: "RHOAI"
