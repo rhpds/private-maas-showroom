@@ -5,12 +5,12 @@
   gather_facts: false
   vars:
     student_user: "{{ user | default('') }}"
-    model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
+    model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
   tasks:
     # -------------------------------------------------------
     # Check 1 — Model endpoint reachable
     # -------------------------------------------------------
-    - name: Check Task 1 — qwen model endpoint is reachable
+    - name: Check Task 1 — nemotron model endpoint is reachable
       ansible.builtin.uri:
         url: "{{ model_internal_url }}/v1/models"
         method: GET
@@ -32,14 +32,14 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Check 3 — Slack MCP server (TCP)
+    # Check 3 — Rocket.Chat MCP server (TCP)
     # -------------------------------------------------------
-    - name: Check Task 3 — Slack MCP server
+    - name: Check Task 3 — Rocket.Chat MCP server
       ansible.builtin.wait_for:
-        host: "slack-mcp-server.lls-demo.svc.cluster.local"
+        host: "rocketchat-mcp.lls-demo.svc.cluster.local"
         port: 80
         timeout: 5
-      register: r_slack_mcp
+      register: r_rocketchat_mcp
       ignore_errors: true
 
     # -------------------------------------------------------
@@ -62,19 +62,19 @@
       ansible.builtin.set_fact:
         _task1_ok: "{{ r_model_endpoint.status | default(0) == 200 }}"
         _task2_ok: "{{ r_ocp_mcp is not failed }}"
-        _task3_ok: "{{ r_slack_mcp is not failed }}"
+        _task3_ok: "{{ r_rocketchat_mcp is not failed }}"
         _task4_ok: "{{ r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0 }}"
 
     - name: Validate all tasks
       validation_check:
         check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok }}"
         pass_msg: |
-          ✅ Task 1: Model endpoint qwen3-4b-instruct is reachable
+          ✅ Task 1: Model endpoint nemotron-3-nano-30b-a3b is reachable
           ✅ Task 2: OCP MCP server is reachable (lls-demo)
-          ✅ Task 3: Slack MCP server is reachable (lls-demo)
+          ✅ Task 3: Rocket.Chat MCP server is reachable (lls-demo)
           ✅ Task 4: Llama Stack playground is running in {{ student_user }}
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
           {{ '✅' if _task2_ok else '❌' }} Task 2: OCP MCP server {{ 'is reachable' if _task2_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
-          {{ '✅' if _task3_ok else '❌' }} Task 3: Slack MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
+          {{ '✅' if _task3_ok else '❌' }} Task 3: Rocket.Chat MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
           {{ '✅' if _task4_ok else '❌' }} Task 4: Llama Stack playground {{ 'is running' if _task4_ok else 'pod not found in ' + student_user + ' namespace — contact cluster admin' }}

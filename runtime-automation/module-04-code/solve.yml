@@ -5,12 +5,12 @@
   gather_facts: false
   vars:
     student_user: "{{ user | default('') }}"
-    model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
+    model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
   tasks:
     # -------------------------------------------------------
     # Task 1 — Verify model endpoint is reachable (prerequisite for Continue)
     # -------------------------------------------------------
-    - name: Verify qwen model endpoint is reachable
+    - name: Verify nemotron model endpoint is reachable
       ansible.builtin.uri:
         url: "{{ model_internal_url }}/v1/models"
         method: GET
@@ -31,7 +31,7 @@
           Content-Type: application/json
         body_format: json
         body:
-          model: "qwen3-4b-instruct"
+          model: "nemotron-3-nano-30b-a3b"
           messages:
             - role: user
               content: "Write a one-line Python hello world."

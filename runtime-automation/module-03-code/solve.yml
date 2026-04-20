@@ -6,16 +6,16 @@
   vars:
     student_user: "{{ user | default('') }}"
     maas_api_url: "https://maas-api.redhat-ods-applications.svc.cluster.local:8443"
-    model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
+    model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
     student_groups:
       - "tier-enterprise-users"
     ingress_domain: "{{ openshift_cluster_ingress_domain | default('') }}"
-    maas_gateway_url: "https://data-science-gateway.{{ ingress_domain }}/llm/qwen3-4b-instruct/v1"
+    maas_gateway_url: "https://data-science-gateway.{{ ingress_domain }}/llm/nemotron-3-nano-30b-a3b/v1"
   tasks:
     # -------------------------------------------------------
     # Task 1 — Verify model endpoint is reachable (prerequisite)
     # -------------------------------------------------------
-    - name: Verify qwen model endpoint is reachable (internal)
+    - name: Verify nemotron model endpoint is reachable (internal)
       ansible.builtin.uri:
         url: "{{ model_internal_url }}/v1/models"
         method: GET
@@ -88,7 +88,7 @@
           Content-Type: application/json
         body_format: json
         body:
-          model: "qwen3-4b-instruct"
+          model: "nemotron-3-nano-30b-a3b"
           messages:
             - role: user
               content: "Say hello in one word."
@@ -152,9 +152,9 @@
           version: 1.0.0
           schema: v1
           models:
-            - name: Qwen3-4B-Instruct
+            - name: Nemotron-3-Nano-30B
               provider: openai
-              model: "qwen3-4b-instruct"
+              model: "nemotron-3-nano-30b-a3b"
               apiBase: "{{ maas_gateway_url }}"
               apiKey: "{{ maas_token | default('') }}"
           context:

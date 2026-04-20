@@ -219,7 +219,7 @@ const WORKSPACE_PROJECT = `Workspace ${USER_NS}`;
 
     const messages = [
       `List all pods in the wksp-${USER_NS} namespace.`,
-      `Post a message to the #rh1-2026 channel: "Hi from ${USERNAME}"`,
+      `Post a message to the #workshop channel: "Hi from ${USERNAME}"`,
     ];
 
     for (const msg of messages) {

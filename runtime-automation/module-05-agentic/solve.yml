@@ -5,12 +5,12 @@
   gather_facts: false
   vars:
     student_user: "{{ user | default('') }}"
-    model_internal_url: "https://qwen3-4b-instruct-kserve-workload-svc.llm.svc.cluster.local:8000"
+    model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
   tasks:
     # -------------------------------------------------------
     # Task 1 — Verify model endpoint is reachable
     # -------------------------------------------------------
-    - name: Verify qwen model endpoint is reachable
+    - name: Verify nemotron model endpoint is reachable
       ansible.builtin.uri:
         url: "{{ model_internal_url }}/v1/models"
         method: GET
@@ -33,14 +33,14 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 3 — Check Slack MCP server (TCP)
+    # Task 3 — Check Rocket.Chat MCP server (TCP)
     # -------------------------------------------------------
-    - name: Check Slack MCP server is reachable
+    - name: Check Rocket.Chat MCP server is reachable
       ansible.builtin.wait_for:
-        host: "slack-mcp-server.lls-demo.svc.cluster.local"
+        host: "rocketchat-mcp.lls-demo.svc.cluster.local"
         port: 80
         timeout: 5
-      register: r_slack_mcp
+      register: r_rocketchat_mcp
       ignore_errors: true
 
     # -------------------------------------------------------
@@ -73,18 +73,18 @@
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "{{ student_user }}"
         pod: "{{ llama_pod }}"
-        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b-instruct-fp16\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
       register: r_llama_chat
       when: llama_pod is defined
       ignore_errors: true
 
-    - name: Chat with Llama Stack — post to Slack #rh1-2026
+    - name: Chat with Llama Stack — post to Rocket.Chat #workshop
       kubernetes.core.k8s_exec:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "{{ student_user }}"
         pod: "{{ llama_pod }}"
-        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"llama3.2:3b-instruct-fp16\",\"messages\":[{\"role\":\"user\",\"content\":\"Post a message to the #rh1-2026 channel: Hi from {{ student_user }}\"}],\"max_tokens\":200,\"stream\":false}'"
-      register: r_slack_chat
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"Post a message to the #workshop channel: Hi from {{ student_user }}\"}],\"max_tokens\":200,\"stream\":false}'"
+      register: r_rocketchat_chat
       when: llama_pod is defined
       ignore_errors: true
 
@@ -93,7 +93,7 @@
         msg: |
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
           OCP MCP server (lls-demo): {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
-          Slack MCP server (lls-demo): {{ 'reachable' if r_slack_mcp is not failed else 'NOT reachable' }}
+          Rocket.Chat MCP server (lls-demo): {{ 'reachable' if r_rocketchat_mcp is not failed else 'NOT reachable' }}
           Llama Stack playground ({{ student_user }}): {{ 'running' if llama_pod is defined else 'not found' }}
           Llama Stack chat (list pods): {{ 'completed' if r_llama_chat is not failed else 'failed' }}
-          Slack chat (post message): {{ 'completed' if r_slack_chat is not failed else 'failed' }}
+          Rocket.Chat (post message): {{ 'completed' if r_rocketchat_chat is not failed else 'failed' }}
