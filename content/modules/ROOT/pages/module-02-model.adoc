@@ -55,7 +55,7 @@ Now, go to the `Gen AI Studio` section of the dashboard and select `AI asset end
 
 image::nav-genaistudio.png[]
 
-In the AI asset endpoints page, change the project from `grafana` to `Workspace userx` with `x` equal to your assigned user number.
+In the AI asset endpoints page, change the project from `grafana` to {user}.
 
 image::genaistudio-changeproject.png[]
 
@@ -69,11 +69,9 @@ We will not be able to manage the model deployment with our simple user privileg
 
 image::maas-tab.png[]
 
-Select the tab. You will see your admin has deployed one model for you to use: `qwen-4b-instruct`
+Select the tab. You will see your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
 
 image::maas-model.png[]
-
-// Test model in playground
 
 We need the endpoint for the next section. Select `View` under the `External endpoint` column:
 
