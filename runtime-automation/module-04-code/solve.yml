@@ -67,7 +67,7 @@
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "wksp-{{ student_user }}"
         pod: "{{ workspace_pod }}"
-        command: "sh -c 'echo rock | python3 /projects/exercises/fun-and-games/game_solutions/rock_paper_scissors/rps_solution.py'"
+        command: "sh -c 'echo rock | python3 /projects/exercises/coding-exercises/game_solutions/rock_paper_scissors/rps_solution.py'"
       register: r_game_run
       when: workspace_pod is defined
       ignore_errors: true

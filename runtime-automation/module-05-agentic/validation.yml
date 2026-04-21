@@ -56,6 +56,19 @@
       ignore_errors: true
 
     # -------------------------------------------------------
+    # Check 5 — RocketChat user credentials secret exists (created by setup job)
+    # -------------------------------------------------------
+    - name: Check Task 5 — RocketChat user credentials secret
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: v1
+        kind: Secret
+        name: rocketchat-user-credentials
+        namespace: "wksp-{{ student_user }}"
+      register: r_rocketchat_creds
+      ignore_errors: true
+
+    # -------------------------------------------------------
     # Build results
     # -------------------------------------------------------
     - name: Build task results
@@ -64,17 +77,20 @@
         _task2_ok: "{{ r_ocp_mcp is not failed }}"
         _task3_ok: "{{ r_rocketchat_mcp is not failed }}"
         _task4_ok: "{{ r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0 }}"
+        _task5_ok: "{{ (r_rocketchat_creds.resources | default([]) | length > 0) }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok }}"
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok and _task5_ok }}"
         pass_msg: |
           ✅ Task 1: Model endpoint nemotron-3-nano-30b-a3b is reachable
           ✅ Task 2: OCP MCP server is reachable (lls-demo)
           ✅ Task 3: Rocket.Chat MCP server is reachable (lls-demo)
           ✅ Task 4: Llama Stack playground is running in {{ student_user }}
+          ✅ Task 5: RocketChat user credentials configured in wksp-{{ student_user }}
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
           {{ '✅' if _task2_ok else '❌' }} Task 2: OCP MCP server {{ 'is reachable' if _task2_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
           {{ '✅' if _task3_ok else '❌' }} Task 3: Rocket.Chat MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
           {{ '✅' if _task4_ok else '❌' }} Task 4: Llama Stack playground {{ 'is running' if _task4_ok else 'pod not found in ' + student_user + ' namespace — contact cluster admin' }}
+          {{ '✅' if _task5_ok else '❌' }} Task 5: RocketChat user credentials {{ 'configured' if _task5_ok else 'not found in wksp-' + student_user + ' — rocketchat-setup job may have failed' }}
