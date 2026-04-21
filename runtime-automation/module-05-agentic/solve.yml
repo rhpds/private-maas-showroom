@@ -204,48 +204,61 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 12 — Call RocketChat MCP server: post grafana logs to #workshop
-    #   Write the MCP JSON payload to a temp file to avoid escaping issues
+    # Task 12 — Fetch grafana logs via OCP MCP and post to RocketChat via RC MCP
+    #   Done entirely inside the pod shell to avoid Jinja2 escaping issues
+    #   with raw log content containing { } and other special chars
     # -------------------------------------------------------
-    - name: Prepare grafana logs message
-      ansible.builtin.set_fact:
-        grafana_log_msg: "Grafana pod logs from {{ student_user }}:\n{{ grafana_logs | default('No logs available') | truncate(400) | replace('\"', '') | replace('\\', '') }}"
-      ignore_errors: true
-
-    - name: Build MCP payload for log posting
-      ansible.builtin.set_fact:
-        mcp_log_payload:
-          jsonrpc: "2.0"
-          method: "tools/call"
-          params:
-            name: "send_message"
-            arguments:
-              channel: "workshop"
-              text: "{{ grafana_log_msg }}"
-          id: 2
-      ignore_errors: true
-
-    - name: Write MCP payload to temp file in pod and send
+    - name: Fetch grafana logs and post to RocketChat (all in pod)
       kubernetes.core.k8s_exec:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "{{ student_user }}"
         pod: "{{ llama_pod }}"
         command: >-
           sh -c '
-          SESSION=$(curl -s -v -X POST {{ rc_mcp_url }}
+          OCP_MCP="{{ ocp_mcp_url }}";
+          RC_MCP="{{ rc_mcp_url }}";
+          GRAFANA_POD="{{ grafana_pod_name }}";
+
+          OCP_SESSION=$(curl -s -v -X POST $OCP_MCP
           -H "Content-Type: application/json"
           -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
           2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
-          cat > /tmp/mcp_payload.json << ENDOFPAYLOAD
-          {{ mcp_log_payload | to_json }}
-          ENDOFPAYLOAD
-          curl -s -X POST {{ rc_mcp_url }}
+
+          LOGS_RAW=$(curl -s -X POST $OCP_MCP
           -H "Content-Type: application/json"
-          -H "Mcp-Session-Id: $SESSION"
-          -d @/tmp/mcp_payload.json
+          -H "Mcp-Session-Id: $OCP_SESSION"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"pods_log\",\"arguments\":{\"name\":\"$GRAFANA_POD\",\"namespace\":\"grafana\",\"tail\":15}},\"id\":2}");
+
+          LOGS_TEXT=$(echo "$LOGS_RAW" | sed -n "s/^data: //p" | python3 -c "
+          import sys,json
+          try:
+            d=json.load(sys.stdin)
+            t=d[\"result\"][\"content\"][0][\"text\"]
+            print(t[:500])
+          except:
+            print(\"Could not parse logs\")
+          " 2>/dev/null || echo "Could not parse logs");
+
+          RC_SESSION=$(curl -s -v -X POST $RC_MCP
+          -H "Content-Type: application/json"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
+          2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
+
+          python3 -c "
+          import json,subprocess,sys
+          msg = \"Grafana pod logs from {{ student_user }}:\\n\" + \"\"\"$LOGS_TEXT\"\"\"
+          payload = json.dumps({\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"send_message\",\"arguments\":{\"channel\":\"workshop\",\"text\":msg}},\"id\":2})
+          with open(\"/tmp/rc_payload.json\",\"w\") as f:
+            f.write(payload)
+          ";
+
+          curl -s -X POST $RC_MCP
+          -H "Content-Type: application/json"
+          -H "Mcp-Session-Id: $RC_SESSION"
+          -d @/tmp/rc_payload.json
           '
       register: r_mcp_rc_logs
-      when: llama_pod is defined and grafana_log_msg is defined
+      when: llama_pod is defined and grafana_pod_name is defined and grafana_pod_name | length > 0
       ignore_errors: true
 
     - name: Report solve status
