@@ -304,7 +304,7 @@
           oc create token {{ tier_sa }}
           -n {{ tier_namespace }}
           --audience={{ gateway_audience }}
-          --duration=300s
+          --duration=600s
           {% if k8s_kubeconfig is defined %}--kubeconfig={{ k8s_kubeconfig }}{% endif %}
       register: r_gateway_token
       when: tier_sa is defined and gateway_host is defined

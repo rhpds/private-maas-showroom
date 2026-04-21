@@ -95,7 +95,7 @@
         cmd: >-
           oc create token prometheus-k8s
           -n openshift-monitoring
-          --duration=60s
+          --duration=600s
           {% if k8s_kubeconfig is defined %}--kubeconfig={{ k8s_kubeconfig }}{% endif %}
       register: r_prom_token
       ignore_errors: true
