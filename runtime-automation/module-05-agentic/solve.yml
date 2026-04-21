@@ -79,26 +79,65 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 7 — Chat with Llama Stack by exec-ing into its pod (bypasses NetworkPolicy)
+    # Task 7 — Chat with Llama Stack (correct model ID)
     # -------------------------------------------------------
     - name: Chat with Llama Stack — list pods in student workspace
       kubernetes.core.k8s_exec:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "{{ student_user }}"
         pod: "{{ llama_pod }}"
-        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"maas-vllm-inference-1/nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
       register: r_llama_chat
       when: llama_pod is defined
       ignore_errors: true
 
-    - name: Chat with Llama Stack — post to Rocket.Chat #workshop
-      kubernetes.core.k8s_exec:
-        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
-        namespace: "{{ student_user }}"
-        pod: "{{ llama_pod }}"
-        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"Post a message to the #workshop channel: Hi from {{ student_user }}\"}],\"max_tokens\":200,\"stream\":false}'"
-      register: r_rocketchat_chat
-      when: llama_pod is defined
+    # -------------------------------------------------------
+    # Task 8 — Post to RocketChat via REST API (MCP tool calls
+    #          only work through the Gen AI Studio Playground UI,
+    #          so we post directly using the tenant credentials)
+    # -------------------------------------------------------
+    - name: Extract RocketChat credentials from secret
+      ansible.builtin.set_fact:
+        rc_auth_token: "{{ r_rocketchat_creds.resources[0].data['auth-token'] | b64decode }}"
+        rc_user_id: "{{ r_rocketchat_creds.resources[0].data['user-id'] | b64decode }}"
+        rc_url: "{{ r_rocketchat_creds.resources[0].data['rocketchat-url'] | b64decode }}"
+      when: r_rocketchat_creds.resources | default([]) | length > 0
+      ignore_errors: true
+
+    - name: Post message to RocketChat #workshop channel
+      ansible.builtin.uri:
+        url: "{{ rc_url }}/api/v1/chat.postMessage"
+        method: POST
+        headers:
+          X-Auth-Token: "{{ rc_auth_token }}"
+          X-User-Id: "{{ rc_user_id }}"
+          Content-Type: application/json
+        body_format: json
+        body:
+          channel: "#workshop"
+          text: "Hi from {{ student_user }} (automated solve)"
+        return_content: true
+        timeout: 10
+      register: r_rocketchat_post
+      when: rc_auth_token is defined
+      ignore_errors: true
+
+    - name: Post message to RocketChat #general channel
+      ansible.builtin.uri:
+        url: "{{ rc_url }}/api/v1/chat.postMessage"
+        method: POST
+        headers:
+          X-Auth-Token: "{{ rc_auth_token }}"
+          X-User-Id: "{{ rc_user_id }}"
+          Content-Type: application/json
+        body_format: json
+        body:
+          channel: "#general"
+          text: "Hi from {{ student_user }} (automated solve)"
+        return_content: true
+        timeout: 10
+      register: r_rocketchat_general
+      when: rc_auth_token is defined
       ignore_errors: true
 
     - name: Report solve status
@@ -110,4 +149,5 @@
           RocketChat user credentials: {{ 'found' if (r_rocketchat_creds.resources | default([]) | length > 0) else 'NOT found — setup job may have failed' }}
           Llama Stack playground ({{ student_user }}): {{ 'running' if llama_pod is defined else 'not found' }}
           Llama Stack chat (list pods): {{ 'completed' if r_llama_chat is not failed else 'failed' }}
-          Rocket.Chat (post message): {{ 'completed' if r_rocketchat_chat is not failed else 'failed' }}
+          RocketChat #workshop post: {{ 'sent' if (r_rocketchat_post is defined and r_rocketchat_post.status | default(0) == 200) else 'failed' }}
+          RocketChat #general post: {{ 'sent' if (r_rocketchat_general is defined and r_rocketchat_general.status | default(0) == 200) else 'failed' }}
