@@ -57,7 +57,20 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 5 — Get Llama Stack pod name to exec into it
+    # Task 5 — Verify RocketChat user credentials exist (created by setup job)
+    # -------------------------------------------------------
+    - name: Check RocketChat user credentials secret
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: v1
+        kind: Secret
+        name: rocketchat-user-credentials
+        namespace: "wksp-{{ student_user }}"
+      register: r_rocketchat_creds
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 6 — Get Llama Stack pod name to exec into it
     # -------------------------------------------------------
     - name: Get Llama Stack pod name
       ansible.builtin.set_fact:
@@ -66,7 +79,7 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 6 — Chat with Llama Stack by exec-ing into its pod (bypasses NetworkPolicy)
+    # Task 7 — Chat with Llama Stack by exec-ing into its pod (bypasses NetworkPolicy)
     # -------------------------------------------------------
     - name: Chat with Llama Stack — list pods in student workspace
       kubernetes.core.k8s_exec:
@@ -94,6 +107,7 @@
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
           OCP MCP server (lls-demo): {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
           Rocket.Chat MCP server (lls-demo): {{ 'reachable' if r_rocketchat_mcp is not failed else 'NOT reachable' }}
+          RocketChat user credentials: {{ 'found' if (r_rocketchat_creds.resources | default([]) | length > 0) else 'NOT found — setup job may have failed' }}
           Llama Stack playground ({{ student_user }}): {{ 'running' if llama_pod is defined else 'not found' }}
           Llama Stack chat (list pods): {{ 'completed' if r_llama_chat is not failed else 'failed' }}
           Rocket.Chat (post message): {{ 'completed' if r_rocketchat_chat is not failed else 'failed' }}
