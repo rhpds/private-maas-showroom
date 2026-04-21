@@ -6,6 +6,8 @@
   vars:
     student_user: "{{ user | default('') }}"
     model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
+    tier_namespace: "maas-default-gateway-tier-enterprise"
+    thanos_url: "https://thanos-querier.openshift-monitoring.svc:9091"
   tasks:
     # -------------------------------------------------------
     # Check 1 — Model endpoint reachable
@@ -69,6 +71,51 @@
       ignore_errors: true
 
     # -------------------------------------------------------
+    # Check 6 — Student SA exists in tier-enterprise namespace
+    # -------------------------------------------------------
+    - name: Check Task 6 — student SA in tier-enterprise namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: v1
+        kind: ServiceAccount
+        namespace: "{{ tier_namespace }}"
+      register: r_tier_sas
+      ignore_errors: true
+
+    - name: Find student SA name
+      ansible.builtin.set_fact:
+        tier_sa: "{{ r_tier_sas.resources | default([]) | map(attribute='metadata.name') | select('match', student_user ~ '-') | first | default('') }}"
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Check 7 — authorized_hits metric exists in Prometheus
+    # -------------------------------------------------------
+    - name: Get Prometheus SA token
+      ansible.builtin.command:
+        cmd: >-
+          oc create token prometheus-k8s
+          -n openshift-monitoring
+          --duration=60s
+          {% if k8s_kubeconfig is defined %}--kubeconfig={{ k8s_kubeconfig }}{% endif %}
+      register: r_prom_token
+      ignore_errors: true
+
+    - name: Check Task 7 — authorized_hits metric in Prometheus
+      ansible.builtin.uri:
+        url: "{{ thanos_url }}/api/v1/query"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ r_prom_token.stdout }}"
+          Content-Type: application/x-www-form-urlencoded
+        body: "query=authorized_hits{user=~\"{{ student_user }}.*\"}"
+        return_content: true
+        validate_certs: false
+        timeout: 15
+      register: r_prom_metrics
+      when: r_prom_token is not failed
+      ignore_errors: true
+
+    # -------------------------------------------------------
     # Build results
     # -------------------------------------------------------
     - name: Build task results
@@ -78,19 +125,25 @@
         _task3_ok: "{{ r_rocketchat_mcp is not failed }}"
         _task4_ok: "{{ r_playground_pod.resources | default([]) | selectattr('status.phase', 'equalto', 'Running') | list | length > 0 }}"
         _task5_ok: "{{ (r_rocketchat_creds.resources | default([]) | length > 0) }}"
+        _task6_ok: "{{ tier_sa | default('') | length > 0 }}"
+        _task7_ok: "{{ (r_prom_metrics.json.data.result | default([]) | length > 0) if (r_prom_metrics is defined and r_prom_metrics is not failed) else false }}"
 
     - name: Validate all tasks
       validation_check:
-        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok and _task5_ok }}"
+        check: "{{ _task1_ok and _task2_ok and _task3_ok and _task4_ok and _task5_ok and _task6_ok and _task7_ok }}"
         pass_msg: |
           ✅ Task 1: Model endpoint nemotron-3-nano-30b-a3b is reachable
           ✅ Task 2: OCP MCP server is reachable (lls-demo)
           ✅ Task 3: Rocket.Chat MCP server is reachable (lls-demo)
           ✅ Task 4: Llama Stack playground is running in {{ student_user }}
           ✅ Task 5: RocketChat user credentials configured in wksp-{{ student_user }}
+          ✅ Task 6: MaaS gateway SA exists in tier-enterprise ({{ tier_sa | default('') }})
+          ✅ Task 7: authorized_hits metric found in Prometheus for {{ student_user }}
         error_msg: |
           {{ '✅' if _task1_ok else '❌' }} Task 1: Model endpoint {{ 'is reachable' if _task1_ok else 'is NOT reachable — contact cluster admin' }}
           {{ '✅' if _task2_ok else '❌' }} Task 2: OCP MCP server {{ 'is reachable' if _task2_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
           {{ '✅' if _task3_ok else '❌' }} Task 3: Rocket.Chat MCP server {{ 'is reachable' if _task3_ok else 'is NOT reachable in lls-demo — contact cluster admin' }}
           {{ '✅' if _task4_ok else '❌' }} Task 4: Llama Stack playground {{ 'is running' if _task4_ok else 'pod not found in ' + student_user + ' namespace — contact cluster admin' }}
           {{ '✅' if _task5_ok else '❌' }} Task 5: RocketChat user credentials {{ 'configured' if _task5_ok else 'not found in wksp-' + student_user + ' — rocketchat-setup job may have failed' }}
+          {{ '✅' if _task6_ok else '❌' }} Task 6: MaaS gateway SA {{ 'exists (' + tier_sa | default('') + ')' if _task6_ok else 'not found in tier-enterprise — student not provisioned for gateway access' }}
+          {{ '✅' if _task7_ok else '❌' }} Task 7: authorized_hits metric {{ 'found in Prometheus' if _task7_ok else 'NOT found — send requests through MaaS gateway to generate metrics' }}

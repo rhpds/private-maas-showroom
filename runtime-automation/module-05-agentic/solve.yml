@@ -8,6 +8,9 @@
     model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
     ocp_mcp_url: "http://ocp-mcp-server.lls-demo.svc.cluster.local:8080/mcp"
     rc_mcp_url: "http://rocketchat-mcp.lls-demo.svc.cluster.local:80/mcp"
+    tier_namespace: "maas-default-gateway-tier-enterprise"
+    gateway_audience: "maas-default-gateway-sa"
+    model_name: "nemotron-3-nano-30b-a3b"
   tasks:
     # -------------------------------------------------------
     # Task 1 — Verify model endpoint is reachable
@@ -95,9 +98,6 @@
     # -------------------------------------------------------
     # Task 8 — OCP MCP: list pods in grafana namespace
     #   and post the result to RocketChat #workshop via RC MCP
-    #
-    #   All MCP responses are written to temp files and parsed
-    #   with python3 to avoid Jinja2/shell escaping issues.
     # -------------------------------------------------------
     - name: "OCP MCP: list grafana pods → RC MCP: post to #workshop"
       kubernetes.core.k8s_exec:
@@ -259,6 +259,82 @@
       when: llama_pod is defined
       ignore_errors: true
 
+    # -------------------------------------------------------
+    # Task 12 — Send requests through MaaS gateway to generate
+    #   Grafana metrics (authorized_hits in Limitador)
+    #
+    #   Discovers the student's SA in the tier namespace,
+    #   creates a token, gets the gateway hostname, and sends
+    #   chat completions through the external gateway.
+    # -------------------------------------------------------
+    - name: Get MaaS gateway hostname
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: gateway.networking.k8s.io/v1
+        kind: Gateway
+        name: maas-default-gateway
+        namespace: openshift-ingress
+      register: r_gateway
+      ignore_errors: true
+
+    - name: Set gateway hostname
+      ansible.builtin.set_fact:
+        gateway_host: "{{ r_gateway.resources[0].spec.listeners[0].hostname }}"
+      when: r_gateway.resources | default([]) | length > 0
+      ignore_errors: true
+
+    - name: Find student SA in tier-enterprise namespace
+      kubernetes.core.k8s_info:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        api_version: v1
+        kind: ServiceAccount
+        namespace: "{{ tier_namespace }}"
+      register: r_tier_sas
+      ignore_errors: true
+
+    - name: Set student tier SA name
+      ansible.builtin.set_fact:
+        tier_sa: "{{ r_tier_sas.resources | default([]) | map(attribute='metadata.name') | select('match', student_user ~ '-') | first }}"
+      when: r_tier_sas.resources | default([]) | length > 0
+      ignore_errors: true
+
+    - name: Create gateway token for student SA
+      ansible.builtin.command:
+        cmd: >-
+          oc create token {{ tier_sa }}
+          -n {{ tier_namespace }}
+          --audience={{ gateway_audience }}
+          --duration=300s
+          {% if k8s_kubeconfig is defined %}--kubeconfig={{ k8s_kubeconfig }}{% endif %}
+      register: r_gateway_token
+      when: tier_sa is defined and gateway_host is defined
+      ignore_errors: true
+
+    - name: Send chat completions through MaaS gateway to generate metrics
+      ansible.builtin.uri:
+        url: "https://{{ gateway_host }}/llm/{{ model_name }}/v1/chat/completions"
+        method: POST
+        headers:
+          Authorization: "Bearer {{ r_gateway_token.stdout }}"
+          Content-Type: application/json
+        body_format: json
+        body:
+          model: "{{ model_name }}"
+          messages:
+            - role: user
+              content: "{{ item }}"
+          max_tokens: 20
+        return_content: true
+        validate_certs: false
+        timeout: 60
+      register: r_gateway_chat
+      loop:
+        - "List all namespaces"
+        - "How many pods are running in the cluster?"
+        - "What is the cluster version?"
+      when: r_gateway_token is defined and r_gateway_token is not failed
+      ignore_errors: true
+
     - name: Report solve status
       ansible.builtin.debug:
         msg: |
@@ -272,3 +348,5 @@
           OCP MCP → grafana logs → RC post: {{ 'completed' if (r_mcp_logs_to_rc is defined and r_mcp_logs_to_rc is not failed) else 'failed or skipped' }}
           RC MCP → list channels: {{ 'completed' if (r_mcp_channels is defined and r_mcp_channels is not failed) else 'failed or skipped' }}
           RC MCP → post Hi to #workshop: {{ 'completed' if (r_mcp_rc_hi is defined and r_mcp_rc_hi is not failed) else 'failed or skipped' }}
+          MaaS gateway SA: {{ tier_sa | default('not found') }}
+          MaaS gateway chat (3 requests): {{ 'completed' if (r_gateway_chat is defined and r_gateway_chat is not failed) else 'failed or skipped' }}
