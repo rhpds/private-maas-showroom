@@ -6,6 +6,8 @@
   vars:
     student_user: "{{ user | default('') }}"
     model_internal_url: "https://nemotron-3-nano-30b-a3b-kserve-workload-svc.llm.svc.cluster.local:8000"
+    ocp_mcp_url: "http://ocp-mcp-server.lls-demo.svc.cluster.local:8080/mcp"
+    rc_mcp_url: "http://rocketchat-mcp.lls-demo.svc.cluster.local:80/mcp"
   tasks:
     # -------------------------------------------------------
     # Task 1 — Verify model endpoint is reachable
@@ -21,8 +23,7 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 2 — Check OCP MCP server (TCP — SSE endpoints stream forever)
-    #   Shared namespace: lls-demo (all students share these MCP servers)
+    # Task 2 — Check OCP MCP server (TCP)
     # -------------------------------------------------------
     - name: Check OCP MCP server is reachable
       ansible.builtin.wait_for:
@@ -44,7 +45,7 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 4 — Check Llama Stack playground pod is running (k8s — direct API blocked by NetworkPolicy)
+    # Task 4 — Check Llama Stack playground pod is running
     # -------------------------------------------------------
     - name: Check lsd-genai-playground pod in student namespace
       kubernetes.core.k8s_info:
@@ -57,7 +58,7 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 5 — Verify RocketChat user credentials exist (created by setup job)
+    # Task 5 — Verify RocketChat user credentials exist
     # -------------------------------------------------------
     - name: Check RocketChat user credentials secret
       kubernetes.core.k8s_info:
@@ -79,79 +80,156 @@
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 7 — Chat with Llama Stack (correct model ID)
+    # Task 7 — Chat with Llama Stack (proves model works)
     # -------------------------------------------------------
-    - name: Chat with Llama Stack — list pods in student workspace
+    - name: Chat with Llama Stack — test model connectivity
       kubernetes.core.k8s_exec:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "{{ student_user }}"
         pod: "{{ llama_pod }}"
-        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"maas-vllm-inference-1/nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"List all pods in the wksp-{{ student_user }} namespace.\"}],\"max_tokens\":200,\"stream\":false}'"
+        command: "curl -s -X POST http://localhost:8321/v1/chat/completions -H 'Content-Type: application/json' -d '{\"model\":\"maas-vllm-inference-1/nemotron-3-nano-30b-a3b\",\"messages\":[{\"role\":\"user\",\"content\":\"Say hello in one sentence.\"}],\"max_tokens\":50,\"stream\":false}'"
       register: r_llama_chat
       when: llama_pod is defined
       ignore_errors: true
 
     # -------------------------------------------------------
-    # Task 7b — Extract AI response from Llama Stack chat
+    # Task 8 — Call OCP MCP server: list pods in grafana namespace
+    #   Uses streamable HTTP (/mcp) — same protocol the Playground uses
     # -------------------------------------------------------
-    - name: Extract AI response from Llama Stack chat
-      ansible.builtin.set_fact:
-        llama_response: "{{ (r_llama_chat.stdout | from_json).choices[0].message.content | default('No response from model') }}"
-      when: r_llama_chat is defined and r_llama_chat is not failed and r_llama_chat.stdout is defined
+    - name: Initialize OCP MCP session and list pods in grafana namespace
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: >-
+          sh -c '
+          SESSION=$(curl -s -v -X POST {{ ocp_mcp_url }}
+          -H "Content-Type: application/json"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
+          2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
+          curl -s -X POST {{ ocp_mcp_url }}
+          -H "Content-Type: application/json"
+          -H "Mcp-Session-Id: $SESSION"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"pods_list_in_namespace\",\"arguments\":{\"namespace\":\"grafana\"}},\"id\":2}"
+          '
+      register: r_mcp_pods
+      when: llama_pod is defined
       ignore_errors: true
 
-    - name: Fallback AI response if chat failed
+    - name: Extract pod listing from MCP response
       ansible.builtin.set_fact:
-        llama_response: "Could not get AI response — Llama Stack chat failed"
-      when: llama_response is not defined
-
-    # -------------------------------------------------------
-    # Task 8 — Post to RocketChat via REST API (MCP tool calls
-    #          only work through the Gen AI Studio Playground UI,
-    #          so we post directly using the tenant credentials)
-    # -------------------------------------------------------
-    - name: Extract RocketChat credentials from secret
-      ansible.builtin.set_fact:
-        rc_auth_token: "{{ r_rocketchat_creds.resources[0].data['auth-token'] | b64decode }}"
-        rc_user_id: "{{ r_rocketchat_creds.resources[0].data['user-id'] | b64decode }}"
-        rc_url: "{{ r_rocketchat_creds.resources[0].data['rocketchat-url'] | b64decode }}"
-      when: r_rocketchat_creds.resources | default([]) | length > 0
+        mcp_pod_listing: "{{ (r_mcp_pods.stdout | regex_search('data: (.+)', '\\1') | first | from_json).result.content[0].text | default('No pods returned') }}"
+      when: r_mcp_pods is defined and r_mcp_pods is not failed and r_mcp_pods.stdout is defined
       ignore_errors: true
 
-    - name: Post message to RocketChat #workshop channel
-      ansible.builtin.uri:
-        url: "{{ rc_url }}/api/v1/chat.postMessage"
-        method: POST
-        headers:
-          X-Auth-Token: "{{ rc_auth_token }}"
-          X-User-Id: "{{ rc_user_id }}"
-          Content-Type: application/json
-        body_format: json
-        body:
-          channel: "#workshop"
-          text: "{{ student_user }} asked: List all pods in wksp-{{ student_user }}\n\nAI Response:\n{{ llama_response }}"
-        return_content: true
-        timeout: 10
-      register: r_rocketchat_post
-      when: rc_auth_token is defined
+    # -------------------------------------------------------
+    # Task 9 — Call OCP MCP server: get grafana-deployment pod logs
+    # -------------------------------------------------------
+    - name: Get grafana pod name from MCP listing
+      ansible.builtin.set_fact:
+        grafana_pod_name: "{{ mcp_pod_listing | regex_search('(grafana-deployment-[a-z0-9-]+)') }}"
+      when: mcp_pod_listing is defined
       ignore_errors: true
 
-    - name: Post message to RocketChat #general channel
-      ansible.builtin.uri:
-        url: "{{ rc_url }}/api/v1/chat.postMessage"
-        method: POST
-        headers:
-          X-Auth-Token: "{{ rc_auth_token }}"
-          X-User-Id: "{{ rc_user_id }}"
-          Content-Type: application/json
-        body_format: json
-        body:
-          channel: "#general"
-          text: "{{ student_user }} asked: List all pods in wksp-{{ student_user }}\n\nAI Response:\n{{ llama_response }}"
-        return_content: true
-        timeout: 10
-      register: r_rocketchat_general
-      when: rc_auth_token is defined
+    - name: Initialize OCP MCP session and get grafana pod logs
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: >-
+          sh -c '
+          SESSION=$(curl -s -v -X POST {{ ocp_mcp_url }}
+          -H "Content-Type: application/json"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
+          2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
+          curl -s -X POST {{ ocp_mcp_url }}
+          -H "Content-Type: application/json"
+          -H "Mcp-Session-Id: $SESSION"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"pods_log\",\"arguments\":{\"name\":\"{{ grafana_pod_name }}\",\"namespace\":\"grafana\",\"tail\":20}},\"id\":2}"
+          '
+      register: r_mcp_logs
+      when: llama_pod is defined and grafana_pod_name is defined and grafana_pod_name | length > 0
+      ignore_errors: true
+
+    - name: Extract pod logs from MCP response
+      ansible.builtin.set_fact:
+        grafana_logs: "{{ (r_mcp_logs.stdout | regex_search('data: (.+)', '\\1') | first | from_json).result.content[0].text | default('No logs returned') }}"
+      when: r_mcp_logs is defined and r_mcp_logs is not failed and r_mcp_logs.stdout is defined
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 10 — Call RocketChat MCP server: list channels
+    # -------------------------------------------------------
+    - name: Initialize RC MCP session and list channels
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: >-
+          sh -c '
+          SESSION=$(curl -s -v -X POST {{ rc_mcp_url }}
+          -H "Content-Type: application/json"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
+          2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
+          curl -s -X POST {{ rc_mcp_url }}
+          -H "Content-Type: application/json"
+          -H "Mcp-Session-Id: $SESSION"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"list_channels\",\"arguments\":{}},\"id\":2}"
+          '
+      register: r_mcp_channels
+      when: llama_pod is defined
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 11 — Call RocketChat MCP server: post "Hi from <user>" to #workshop
+    # -------------------------------------------------------
+    - name: Initialize RC MCP session and post Hi message to workshop
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: >-
+          sh -c '
+          SESSION=$(curl -s -v -X POST {{ rc_mcp_url }}
+          -H "Content-Type: application/json"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
+          2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
+          curl -s -X POST {{ rc_mcp_url }}
+          -H "Content-Type: application/json"
+          -H "Mcp-Session-Id: $SESSION"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"send_message\",\"arguments\":{\"channel\":\"workshop\",\"text\":\"Hi from {{ student_user }}\"}},\"id\":2}"
+          '
+      register: r_mcp_rc_hi
+      when: llama_pod is defined
+      ignore_errors: true
+
+    # -------------------------------------------------------
+    # Task 12 — Call RocketChat MCP server: post grafana logs to #workshop
+    # -------------------------------------------------------
+    - name: Truncate grafana logs for RocketChat message
+      ansible.builtin.set_fact:
+        grafana_logs_short: "{{ grafana_logs | default('No logs available') | truncate(500) }}"
+      ignore_errors: true
+
+    - name: Initialize RC MCP session and post grafana logs to workshop
+      kubernetes.core.k8s_exec:
+        kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
+        namespace: "{{ student_user }}"
+        pod: "{{ llama_pod }}"
+        command: >-
+          sh -c '
+          SESSION=$(curl -s -v -X POST {{ rc_mcp_url }}
+          -H "Content-Type: application/json"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
+          2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
+          LOGS=$(echo "{{ grafana_logs_short | regex_replace("[\"\\\\]", "") }}" | head -20);
+          curl -s -X POST {{ rc_mcp_url }}
+          -H "Content-Type: application/json"
+          -H "Mcp-Session-Id: $SESSION"
+          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"send_message\",\"arguments\":{\"channel\":\"workshop\",\"text\":\"Grafana pod logs from {{ student_user }}:\\n$LOGS\"}},\"id\":2}"
+          '
+      register: r_mcp_rc_logs
+      when: llama_pod is defined
       ignore_errors: true
 
     - name: Report solve status
@@ -160,8 +238,11 @@
           Model endpoint: {{ 'reachable' if r_model_endpoint.status | default(0) == 200 else 'NOT reachable' }}
           OCP MCP server (lls-demo): {{ 'reachable' if r_ocp_mcp is not failed else 'NOT reachable' }}
           Rocket.Chat MCP server (lls-demo): {{ 'reachable' if r_rocketchat_mcp is not failed else 'NOT reachable' }}
-          RocketChat user credentials: {{ 'found' if (r_rocketchat_creds.resources | default([]) | length > 0) else 'NOT found — setup job may have failed' }}
+          RocketChat user credentials: {{ 'found' if (r_rocketchat_creds.resources | default([]) | length > 0) else 'NOT found' }}
           Llama Stack playground ({{ student_user }}): {{ 'running' if llama_pod is defined else 'not found' }}
-          Llama Stack chat (list pods): {{ 'completed' if r_llama_chat is not failed else 'failed' }}
-          RocketChat #workshop post: {{ 'sent' if (r_rocketchat_post is defined and r_rocketchat_post.status | default(0) == 200) else 'failed' }}
-          RocketChat #general post: {{ 'sent' if (r_rocketchat_general is defined and r_rocketchat_general.status | default(0) == 200) else 'failed' }}
+          Llama Stack chat: {{ 'completed' if (r_llama_chat is defined and r_llama_chat is not failed) else 'failed or skipped' }}
+          OCP MCP — list pods (grafana): {{ 'completed' if (r_mcp_pods is defined and r_mcp_pods is not failed) else 'failed or skipped' }}
+          OCP MCP — grafana pod logs: {{ 'completed' if (r_mcp_logs is defined and r_mcp_logs is not failed) else 'failed or skipped' }}
+          RC MCP — list channels: {{ 'completed' if (r_mcp_channels is defined and r_mcp_channels is not failed) else 'failed or skipped' }}
+          RC MCP — post Hi to #workshop: {{ 'completed' if (r_mcp_rc_hi is defined and r_mcp_rc_hi is not failed) else 'failed or skipped' }}
+          RC MCP — post logs to #workshop: {{ 'completed' if (r_mcp_rc_logs is defined and r_mcp_rc_logs is not failed) else 'failed or skipped' }}
