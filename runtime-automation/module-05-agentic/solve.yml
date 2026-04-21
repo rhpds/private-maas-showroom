@@ -92,6 +92,20 @@
       ignore_errors: true
 
     # -------------------------------------------------------
+    # Task 7b — Extract AI response from Llama Stack chat
+    # -------------------------------------------------------
+    - name: Extract AI response from Llama Stack chat
+      ansible.builtin.set_fact:
+        llama_response: "{{ (r_llama_chat.stdout | from_json).choices[0].message.content | default('No response from model') }}"
+      when: r_llama_chat is defined and r_llama_chat is not failed and r_llama_chat.stdout is defined
+      ignore_errors: true
+
+    - name: Fallback AI response if chat failed
+      ansible.builtin.set_fact:
+        llama_response: "Could not get AI response — Llama Stack chat failed"
+      when: llama_response is not defined
+
+    # -------------------------------------------------------
     # Task 8 — Post to RocketChat via REST API (MCP tool calls
     #          only work through the Gen AI Studio Playground UI,
     #          so we post directly using the tenant credentials)
@@ -115,7 +129,7 @@
         body_format: json
         body:
           channel: "#workshop"
-          text: "Hi from {{ student_user }} (automated solve)"
+          text: "{{ student_user }} asked: List all pods in wksp-{{ student_user }}\n\nAI Response:\n{{ llama_response }}"
         return_content: true
         timeout: 10
       register: r_rocketchat_post
@@ -133,7 +147,7 @@
         body_format: json
         body:
           channel: "#general"
-          text: "Hi from {{ student_user }} (automated solve)"
+          text: "{{ student_user }} asked: List all pods in wksp-{{ student_user }}\n\nAI Response:\n{{ llama_response }}"
         return_content: true
         timeout: 10
       register: r_rocketchat_general
