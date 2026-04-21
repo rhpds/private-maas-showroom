@@ -205,13 +205,27 @@
 
     # -------------------------------------------------------
     # Task 12 — Call RocketChat MCP server: post grafana logs to #workshop
+    #   Write the MCP JSON payload to a temp file to avoid escaping issues
     # -------------------------------------------------------
-    - name: Truncate grafana logs for RocketChat message
+    - name: Prepare grafana logs message
       ansible.builtin.set_fact:
-        grafana_logs_short: "{{ grafana_logs | default('No logs available') | truncate(500) }}"
+        grafana_log_msg: "Grafana pod logs from {{ student_user }}:\n{{ grafana_logs | default('No logs available') | truncate(400) | replace('\"', '') | replace('\\', '') }}"
       ignore_errors: true
 
-    - name: Initialize RC MCP session and post grafana logs to workshop
+    - name: Build MCP payload for log posting
+      ansible.builtin.set_fact:
+        mcp_log_payload:
+          jsonrpc: "2.0"
+          method: "tools/call"
+          params:
+            name: "send_message"
+            arguments:
+              channel: "workshop"
+              text: "{{ grafana_log_msg }}"
+          id: 2
+      ignore_errors: true
+
+    - name: Write MCP payload to temp file in pod and send
       kubernetes.core.k8s_exec:
         kubeconfig: "{{ k8s_kubeconfig | default(omit) }}"
         namespace: "{{ student_user }}"
@@ -222,14 +236,16 @@
           -H "Content-Type: application/json"
           -d "{\"jsonrpc\":\"2.0\",\"method\":\"initialize\",\"params\":{\"protocolVersion\":\"2024-11-05\",\"capabilities\":{},\"clientInfo\":{\"name\":\"solve\",\"version\":\"1.0\"}},\"id\":1}"
           2>&1 | grep "Mcp-Session-Id:" | sed "s/.*Mcp-Session-Id: //;s/\r//");
-          LOGS=$(echo "{{ grafana_logs_short | regex_replace("[\"\\\\]", "") }}" | head -20);
+          cat > /tmp/mcp_payload.json << ENDOFPAYLOAD
+          {{ mcp_log_payload | to_json }}
+          ENDOFPAYLOAD
           curl -s -X POST {{ rc_mcp_url }}
           -H "Content-Type: application/json"
           -H "Mcp-Session-Id: $SESSION"
-          -d "{\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"send_message\",\"arguments\":{\"channel\":\"workshop\",\"text\":\"Grafana pod logs from {{ student_user }}:\\n$LOGS\"}},\"id\":2}"
+          -d @/tmp/mcp_payload.json
           '
       register: r_mcp_rc_logs
-      when: llama_pod is defined
+      when: llama_pod is defined and grafana_log_msg is defined
       ignore_errors: true
 
     - name: Report solve status
