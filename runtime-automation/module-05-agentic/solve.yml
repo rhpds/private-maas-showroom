@@ -121,13 +121,16 @@
           > /tmp/ocp_pods_response.txt;
 
           python3 -c "
-          import json
+          import json, sys
           with open(\"/tmp/ocp_pods_response.txt\") as f:
               raw = f.read()
+          data = None
           for line in raw.splitlines():
               if line.startswith(\"data: \"):
                   data = json.loads(line[6:])
                   break
+          if data is None:
+              data = json.loads(raw)
           pod_text = data[\"result\"][\"content\"][0][\"text\"]
           msg = \"Pods in grafana namespace:\\n\" + pod_text
           payload = json.dumps({\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"send_message\",\"arguments\":{\"channel\":\"workshop\",\"text\":msg}},\"id\":2})
@@ -163,11 +166,19 @@
           OCP_MCP="{{ ocp_mcp_url }}";
           RC_MCP="{{ rc_mcp_url }}";
 
-          GRAFANA_POD=$(cat /tmp/ocp_pods_response.txt | sed -n "s/^data: //p" | python3 -c "
-          import sys,json,re
-          d=json.load(sys.stdin)
-          t=d[\"result\"][\"content\"][0][\"text\"]
-          m=re.search(r\"grafana-deployment-[a-z0-9-]+\",t)
+          GRAFANA_POD=$(python3 -c "
+          import json, re
+          with open(\"/tmp/ocp_pods_response.txt\") as f:
+              raw = f.read()
+          data = None
+          for line in raw.splitlines():
+              if line.startswith(\"data: \"):
+                  data = json.loads(line[6:])
+                  break
+          if data is None:
+              data = json.loads(raw)
+          t = data[\"result\"][\"content\"][0][\"text\"]
+          m = re.search(r\"grafana-deployment-[a-z0-9-]+\", t)
           print(m.group(0) if m else \"\")
           ");
 
@@ -183,13 +194,16 @@
           > /tmp/ocp_logs_response.txt;
 
           python3 -c "
-          import json
+          import json, sys
           with open(\"/tmp/ocp_logs_response.txt\") as f:
               raw = f.read()
+          data = None
           for line in raw.splitlines():
               if line.startswith(\"data: \"):
                   data = json.loads(line[6:])
                   break
+          if data is None:
+              data = json.loads(raw)
           log_text = data[\"result\"][\"content\"][0][\"text\"]
           msg = \"Grafana pod logs ({{ student_user }}):\\n\" + log_text[:500]
           payload = json.dumps({\"jsonrpc\":\"2.0\",\"method\":\"tools/call\",\"params\":{\"name\":\"send_message\",\"arguments\":{\"channel\":\"workshop\",\"text\":msg}},\"id\":2})
