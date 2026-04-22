@@ -128,8 +128,8 @@ Open the Rocket.Chat application at: {rocketchat_url}
 
 Login with the following credentials:
 
-* **Username**: admin
-* **Password**: admin123
+* **Username**: {user}
+* **Password**: {password}
 
 You will see a pop-up. Simply close it, or accept update configuration:
 
