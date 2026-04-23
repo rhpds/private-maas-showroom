@@ -1,0 +1,84 @@
+:imagesdir: ../assets/images
+
+[#troubleshooting]
+= Troubleshooting
+
+This page provides solutions to issues you may encounter during the workshop.
+
+== OpenShift Dev Spaces Issues
+
+=== Workspace Deployment Timeouts or Failures
+
+If your Dev Spaces workspace fails to start or times out/fails in some way during deployment:
+
+1. Navigate to the OpenShift Dev Spaces dashboard: {devspaces_url}
+2. Click on **Workspaces** in the left navigation
+3. Find your workspace in the list
+4. Click the three-dot menu (⋮) next to your workspace
+5. Select **Delete**
+
+image::delete-workspace.png[]
+
+The pod will recreate and you can re-open the workspace environment.
+
+== Continue Extension Issues
+
+=== Continue Extension Not Appearing in Sidebar
+
+If the Continue extension does not automatically install, go the `Applications` tab. Continue should appear under `Recommended`. Click `Install`.
+
+=== Model Connection Errors
+
+If you see connection errors when chatting with the model:
+
+**Check your configuration file** (`~/.continue/config.yaml`):
+
+* Verify the `apiBase` URL is correct and includes `/v1` at the end
+* Ensure the `apiKey` matches exactly what was generated (no extra spaces, ensure you copied the full API key properly, etc.)
+
+== Terminal and Code Execution Issues
+
+=== "Command Not Found" Errors
+
+When running Python or Bash scripts:
+
+* **For Python**: Verify Python is installed with `python --version` or try `python3` instead
+* **For Bash**: Check that you're using the correct path (try `bash yourfile.sh` instead of `./yourfile.sh`)
+* **Path issues**: Ensure you're in the correct directory - use `pwd` to check current location and `ls` to list files
+
+=== "Permission Denied" Errors
+
+For bash scripts (`.sh` files), you need to make them executable first:
+
+[source,console]
+----
+chmod +x your_filename.sh
+----
+
+After making the file executable, you can run it with:
+
+[source,console]
+----
+./your_filename.sh
+----
+
+=== File Not Found Errors
+
+* Use `pwd` to verify your current directory
+* Use `ls` to list files in the current directory
+* Check for typos in the filename
+* Ensure you're using the correct path (absolute vs relative)
+
+== Getting Additional Help
+
+If you encounter an issue not covered here:
+
+1. **Check the Continue chat interface** - Describe your error and ask for help
+2. **Review error messages carefully** - They often contain specific hints about what's wrong
+3. **Ask workshop facilitators** - They can help diagnose cluster-specific issues
+
+include::common/solve-button.adoc[]
+
+++++
+<div class="solve-button-placeholder" data-module="troubleshooting"></div>
+++++

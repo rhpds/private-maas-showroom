@@ -136,6 +136,8 @@ NOTE: You may reference the complete configuration documentation here: https://d
 
 When the model is properly configured, you will be able to chat with the model in the sidebar.
 
+NOTE: This workshop and model configuration only support Chat mode for the Continue extension. Ensure it is set to `Chat` and not `Agent` or `Plan`.
+
 image::ready-to-chat.png[]
 
 Go ahead - test it out with the following prompt:
