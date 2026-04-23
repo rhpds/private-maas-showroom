@@ -41,6 +41,14 @@ To address these challenges as a platform engineer, you will design a centralize
 [.bordershadow]
 image::maas.png[width="50%"]
 
+== Powered by Red Hat AI Factory with NVIDIA
+
+This workshop demonstrates a **Models-as-a-Service** architecture built on **Red Hat AI Factory with NVIDIA**—a co-engineered, enterprise-grade AI solution that combines NVIDIA's specialized, performance-optimized AI computing, networking, and software with Red Hat's open hybrid cloud AI platform.
+
+Together, this joint solution enables you to deploy and manage efficient, cost-effective AI solutions across hybrid cloud environments. You'll experience an end-to-end, high-performance AI stack with unified orchestration and management, leveraging Red Hat AI Enterprise and NVIDIA AI Enterprise software for streamlined model customization, industry-leading LLM serving, and accelerated infrastructure to build, deploy, and manage AI at scale.
+
+Throughout this workshop, you'll work with components from this factory approach including optimized model serving, secure API gateways, observability dashboards, and developer-friendly tools—all running on Red Hat OpenShift AI.
+
 == Module 1 Goals: Step into the Developer role.
 
 In this first module, you will take your first step into the role of a developer. You will access your OpenShift web console and get access to your model credentials that have been set up through a Models-as-a-Service interface. 

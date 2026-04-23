@@ -20,14 +20,12 @@ Our home base will be our OpenShift cluster web console:
 
 From here, we will navigate to and between the following environments throughout our workshop:
 
-* **Cluster Argo CD**
-** We may use this app to view our GitOps application deployments. This may be useful if you need to check the health of any of our apps.
-* **Grafana**
-** A dashboard interface that will show us model usage metrics.
 * **Red Hat OpenShift AI**
-** Where we will view and manage our model deployments and other MLOps/LLMOps tasks and agentic resources.
+** View and manage model deployments, MLOps/LLMOps workflows, and AI resources.
 * **Red Hat OpenShift Dev Spaces**
-** Where we will go into our developer persona and leverage our model as a service setup for coding tasks.
+** Develop and code using our model-as-a-service infrastructure.
+* **Grafana**
+** Monitor model usage and performance through dashboards.
 
 You may find and go to these applications via our navigation button in the web console:
 
@@ -63,23 +61,23 @@ image::genaistudio-changeproject.png[]
 
 Now you may view your available asset endpoints.
 
-You will not see any available models under the `Models` tab. Why? Because you do not have a model deployed in this project (project = namespace).
+We currently have a model deployed in a namespace managed by our cluster admin. This admin has set up a `Models as a Service` architecture for our organization with a central model they have deployed and managed that is available for use by remote teams across the organization.
 
-We do, however, have a model deployed in a separate namespace managed by our cluster admin. This admin has set up a `Models as a Service` architecture for our organization with a central model they have deployed and now manage that is available for use by remote teams across the organization. 
-
-We will not be able to manage the model deployment with our simple user privileges, but we can access its endpoint information via the `Models as a service` tab. 
+We do not have access to manage the model deployment directly, but we can access its endpoint information via the `Models as a Service` tab. 
 
 image::maas-tab.png[]
 
-Select the tab. You will see your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
+Select the tab. Your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
 
 image::maas-model.png[]
 
-We need the endpoint for the next section. Select `View` under the `External endpoint` column:
+Let's grab the endpoint to use in our code assistant. Select `View` under the `External endpoint` column:
 
 image::view-endpoint.png[]
 
-Copy the MaaS route into a separate note file on your computer for safekeeping.
+Copy the MaaS route and save it in a note file - you'll need this in the next module.
+
+NOTE: To copy the route, highlight the text and use kbd:[Ctrl+C] (or kbd:[Cmd+C] on Mac).
 
 image::copy-route.png[]
 
@@ -87,7 +85,9 @@ Now, click `Generate API token`.
 
 image::generate-token.png[]
 
-Copy this value along with your route endpoint.
+Copy this API token and save it with your route endpoint - you'll need both values in the next module.
+
+NOTE: Highlight the token text and copy with kbd:[Ctrl+C] (or kbd:[Cmd+C] on Mac).
 
 image::copy-token.png[]
 

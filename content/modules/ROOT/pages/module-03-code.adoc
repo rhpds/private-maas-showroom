@@ -3,33 +3,17 @@
 [#code-asst]
 = AI-Assisted Development
 
-Now that you have your model endpoint and API key, you can proceed to your work as an AI developer. Your organization leverages OpenShift Dev Spaces for your development team to develop and collaborate all in one OpenShift cluster. And now, you have been given access to a Models as a Service endpoint to enhance your work.
+Now that you have your model endpoint and API key, you’ll use OpenShift Dev Spaces as your development environment and connect it to your MaaS endpoint.
 
-== The impact of AI code assistants
+AI code assistants understand full project context, edit code through natural language instructions, and automate tedious tasks like generating tests or refactoring. Integrated directly into your IDE, they help you build better software faster.
 
-You're not just going to write code - you're going to collaborate with an **AI-powered teammate**.
+== Setting up a cloud integrated developer environment (IDE) with OpenShift Dev Spaces
 
-Modern code assistants can:
+OpenShift Dev Spaces delivers instant access to pre-configured, containerized workspaces running on your OpenShift cluster. It ensures consistency across your team, eliminates "works on my machine" problems, and keeps your development environment in sync with your deployment target.
 
-* **Understand Full Project Context**: Assistants like Continue, GitHub Copilot, and Cursor can read across files and directories, understanding how your code fits together.
+**Why use Dev Spaces for this workshop?** While you can expose model endpoints externally and develop locally, Dev Spaces offers advantages: your code runs in the same environment where it will deploy, dependencies are pre-configured, and you can access cluster-internal services directly. For this workshop, the model is cluster-internal only, making Dev Spaces the natural choice.
 
-* **Edit code with Natural Language**: You can describe a change—like "add error handling here" or "convert this to async"—and AI-powered assistants can apply that change intelligently.
-
-* **Proactively Suggest Improvements**: They catch bugs, highlight inefficiencies, and recommend best-practice patterns.
-
-* **Automate Tedious Tasks**: From generating unit tests and docstrings to scaffolding boilerplate or renaming variables across a project—they take care of the grunt work so you can focus on logic and design.
-
-These assistants don’t just write code - with the right guardrails and knowledge in place, they can understand your project and help you build better software faster. And the best part? Most of them work seamlessly inside popular IDE's like Visual Studio Code, so you don’t need to switch tools to get started.
-
-Let's get set up.
-
-== Step 1: Setting up a cloud integrated developer environment (IDE) with OpenShift Dev Spaces
-
-As a developer, your environment should be fast, consistent, and ready to go for your work. That is what OpenShift Dev Spaces delivers: instant access to pre-configured, containerized workspaces — all running securely on your OpenShift cluster.
-
-You could also leverage an exposed model API endpoint in your local environment as a developer, if the model is exposed properly. However, your company has not exposed the model outside of the confines of the cluster, so you are required to work within the environment and not locally.
-
-NOTE: Even though the model route information you copied from the OpenShift AI dashboard interface showed as an **External endpoint** route, there is no external route exposed in this cluster. However, the current MaaS implementation expects external route exposure so this naming is hardcoded into the dashboard. 
+NOTE: The OpenShift AI dashboard shows "External endpoint" for the route — this is currently the default MaaS labeling in the UI. In this environment, the route is cluster-internal only.
 
 === Access OpenShift Dev Spaces
 
@@ -37,25 +21,34 @@ NOTE: Even though the model route information you copied from the OpenShift AI d
 
 image::nav-devspaces.png[]
 
-When prompted for your login credentials, repeat the same user login from previous steps.
+When prompted for your login credentials, repeat the same OpenShift user login:
 
-Once authenticated, you will see the OpenShift Dev Spaces central dashboard. We have prepared a workspace for you to access. This is a VSCode IDE workspace with a prepared repository already cloned in and necessary dependencies.
+* Username: {user}
+* Password: {password}
 
-When fully loaded, as indicated by a green dot by the workspace name (this could take a moment), click `Open`.
+Once authenticated, you will see the OpenShift Dev Spaces central dashboard. We have prepared a workspace for you to access. This is a VS Code IDE workspace with a prepared repository already cloned in and necessary dependencies configured.
+
+Click `Open`:
 
 image::open-workspace.png[]
 
-After a moment, you'll see the VSCode interface running in your browser. If prompted, click "Trust" when asked about the authors. We're friendly, I promise! 
+After a moment, you'll see the VS Code interface running in your browser. If prompted, click "Trust" when asked about the authors. 
 
 image::trust-vscode.png[]
 
-Inside your workspace, you'll find the aforementioned cloned GitHub repository. This is where you will build and refine with some AI assistance. The only thing we need to configure now is our code extension.
+We have pre-configured the Dev Spaces workspace to install the Continue code assistant extension. You will be prompted to `trust the Continue publisher`. Click `Trust publisher & Install`:
 
-Before we dive into the code, let's meet **Continue**.
+image::trust-continue.png[]
 
-== Step 2: Add Continue, Your Coding Teammate
+In our workspace you'll find a repository ready for your use. This is where you will build and refine with some AI assistance. The only thing we need to configure now is our model connection to the Continue extension.
 
-**Continue** is an open-source AI code assistant that integrates seamlessly into VS Code. Unlike traditional code completion tools, Continue provides an interactive chat interface where you can have natural conversations about your code. You can ask Continue to perform actions like:
+NOTE: The repository you are in is for the https://docs.redhat.com/en/learn/ai-quickstarts/rh-maas-code-assistant[Accelerate enterprise development with NVIDIA and MaaS^] AI quickstart. 
+
+Before we dive in, let me tell you a bit about **Continue**.
+
+== Meet Your AI Code Assistant
+
+**Continue** is an open-source AI code assistant that integrates into VS Code. Continue provides an interactive chat interface where you can have natural conversations about your code. You can ask Continue to perform actions like:
 
 **“Add logging to this function”**
 
@@ -67,59 +60,49 @@ Before we dive into the code, let's meet **Continue**.
 
 Continue will execute these requests directly in your editor, with full awareness of your codebase and project context.
 
-What makes Continue particularly powerful is its flexibility - it supports custom model endpoints, making it perfect for connecting to your private enterprise models. As an **open-source** solution, Continue gives you complete control over your AI coding workflow. 
+Continue supports custom model endpoints, making it a perfect example for connecting to your private enterprise models. Continue is an **open-source** solution that gives you complete control over your AI coding workflow. 
 
 NOTE: Continue is an example of an AI-powered coding assistant for this workshop experience. You can easily imagine how this could work with any other desired code assistant extensions that allow you to customize the model used.
 
-=== Install Continue
+== Connect Continue to Your MaaS Model
 
-Select the bottom navigation item on the left-hand side to open up the extensions marketplace.
-
-image::nav-extensions.png[]
-
-In the search bar, search for **Continue** and click **Install**.
-
-image::install-continue.png[]
-
-When prompted, trust publisher and install the extension.
-
-You've now installed Continue - next, let's connect it to your private model.
-
-== Step 3: Connect Continue to Your MaaS Model
-
-Navigate to the **Continue sidebar icon** in the left-hand side navigation panel:
+Navigate to the **Continue sidebar icon** in the left-hand side navigation panel. If needed, expand the Continue app sidebar by dragging the border over.
 
 image::nav-continue.png[]
 
-NOTE: Expand the Continue app sidebar by dragging the border over.
+image::continue-open.png[]
 
-We will do two things in this module:
+In order to connect our model to the Continue code extension we must provide the extension our model's endpoint URL and API key from our MaaS deployment from the previous module.
 
-. Connect to our MaaS model
-. Use our model's "brain" to help us understand and deploy a fun game, and then work on an impactful Kubernetes deployment.
+NOTE: If you didn't document your model access information, go back to the OpenShift AI dashboard to the **AI asset endpoints** section to retrieve the credentials: https://data-science-gateway.{openshift_cluster_ingress_domain}/
 
-In order to connect our model to the Continue code extension we must provide the extension our model's endpoint URL and API key from our MaaS application in the previous module.
+=== Configure the Continue Extension
 
-NOTE: If needed, go back to the OpenShift AI dashboard to the AI asset endpoints section to retrieve the credentials.
+We've provided a pre-configured template file for the Continue extension. You'll need to move it to the proper location where Continue expects to find it.
 
-=== Enter MaaS endpoint details
+Open a terminal in VS Code (Terminal > New Terminal from the menu, or kbd:[Ctrl+`])
 
-Click on the searchbar at the top of the VSCode window:
+image::new-terminal.png[]
 
-image::vscode-search.png[]
+In the terminal, run the following command:
 
-Search for the configuration file of the Continue extension:
+[source,sh,role="execute"]
+----
+cp /projects/exercises/.vscode/config.yaml ~/.continue/config.yaml
+----
+
+This copies the template configuration file to `~/.continue/config.yaml`, replacing the blank template that's there.
+
+Now open the configuration file to customize it with your MaaS endpoint details. Open the search bar (kbd:[Cmd+P] on Mac or kbd:[Ctrl+P] on Linux) and type:
 
 [source,sh,role="execute"]
 ----
 ~/.continue/config.yaml
 ----
 
-image::vscode-search-config.png[]
+image::search-config.png[]
 
-Hit `Enter`.
-
-This will open the `config.yaml` file. Delete the file contents and replace with the following:
+Hit `Enter` to open the file. You'll see the following configuration:
 
 [source,yaml,role="execute"]
 ----
@@ -149,13 +132,20 @@ For example:
 * **apiBase**: `http://maas.apps.ocp.75d7w.sandbox114.opentlc.com/llm/nemotron-3-nano-30b-a3b/v1` (Note the `v1` at the end of the URL)
 * **apiKey**: `your-actual-api-key-here`
 
-Reference the complete configuration documentation here: https://docs.continue.dev/reference[Continue Documentation^]
+NOTE: You may reference the complete configuration documentation here: https://docs.continue.dev/reference[Continue Documentation^]
 
-When the model is properly configured, you will see the model name, `NVIDIA Nemotron 3 Nano 30B A3B FP8` in the Continue chat sidebar.
+When the model is properly configured, you will be able to chat with the model in the sidebar.
 
-Go ahead - test it out and chat a bit!
+image::ready-to-chat.png[]
 
-NOTE: If the container restarts, which will prompt you to have to reload the VSCode workspace window, you will need to re-edit the `config.yaml` file with the model configuration details.
+Go ahead - test it out with the following prompt:
+
+[source,sh,role="execute"]
+----
+Explain the software company Red Hat in a short paragraph.
+----
+
+NOTE: If you get an error when chatting with the model, double check your API key and route details. Ensure you have left the `/v1` at the end of the URL string.
 
 == You're Ready to Code with AI
 

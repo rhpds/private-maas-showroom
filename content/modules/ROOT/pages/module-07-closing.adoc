@@ -11,6 +11,18 @@ Over the course of this hands-on workshop, you experienced how generative AI and
 
 All within an enterprise-ready OpenShift AI environment.
 
+== Taking Red Hat AI Factory with NVIDIA to Production
+
+What you've experienced in this workshop represents the capabilities of **Red Hat AI Factory with NVIDIA**—a production-ready platform designed to transform ad hoc AI development into a repeatable, scalable, and secure factory process.
+
+**Key benefits you've seen in action:**
+
+* **Accelerate Time-to-Value**: Move from concept to production faster with streamlined workflows for model access, agentic AI development, and API integration
+* **Increase Operational Efficiency**: Maximize infrastructure utilization through optimized inference serving, intelligent resource management, and Models-as-a-Service architecture
+* **Mitigate Risk**: Ensure enterprise security, compliance, and operational stability with hardened containers, built-in observability, and zero-trust workload protection
+
+This joint solution from Red Hat and NVIDIA provides co-engineered support, Day Zero platform updates, and a unified experience across bare metal, virtual machines, and public clouds—ensuring that the patterns you've learned today scale seamlessly into production environments.
+
 == What's next
 
 Learn more in our `Resources` section.
