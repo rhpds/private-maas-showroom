@@ -94,6 +94,8 @@ cd ./coding-exercises/game_starters/rock_paper_scissors/
 
 Now run your game based on the language you chose:
 
+NOTE: Substitute the placeholder file names for your actual file.
+
 **For Python (.py files):**
 
 [source,console]
