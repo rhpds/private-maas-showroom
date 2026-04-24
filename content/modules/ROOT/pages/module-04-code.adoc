@@ -177,11 +177,13 @@ game_solutions/
 
 You can run these solutions using the same Python or Bash commands from Step 4 above to see how they work.
 
-== Taking the Next Step
+== What's Next: A Different Lens on the Same Platform
 
-You've now used AI in a real, yet low-pressure, context - scaffolding, editing, testing and debugging a working application!
+You've just experienced the MaaS platform as a **developer** - consuming model endpoints to build applications with AI assistance.
 
-In the next activity, we'll use agentic AI for cluster operations and observability.
+But the same MaaS architecture you used for Continue also powers operational automation. In the next module, you'll switch roles to become an **SRE/DevOps practitioner** and see how the same Nemotron model - deployed once, shared across the organization - can drive infrastructure operations, diagnostics, and ChatOps workflows.
+
+**Same platform. Same model. Different use case.** This is the power of Models-as-a-Service.
 
 include::common/solve-button.adoc[]
 

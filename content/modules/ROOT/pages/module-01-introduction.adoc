@@ -49,6 +49,16 @@ Together, this joint solution enables you to deploy and manage efficient, cost-e
 
 Throughout this workshop, you'll work with components from this factory approach including optimized model serving, secure API gateways, observability dashboards, and developer-friendly tools—all running on Red Hat OpenShift AI.
 
-== Module 1 Goals: Step into the Developer role.
+== Your Multi-Persona Journey
 
-In this first module, you will take your first step into the role of a developer. You will access your OpenShift web console and get access to your model credentials that have been set up through a Models-as-a-Service interface. 
+As a platform team, you've already deployed a Models-as-a-Service architecture for your organization. In this workshop, you'll experience that platform from three perspectives:
+
+* **Modules 2-4: Developer** - consuming models for AI-assisted development
+* **Module 5: SRE/DevOps Practitioner** - using models for operational automation
+* **Module 6: Platform Stakeholder** - analyzing usage and business impact
+
+Each persona uses the **same centrally-deployed model** - demonstrating how MaaS maximizes resource utilization, reduces duplication, and serves diverse organizational needs from a single platform.
+
+== Module 1 Goals: Step into the Developer Role
+
+In this first module, you'll begin as a **developer**. You'll access your OpenShift web console and retrieve credentials for the centrally-managed model that's been deployed through the Models-as-a-Service interface. 

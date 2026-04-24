@@ -30,6 +30,7 @@ asciidoc:
     rhoai_dashboard_url: https://data-science-gateway.{openshift_cluster_ingress_domain}/
     rocketchat_url: https://rocketchat.{openshift_cluster_ingress_domain}
     devspaces_url: https://devspaces.{openshift_cluster_ingress_domain}/
+    grafana_url: https://grafana-route-grafana.{openshift_cluster_ingress_domain}/
     login_command: oc login --insecure-skip-tls-verify=false -u userX -p openshift https://api.MYCLUSTER.com:6443"
     rhoai: "Red Hat OpenShift AI"
     rhoai-short: "RHOAI"

@@ -2,14 +2,15 @@
 [#closing-summary]
 = Closing Summary
 
-Over the course of this hands-on workshop, you experienced how generative AI and agentic systems can be:
+Over the course of this workshop, you experienced a **Models-as-a-Service** platform from three perspectives:
 
-* Deployed and secured
-* Exposed as scalable services
-* Integrated into real workflows
-* Observed and monitored for impact
+* **Developer** (Modules 2-4): Consumed centrally-deployed models for AI-assisted coding
+* **SRE/DevOps** (Module 5): Used the same model for infrastructure automation with MCP servers
+* **Platform Stakeholder** (Module 6): Analyzed usage metrics for capacity planning and cost attribution
 
-All within an enterprise-ready OpenShift AI environment.
+**The key insight:** One Nemotron model, deployed once, served all three personas - demonstrating how MaaS maximizes resource utilization while accelerating consumption across your organization.
+
+This is Red Hat AI Factory with NVIDIA: enterprise-ready AI infrastructure that scales from developer productivity to operational automation to business insight.
 
 == Taking Red Hat AI Factory with NVIDIA to Production
 

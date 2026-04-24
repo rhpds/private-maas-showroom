@@ -2,9 +2,11 @@
 [#agentic-ai]
 = System Administration with Agentic AI 
 
-In the last module, you stepped into the developer role building applications using private LLM endpoints. Now, you'll become a **site reliability engineer (SRE) or DevOps practitioner** focused on observability, diagnostics, and operational scale. 
+In the last module, you stepped into the developer role building applications using private LLM endpoints. Now, you'll become a **site reliability engineer (SRE) or DevOps practitioner** focused on observability, diagnostics, and operational scale.
 
 But you won't go at it alone, you'll work with agentic AI tooling to navigate your OpenShift environment in real time - just like a modern SRE team building insight-driven automation.
+
+NOTE: You're still using the **same Nemotron model** from the MaaS deployment you accessed in earlier modules. The difference? Instead of consuming it through Continue for coding assistance, you'll now interact with it through the Gen AI Studio Playground with MCP server integrations for infrastructure operations. This demonstrates how a single, centrally-managed model serves multiple personas and use cases across your organization.
 
 == Why Agentic AI for Admins?
 
