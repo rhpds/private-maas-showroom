@@ -3,3 +3,30 @@ type: showroom
 
 default_width: 30
 persist_url_state: true
+
+view_switcher:
+  enabled: true
+  default_mode: split
+tabs:
+  # RHOAI Console
+  - name: OpenShift AI Console
+    url: 'https://data-science-gateway.${DOMAIN}'
+  # OCP Console
+  - name: OpenShift Console
+    url: 'https://console-openshift-console.${DOMAIN}'
+  # Single terminal
+  #- name: Terminal
+  #  path: /terminal/
+  #  port: 443
+
+  # Vertical split terminals
+  # - name: Bastion
+  #   path: /wetty
+  #   port: 443
+  #   secondary_name: Bastion
+  #   secondary_path: /wetty
+  #   secondary_port: 443
+
+  # External page
+  #- name: Llamastack Docs
+  #  url: 'https://llama-stack.readthedocs.io/en/latest/'
