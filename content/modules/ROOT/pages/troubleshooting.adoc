@@ -69,6 +69,37 @@ After making the file executable, you can run it with:
 * Check for typos in the filename
 * Ensure you're using the correct path (absolute vs relative)
 
+[#module-05-issues]
+== Module 05: Agentic AI Issues
+
+=== MCP Server Authorization Failures
+
+* Authorization is session-based. If you refresh the playground, you must re-select both MCP servers (Kubernetes and Rocket.Chat)
+* Click the MCP server dropdown, select each server, and click "Save" to reauthorize
+
+=== Tool Selection Not Persisting
+
+* Tool selections reset on page refresh. Verify your tool selections match the configuration specified in Module 05
+* Ensure you've deselected unnecessary tools to stay under the 40-tool performance threshold
+
+=== Message Posting Failures
+
+* Verify you're using the exact channel name: `#workshop`
+* Check that the Rocket.Chat MCP Server is still authorized (look for the green indicator)
+* If errors persist, try a simpler command first: "List all Rocket.Chat channels" to verify connectivity
+
+=== Pod or Namespace Not Found
+
+* Ensure you're using the correct namespace name (`grafana`)
+* For pod-specific commands, use the full pod name including the generated suffix
+* Run "List all pods in the grafana namespace" first to get the exact pod name
+
+=== General Recovery Steps for Playground Issues
+
+* Resend the message if you receive a timeout error
+* Restart the playground if authorization or connectivity issues persist
+* After restarting, remember to: re-select MCP servers → reconfigure tool selections → retry your command
+
 == Getting Additional Help
 
 If you encounter an issue not covered here:

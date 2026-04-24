@@ -32,7 +32,14 @@ In this module, we'll use a preconfigured stack that includes:
 
 * **Rocket.Chat MCP Server** - allows our LLM agent to interact with a Rocket.Chat workspace. We will use it to interact with a specific Rocket.Chat workspace for which we have authorization configured.
 
-* **NVIDIA Nemotron 3 Nano 30B A3B FP8 Model** - a lightweight, instruction-tuned model optimized for agentic workflows and tool calling. The FP8 quantization enables efficient inference while maintaining accuracy for structured tasks like API calls and multi-step reasoning. This model drives the agent's decision-making as it translates natural language into MCP server tool invocations. 
+* **NVIDIA Nemotron 3 Nano 30B A3B FP8 Model** - a lightweight, instruction-tuned model optimized for agentic workflows and tool calling. This model drives the agent's decision-making as it translates natural language into MCP server tool invocations.
+
+IMPORTANT: This agent will have real access to your OpenShift cluster and Rocket.Chat workspace. When experimenting:
+
+* Avoid deleting resources unless explicitly instructed
+* Do not modify resources outside the namespaces specified in exercises
+* Be cautious when sharing logs - they may contain sensitive information
+* Always validate tool outputs before acting on them in production scenarios 
 
 == Connect Your Model to MCP Servers
 
@@ -78,23 +85,51 @@ NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.
 
 image::playground.png[]
 
-**Authorize your MCP servers** before issuing commands. This establishes the secure connection between your agent and live infrastructure. The Kubernetes MCP server is already authorized.
+**Select your MCP servers** before issuing commands to authorize and activate them. This establishes the secure connection between your agent and live infrastructure. The Kubernetes MCP server is already authorized. Select Rocket.Chat MCP Server.
 
-image::authorize-mcp.png[]
+image::select-mcp.png[]
 
-Select the RocketChat MCP server. You'll see a confirmation popup - click `Save`:
+You'll see a confirmation popup - click `Save`:
 
 image::mcp-auth-save.png[]
 
 Your agent is now live and connected to both Kubernetes and Rocket.Chat. You can issue natural language commands and watch them translate into real infrastructure operations.
 
-NOTE: Authorization is **session-based**. If you refresh or reopen the playground, you'll need to re-authorize the MCP servers and reconfigure your settings.
+NOTE: Authorization to the MCP servers is **session-based**. If you refresh or reopen the playground, you'll need to re-select the MCP servers and reconfigure your settings.
 
 **View Tools**
 
-View the MCP servers' available tools. You can see the Kubernetes MCP server has 20 tools active and available:
+View the MCP servers' available tools. You can see the RocketChat MCP Server has 28 tools active and available:
 
-image::view-mcp-tools.png[]
+image::view-rc-tools.png[]
+
+NOTE: You will see an alert about **performance degradation with more than 40 active tools**. This happens because too many tools increase the model's context window size and reduce its ability to accurately select the correct tool for each task - similar to decision paralysis when faced with too many choices. The model must evaluate every available tool against each request, and more options mean more opportunity for selection errors.
+
+To optimize performance and help the model focus on the most relevant operations, we'll deselect some of the less frequently used tools. This improves response accuracy and reduces latency for tool invocation.
+
+* Select the Kubernetes MCP server tools:
+
+image::view-k8s-tools.png[]
+
+Ensure only the following tools are selected:
+
+* `namespaces_list`
+* `pods_get`
+* `pods_list`
+* `pods_list_in_namespace`
+* `pods_log`
+
+* Now select the Rocket.Chat MCP Server tools:
+
+image::view-rc-tools.png[]
+
+Ensure only the following tools are selected:
+
+* `get_channel_info`
+* `list_channels`
+* `send_message`
+
+NOTE: Feel free to experiment with other tools! For the purposes of the following steps, the above configuration is ideal to ensure consistent behavior.
 
 == Investigate our OpenShift Resources
 
@@ -107,7 +142,9 @@ In the chat, enter:
 List all pods in the grafana namespace.
 ----
 
-Response output will vary slightly, but you should see it correctly list the active pod in the `grafana` namespace: `grafana-deployment`.
+Response output will vary slightly, but you should see it correctly list the active pod in the `grafana` namespace. The pod name will start with `grafana-deployment-` followed by a generated suffix (e.g., `grafana-deployment-7d8f9c5b4-xyz12`).
+
+✓ **Success indicator**: You should see output listing one or more pods with names starting with `grafana-deployment-` and showing their status as `Running`.
 
 Let's try something else:
 
@@ -116,7 +153,11 @@ Let's try something else:
 Get logs for the grafana-deployment pod in the grafana namespace.
 ----
 
-Feel free to experiment further with the tools available.
+NOTE: You may need to use the exact pod name from the previous command (including the generated suffix). If the model cannot find the pod, copy the full pod name from the previous output and specify it in your request.
+
+✓ **Success indicator**: You should see log output including timestamps. The logs will show the application's runtime activity.
+
+Feel free to experiment further with the tools available before moving to the next step.
 
 === Post a Message to our Rocket.Chat Workspace
 
@@ -152,6 +193,8 @@ NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel whe
 List all Rocket.Chat channels in our workspace.
 ----
 
+✓ **Success indicator**: You should see a list of available channels including `#general` and `#workshop`.
+
 Now, let's post a message to our Rocket.Chat workspace:
 
 [source,console,role=execute,subs=attributes+]
@@ -161,6 +204,8 @@ Post a message to the #workshop channel: "Hi from <insert name>".
 
 Go check the `#workshop` channel in the Rocket.Chat application to see your message.
 
+✓ **Success indicator**: Your message should appear in the #workshop channel within a few seconds, posted by your bot user account.
+
 ==== Send logs to Rocket.Chat
 
 Now, let's try out a real use case for this! It may not be done through a chat UI like the playground, but it's a good example of how you can use agentic AI to help you with your work. In a production environment, you would likely use a more robust automation to send logs or other information from your Red Hat AI cluster to Rocket.Chat.
@@ -169,18 +214,32 @@ Let's send pod logs from your workspace to the `#workshop` channel, where you an
 
 [source,console,role=execute,subs=attributes+]
 ----
-Get the pod logs for the grafana-deployment pod in the grafana namespace. Assess the logs and post the logs + summary message to the #workshop channel in Rocket.Chat.
+Get the pod logs for the grafana-deployment pod in the grafana namespace. Review the logs for any errors or warnings, then post a summary highlighting any issues found along with the recent log entries to the #workshop channel in Rocket.Chat.
 ----
+
+✓ **Success indicator**: Check the #workshop channel in Rocket.Chat - you should see a message containing both a summary of the log analysis and relevant log excerpts from the Grafana pod.
+
+NOTE: If you encounter issues with MCP server authorization, tool selection, or message posting, see the xref:troubleshooting.adoc#module-05-issues[Module 05 troubleshooting section].
 
 == Summary: What You Did
 
 In this module, you:
 
-* Integrated your own LLM with a tool-using agent.
-* Explored OpenShift resources with natural language
-* Interacted with a Rocket.Chat workspace using natural language
+* **Integrated your own LLM with a tool-using agent** - connecting NVIDIA Nemotron with MCP servers for live infrastructure interaction
+* **Explored OpenShift resources with natural language** - querying pods, namespaces, and logs without writing kubectl commands
+* **Interacted with a Rocket.Chat workspace using natural language** - posting operational data directly to team collaboration channels
 
-You just used AI to reduce operational complexity and speed up workflows!
+**Why This Matters:**
+
+This agentic pattern enables on-call engineers and SREs to query infrastructure using conversational language, reducing context switching and accelerating incident response. You've experienced the foundation of ChatOps workflows where AI agents bridge operational tools and team communication platforms.
+
+**Real-World Applications:**
+
+* **Automated incident response**: Query cluster health, retrieve logs, and post findings to Slack/Teams without leaving your chat window
+* **Self-service infrastructure queries**: Enable non-technical team members to ask "Is the API healthy?" and get real answers
+* **Proactive monitoring**: Agents can watch for specific patterns and automatically notify teams when issues arise
+
+You just used AI to reduce operational complexity and speed up workflows - imagine scaling this across your entire infrastructure stack!
 
 include::common/solve-button.adoc[]
 
