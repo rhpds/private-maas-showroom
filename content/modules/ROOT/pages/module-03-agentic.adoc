@@ -1,0 +1,86 @@
+:imagesdir: ../assets/images
+[#agentic-ai]
+= Agentic AI with Rocket.Chat
+
+Agentic AI extends beyond code assistance - it can interact with operational tools using natural language. In this module, you'll use the same Nemotron model to post messages to a Rocket.Chat workspace.
+
+== Open the Gen AI Studio Playground
+
+The playground lets you test agentic AI capabilities - models with tool-calling abilities - before writing code.
+
+1. From the OpenShift AI dashboard, navigate to **AI asset endpoints**
+
+image::nav-aiassets.png[]
+
+2. Ensure project is set to **{user}**
+
+3. Click **Try in Playground** for the Nemotron model
+
+image::mcp-try-playground.png[]
+
+You'll see a chat interface with your model preselected.
+
+image::playground.png[]
+
+== Authorize the Rocket.Chat MCP Server
+
+MCP (Model Context Protocol) servers give your model access to external tools. The Rocket.Chat MCP server is already configured - you just need to authorize it.
+
+1. Click the MCP servers dropdown and select **Rocket.Chat MCP Server**
+
+image::select-mcp.png[]
+
+2. Click **Save** on the confirmation popup
+
+image::mcp-auth-save.png[]
+
+Your agent now has access to Rocket.Chat.
+
+== Post a Message to Rocket.Chat
+
+First, open Rocket.Chat in a new tab: {rocketchat_url}
+
+* **Username**: {user}
+* **Password**: {password}
+
+Close any popups you see.
+
+image::rocketchat-popup.png[]
+
+Now, back in the **Gen AI Studio Playground**, type this in the chat:
+
+[source,console,role=execute,subs=attributes+]
+----
+List all Rocket.Chat channels in our workspace.
+----
+
+You should see channels including `#general` and `#workshop`.
+
+Now let's post a message:
+
+[source,console,role=execute,subs=attributes+]
+----
+Post a message to the #workshop channel: "Hello from {user} - testing agentic AI!"
+----
+
+**Check the Rocket.Chat tab** - your message should appear in the #workshop channel within a few seconds.
+
+== What Just Happened?
+
+You used natural language to:
+* Query available channels
+* Post a message to a specific channel
+
+The model translated your request into Rocket.Chat API calls automatically. This same pattern enables ChatOps workflows - imagine triggering deployments, querying logs, or posting incident reports through conversational commands.
+
+include::common/solve-button.adoc[]
+
+++++
+<div class="solve-button-placeholder" data-module="module-03-agentic"></div>
+++++
+
+include::common/validate-button.adoc[]
+
+++++
+<div class="validate-button-placeholder" data-module="module-03-agentic"></div>
+++++

@@ -1,0 +1,58 @@
+:imagesdir: ../assets/images
+[#model-analytics]
+= Usage Analytics
+
+Now that you've consumed the MaaS model, let's see how the platform tracks usage.
+
+== View the Grafana Dashboard
+
+1. From the cluster apps menu, select **Grafana**
+
+image::grafana-app.png[]
+
+2. Select the **grafana** dashboard
+
+image::dashboards-grafana.png[]
+
+3. Select **MaaS Token Metrics Dashboard**
+
+image::maas-dashboard.png[]
+
+== What You're Seeing
+
+This dashboard shows real usage metrics from the Prometheus observability stack:
+
+image::use-grafana-db.png[]
+
+Key metrics:
+
+* **Total Authorized Hits**: Total token count across all users
+* **Top Users by Hits**: Who's using the model most
+* **Hourly Usage**: Usage patterns over time
+* **Cost by User**: Estimated costs based on tier pricing (Enterprise tier)
+
+**Your activity is here** - the Rocket.Chat interactions you just did in the playground generated tokens, and they're being tracked in this dashboard.
+
+NOTE: This is a **custom Grafana dashboard** integrating with Red Hat AI's Prometheus metrics stack. While this specific dashboard is a workshop example, it demonstrates how you can leverage the platform's built-in observability. Red Hat AI will include integrated analytics in upcoming releases.
+
+== Why This Matters
+
+For platform teams, this visibility enables:
+
+* **Capacity planning**: Track growth trends to justify GPU scaling
+* **Cost attribution**: Chargeback models based on actual consumption
+* **ROI measurement**: Prove business value with usage data
+
+**Solving the MaaS problem**: Instead of idle or overloaded GPUs without accountability, you now have measurable, optimized infrastructure with clear usage tracking - transforming AI from a cost center into a managed platform service.
+
+include::common/solve-button.adoc[]
+
+++++
+<div class="solve-button-placeholder" data-module="module-04-analytics"></div>
+++++
+
+include::common/validate-button.adoc[]
+
+++++
+<div class="validate-button-placeholder" data-module="module-04-analytics"></div>
+++++

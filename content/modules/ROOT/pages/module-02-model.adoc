@@ -1,97 +1,39 @@
 :imagesdir: ../assets/images
 
 [#model-deployment]
-= Introduction to your environment
+= Get Model Credentials
 
-Our first step is to get accustomed to our environment and its components.
+Your platform team has deployed **NVIDIA Nemotron 3 Nano 30B A3B** as a centrally-managed service. You'll access this model through the Red Hat OpenShift AI dashboard.
 
-In this workshop, you'll work with **NVIDIA Nemotron 3 Nano 30B A3B FP8** - a lightweight, instruction-tuned large language model designed for enterprise deployment. With FP8 quantization, it delivers production-grade inference performance while maintaining accuracy for coding assistance, reasoning tasks, and tool-calling workflows. This makes it ideal for Models-as-a-Service architectures where multiple teams share centrally-managed model infrastructure. 
+**Login to OpenShift Console**:
 
-Our home base will be our OpenShift cluster web console:
+* **Console URL**: https://console-openshift-console.{openshift_cluster_ingress_domain}/[https://console-openshift-console.{openshift_cluster_ingress_domain}/,window=_blank]
+* **User**: {user}
+* **Password**: {password}
 
-// NOTE: If you are accessing these instructions through our Red Hat Demo Platform workshop, the information below will render properly with unique values. If you are accessing the instructions separately for your own cluster, from the GitHub repository, you will instead see placeholder values.
+== Access the Model Endpoint
 
-**Console URL**: https://console-openshift-console.{openshift_cluster_ingress_domain}/[https://console-openshift-console.{openshift_cluster_ingress_domain}/,window=_blank].
-
-**Login Credentials**:
-
-. **User**: {user}
-. **Password**: {password}
-
-From here, we will navigate to and between the following environments throughout our workshop:
-
-* **Red Hat OpenShift AI**
-** View and manage model deployments, MLOps/LLMOps workflows, and AI resources.
-* **Red Hat OpenShift Dev Spaces**
-** Develop and code using our model-as-a-service infrastructure.
-* **Grafana**
-** Monitor model usage and performance through dashboards.
-
-You may find and go to these applications via our navigation button in the web console:
-
-image::apps-menu.png[]
-
-Now that you know how to get around, your adventure begins!
-
-== View model deployment
-
-OpenShift AI provides a web-based dashboard interface to deploy and manage models with ease, at scale and in conjunction with other critical AI assets like MCP servers or evaluation tooling.
-
-Let's get connected.
-
-**Open the OpenShift AI Dashboard**
-
-Click the navigation button and select **Red Hat OpenShift AI** from the drop-down menu.
+1. Click the apps menu and select **Red Hat OpenShift AI**
 
 image::nav-rhoai.png[]
 
-If prompted, login again with your user credentials to the OpenShift AI dashboard.
-
-Once authenticated you will see the following home page:
-
-image::rhoai-dashboard.png[]
-
-Now, go to the `Gen AI Studio` section of the dashboard and select `AI asset endpoints`.
+2. Navigate to **Gen AI Studio** → **AI asset endpoints**
 
 image::nav-genaistudio.png[]
 
-In the AI asset endpoints page, change the project from `grafana` to {user}.
+3. Change the project to **{user}**
 
 image::genaistudio-changeproject.png[]
 
-Now you may view your available asset endpoints.
-
-We currently have a model deployed in a namespace managed by our cluster admin. This admin has set up a `Models as a Service` architecture for our organization with a central model they have deployed and managed that is available for use by remote teams across the organization.
-
-We do not have access to manage the model deployment directly, but we can access its endpoint information via the `Models as a Service` tab. 
+4. Select the **Models as a Service** tab
 
 image::maas-tab.png[]
 
-Select the tab. Your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
+You'll see the `nemotron-3-nano-30b-a3b` model deployed by your platform team.
 
 image::maas-model.png[]
 
-Let's grab the endpoint to use in our code assistant. Select `View` under the `External endpoint` column:
-
-image::view-endpoint.png[]
-
-Copy the MaaS route and save it in a note file - you'll need this in the next module.
-
-NOTE: To copy the route, highlight the text and use kbd:[Ctrl+C] (or kbd:[Cmd+C] on Mac).
-
-image::copy-route.png[]
-
-Now, click `Generate API token`.
-
-image::generate-token.png[]
-
-Copy this API token and save it with your route endpoint - you'll need both values in the next module.
-
-NOTE: Highlight the token text and copy with kbd:[Ctrl+C] (or kbd:[Cmd+C] on Mac).
-
-image::copy-token.png[]
-
-Now that we have our model connection details, we can proceed to our development environment to leverage the model.
+**You don't need to copy these credentials** - the Gen AI Studio Playground (next module) is already pre-configured to use this model. We're just showing you where the MaaS endpoints live in the platform.
 
 include::common/solve-button.adoc[]
 

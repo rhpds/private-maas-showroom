@@ -1,64 +1,26 @@
 :imagesdir: ../assets/images
 
 [#maas_introduction]
-= Introduction: The Hidden Cost of Infrastructure-as-a-Service
+= Introduction: Models-as-a-Service
 
-When infrastructure is self-service with no clear guardrails in place, problems can quickly emerge:
-
-- Teams struggle to correctly request and size GPU resources
-- Multiple teams may deploy identical models, duplicating effort
-- Expensive GPUs remain idle or become overloaded
-- Infrastructure costs escalate without clear accountability
-- Developers need model access, not GPU management complexity
+When AI infrastructure is self-service without guardrails, problems emerge: teams duplicate models, GPUs sit idle or overload, and costs escalate without accountability.
 
 [.bordershadow]
 image::iaas.png[width="50%"]
 
-== Models-as-a-Service: A Better Abstraction for AI at Scale
-
-To address these challenges as a platform engineer, you will design a centralized, reusable, and secure model-serving layer:
-
-**Centralized Model Management**
-
-* Platform teams deploy and maintain models with proper lifecycle management
-* Versioning, rollbacks, and testing become standardized processes
-
-**Secure API Gateway**
-
-* All model access goes through authenticated, rate-limited endpoints
-* Full observability and monitoring across all model interactions
-
-**Developer-Friendly Access**
-
-* Developers consume models without managing underlying hardware
-* Teams focus on building applications, agents, and features powered by AI
-
-**Efficient Resource Utilization**
-
-* GPU resources are pooled and shared across the organization
-* Eliminates waste while ensuring fair access and cost control
+**Models-as-a-Service** solves this by centralizing model deployment and exposing them through secure, authenticated APIs. Platform teams manage models once; developers consume them without GPU complexity.
 
 [.bordershadow]
 image::maas.png[width="50%"]
 
-== Powered by Red Hat AI Factory with NVIDIA
+== What You'll Experience
 
-This workshop demonstrates a **Models-as-a-Service** architecture built on **Red Hat AI Factory with NVIDIA**—a co-engineered, enterprise-grade AI solution that combines NVIDIA's specialized, performance-optimized AI computing, networking, and software with Red Hat's open hybrid cloud AI platform.
+In this 10-15 minute workshop, you'll:
 
-Together, this joint solution enables you to deploy and manage efficient, cost-effective AI solutions across hybrid cloud environments. You'll experience an end-to-end, high-performance AI stack with unified orchestration and management, leveraging Red Hat AI Enterprise and NVIDIA AI Enterprise software for streamlined model customization, industry-leading LLM serving, and accelerated infrastructure to build, deploy, and manage AI at scale.
+1. **Get model credentials** from a centrally-deployed NVIDIA Nemotron model
+2. **Use agentic AI** to interact with Rocket.Chat using natural language
+3. **View usage analytics** showing how the platform tracks consumption
 
-Throughout this workshop, you'll work with components from this factory approach including optimized model serving, secure API gateways, observability dashboards, and developer-friendly tools—all running on Red Hat OpenShift AI.
+Powered by **Red Hat AI Factory with NVIDIA** - enterprise-grade AI infrastructure running on Red Hat OpenShift AI.
 
-== Your Multi-Persona Journey
-
-As a platform team, you've already deployed a Models-as-a-Service architecture for your organization. In this workshop, you'll experience that platform from three perspectives:
-
-* **Modules 2-4: Developer** - consuming models for AI-assisted development
-* **Module 5: SRE/DevOps Practitioner** - using models for operational automation
-* **Module 6: Platform Stakeholder** - analyzing usage and business impact
-
-Each persona uses the **same centrally-deployed model** - demonstrating how MaaS maximizes resource utilization, reduces duplication, and serves diverse organizational needs from a single platform.
-
-== Module 1 Goals: Step into the Developer Role
-
-In this first module, you'll begin as a **developer**. You'll access your OpenShift web console and retrieve credentials for the centrally-managed model that's been deployed through the Models-as-a-Service interface. 
+Let's get started. 
