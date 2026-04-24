@@ -14,6 +14,12 @@ tabs:
   # OCP Console
   - name: OpenShift Console
     url: 'https://console-openshift-console.${DOMAIN}'
+  # Rocket Chat UI  
+  - name: Rocket Chat Console
+    url: 'https://rocketchat.${DOMAIN}'
+  # Grafana Dashboard  
+  - name: Grafana Dashboard
+    url: 'https://grafana-route-grafana.${DOMAIN}'    
   # Single terminal
   #- name: Terminal
   #  path: /terminal/
