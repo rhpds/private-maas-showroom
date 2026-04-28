@@ -62,7 +62,7 @@ Close any popups you see.
 
 Now, back in the **Gen AI Studio Playground** in the **OpenShift AI Console** tab, activate the Rocket.Chat MCP server:
 
-1. In the playground's **MCP servers** section, select the **Rocket.Chat MCP Server**:
+1. In the playground's **MCP servers** section, deselect the **Kubernetes MCP Server** and select the **Rocket.Chat MCP Server**:
 +
 image::select-mcp.png[]
 +
@@ -71,6 +71,8 @@ image::select-mcp.png[]
 image::mcp-auth-save.png[]
 
 Your agent now has access to Rocket.Chat.
+
+NOTE: Disable the Kubernetes MCP Server before proceeding to prevent the model from mixing up tools between the two servers.
 
 Now, type this in the chat:
 
@@ -88,7 +90,7 @@ Now let's post a message:
 Post a message to the #workshop channel: "Hello from {user} - testing agentic AI at Red Hat Summit!"
 ----
 
-**Check the Rocket.Chat tab** - your message should appear in the **#workshop** channel within a few seconds.
+**Check the Rocket.Chat Console tab** - your message should appear in the **#workshop** channel within a few seconds.
 
 == What Just Happened?
 

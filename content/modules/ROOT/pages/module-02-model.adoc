@@ -7,7 +7,7 @@ Your platform team has deployed **NVIDIA Nemotron 3 Nano 30B A3B** as a centrall
 
 **Login to OpenShift AI Dashboard**:
 
-* **User**: {user}
+* **Username**: {user}
 * **Password**: {password}
 
 == Access the Model Endpoint

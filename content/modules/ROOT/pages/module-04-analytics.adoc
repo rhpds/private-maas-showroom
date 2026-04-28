@@ -8,8 +8,8 @@ Now that you've used the MaaS model a bit, let's see how the platform tracks usa
 
 1. Select the **Grafana Dashboard** tab. Log in again with your credentials if prompted.
 +
-Username: {user}
-Password: {password}
+* **Username**: {user}
+* **Password**: {password}
 +
 2. Go to the **grafana** dashboard
 +
