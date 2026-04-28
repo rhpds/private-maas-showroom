@@ -5,35 +5,34 @@
 
 Your platform team has deployed **NVIDIA Nemotron 3 Nano 30B A3B** as a centrally-managed service. You'll access this model through the Red Hat OpenShift AI dashboard.
 
-**Login to OpenShift Console**:
+**Login to OpenShift AI Dashboard**:
 
-* **Console URL**: https://console-openshift-console.{openshift_cluster_ingress_domain}/[https://console-openshift-console.{openshift_cluster_ingress_domain}/,window=_blank]
 * **User**: {user}
 * **Password**: {password}
 
 == Access the Model Endpoint
 
-1. Click the apps menu and select **Red Hat OpenShift AI**
-
-image::nav-rhoai.png[]
-
-2. Navigate to **Gen AI Studio** → **AI asset endpoints**
-
+. Navigate to **Gen AI Studio** → **AI asset endpoints**
++
 image::nav-genaistudio.png[]
-
-3. Change the project to **{user}**
-
++
+. Change the project to **{user}**
++
 image::genaistudio-changeproject.png[]
-
-4. Select the **Models as a Service** tab
-
++
+. Select the **Models as a Service** tab
++
 image::maas-tab.png[]
 
 You'll see the `nemotron-3-nano-30b-a3b` model deployed by your platform team.
 
 image::maas-model.png[]
 
-**You don't need to copy these credentials** - the Gen AI Studio Playground (next module) is already pre-configured to use this model. We're just showing you where the MaaS endpoints live in the platform.
+== Understanding the MaaS Workflow
+
+This MaaS pattern reflects best practice: platform teams centralize infrastructure management (deploying models, managing endpoints, handling credentials) while making consumption seamless for users. You get secure access without struggling with infrastructure details.
+
+In a real MaaS deployment, you'd copy these endpoint details and API keys to configure your applications. However, **for this workshop, your platform team has simply pre-configured the Gen AI Studio Playground** to use this model for us to experiment in the next module.
 
 include::common/solve-button.adoc[]
 

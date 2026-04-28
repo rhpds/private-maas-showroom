@@ -1,20 +1,26 @@
 :imagesdir: ../assets/images
 [#agentic-ai]
-= Agentic AI with Rocket.Chat
+= Agentic AI with MCP Servers
 
-Agentic AI extends beyond code assistance - it can interact with operational tools using natural language. In this module, you'll use the same Nemotron model to post messages to a Rocket.Chat workspace.
+Agentic AI doesn't just answer questions—it takes actions. Using tool-calling capabilities, models can execute real operations in external systems based on natural language instructions.
+
+In this module, you'll see the power of MaaS in action: the same Nemotron model you accessed in the previous module can also perform operational tasks. You'll use it to interact with your Kubernetes cluster and Rocket.Chat workspace, demonstrating how one centrally-deployed model serves multiple use cases.
 
 == Open the Gen AI Studio Playground
 
-The playground lets you test agentic AI capabilities - models with tool-calling abilities - before writing code.
+To enable agentic capabilities, your model needs access to external tools. **MCP (Model Context Protocol) servers** expose these tools—like Kubernetes APIs and Rocket.Chat's messaging system—to your model through a standardized interface.
 
-1. From the OpenShift AI dashboard, navigate to **AI asset endpoints**
+The Gen AI Studio Playground lets you test these MCP server integrations interactively, so you can validate agentic workflows before building them into production applications.
 
-image::nav-aiassets.png[]
+1. In the **AI asset endpoints** section of the dashboard, navigate to the `MCP servers` tab:
+
++
+image::genaistudio-mcpservers.png[]
++
 
 2. Ensure project is set to **{user}**
 
-3. Click **Try in Playground** for the Nemotron model
+3. Click **Try in Playground** for the `Kubernetes-MCP-Server`
 
 image::mcp-try-playground.png[]
 
@@ -22,32 +28,51 @@ You'll see a chat interface with your model preselected.
 
 image::playground.png[]
 
-== Authorize the Rocket.Chat MCP Server
+The Kubernetes MCP server is already authorized (you clicked "Try in Playground" for it). Let's test it first, then add Rocket.Chat capabilities.
 
-MCP (Model Context Protocol) servers give your model access to external tools. The Rocket.Chat MCP server is already configured - you just need to authorize it.
+== Query Your Kubernetes Cluster
 
-1. Click the MCP servers dropdown and select **Rocket.Chat MCP Server**
+With the Kubernetes MCP server active, you can interact with your OpenShift cluster using natural language. Try these commands in the playground:
 
-image::select-mcp.png[]
+[source,console,role=execute,subs=attributes+]
+----
+List all pods in the {user} namespace
+----
 
-2. Click **Save** on the confirmation popup
+NOTE: If you see any errors for any prompts in this module, refresh the page and try the prompt again.
 
-image::mcp-auth-save.png[]
+You should see the pods running in your namespace, including the model serving pods.
 
-Your agent now has access to Rocket.Chat.
+Feel free to ask more questions and utilize more of the MCP server's tools.
+
+The model translates your natural language request into `kubectl` commands and returns the results. This is ChatOps in action—no YAML, no command-line syntax, just conversational requests.
+
+== Add Rocket.Chat Capabilities
+
+Now let's expand your agent's capabilities by adding a second MCP server. This demonstrates how you can compose multiple tools for a single agent.
 
 == Post a Message to Rocket.Chat
 
-First, open Rocket.Chat in a new tab: {rocketchat_url}
+First, open the **Rocket Chat Console** tab and login:
 
 * **Username**: {user}
 * **Password**: {password}
 
 Close any popups you see.
 
-image::rocketchat-popup.png[]
+Now, back in the **Gen AI Studio Playground** in the **OpenShift AI Console** tab, activate the Rocket.Chat MCP server:
 
-Now, back in the **Gen AI Studio Playground**, type this in the chat:
+1. In the playground's **MCP servers** section, select the **Rocket.Chat MCP Server**:
++
+image::select-mcp.png[]
++
+2. Click **Save** on the confirmation popup
+
+image::mcp-auth-save.png[]
+
+Your agent now has access to Rocket.Chat.
+
+Now, type this in the chat:
 
 [source,console,role=execute,subs=attributes+]
 ----
@@ -60,18 +85,16 @@ Now let's post a message:
 
 [source,console,role=execute,subs=attributes+]
 ----
-Post a message to the #workshop channel: "Hello from {user} - testing agentic AI!"
+Post a message to the #workshop channel: "Hello from {user} - testing agentic AI at Red Hat Summit!"
 ----
 
-**Check the Rocket.Chat tab** - your message should appear in the #workshop channel within a few seconds.
+**Check the Rocket.Chat tab** - your message should appear in the **#workshop** channel within a few seconds.
 
 == What Just Happened?
 
-You used natural language to:
-* Query available channels
-* Post a message to a specific channel
+You used natural language to interact with two different systems—Kubernetes for infrastructure operations, Rocket.Chat for team communication. The model automatically translated your requests into the appropriate API calls.
 
-The model translated your request into Rocket.Chat API calls automatically. This same pattern enables ChatOps workflows - imagine triggering deployments, querying logs, or posting incident reports through conversational commands.
+**This is the MaaS multiplier**: One model deployment serves multiple use cases. Platform teams manage the infrastructure once; users consume it across different workflows through simple conversational interfaces.
 
 include::common/solve-button.adoc[]
 

@@ -3,7 +3,7 @@
 [#maas_introduction]
 = Introduction: Models-as-a-Service
 
-When AI infrastructure is self-service without guardrails, problems emerge: teams duplicate models, GPUs sit idle or overload, and costs escalate without accountability.
+When AI infrastructure is self-service without guardrails, problems emerge: teams duplicate model deployments unnecessarily, GPUs sit idle or overload, and costs escalate without accountability.
 
 [.bordershadow]
 image::iaas.png[width="50%"]

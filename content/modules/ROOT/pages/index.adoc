@@ -3,47 +3,49 @@
 
 == Welcome to the Workshop
 
-This isn't a simple product tutorial. This workshop covers the full technical stack for deploying and operating Models-as-a-Service in an enterprise Red Hat AI environment.
+In this **lightning lab**, you'll experience Models-as-a-Service in action. When AI infrastructure lacks governance, teams duplicate models, GPUs sit idle or overload, and costs escalate without accountability.
 
-You'll work through three operational perspectives:
+**Models-as-a-Service** solves this by centralizing model deployment and exposing them through secure, authenticated APIs. Platform teams manage models once; developers consume them without GPU complexity.
 
-* **Developer**: Connect a code assistant application to a private LLM endpoint via Red Hat AI inference APIs. Install and configure a code assistant to use your deployed model. Build AI-enhanced applications without external dependencies.
+You'll experience three key aspects:
 
-* **Platform Engineer/SRE**: Test agentic workflows with MCP servers for Kubernetes and Rocket.Chat. Use the integrated UI to query cluster resources, retrieve pod logs, and push operational data to team channels—all via natural language prompts backed by real-time API calls.
+* **Model Access**: Retrieve credentials from a centrally-deployed NVIDIA Nemotron model through the Red Hat OpenShift AI dashboard
+* **Agentic AI**: Use natural language to interact with Rocket.Chat via the Gen AI Studio Playground
+* **Usage Analytics**: View real-time token consumption and cost metrics through a custom Grafana dashboard
 
-* **Platform Stakeholder**: Analyze model usage through a custom Grafana dashboard: token consumption, request latency, user attribution, and cost allocation. Understand production utilization patterns before scaling investment.
-
-By the end, you'll have hands-on experience across model deployment, developer integration, operational automation, and usage analytics.
+By the end, you'll see how MaaS eliminates GPU waste, enables cost attribution, and transforms AI infrastructure into a managed service.
 
 == Workshop Agenda
 
-=== **Module 1:** Introduction to your environment and Models-as-a-Service Infrastructure
-As a developer, get acquainted with your Red Hat AI cluster environment and navigate to the OpenShift AI dashboard to view your NVIDIA Nemotron model deployment and retrieve your endpoint and API token.
+=== **Module 1:** Introduction to Models-as-a-Service
+Understand the MaaS problem and solution, and preview what you'll accomplish in this workshop.
 
-=== **Module 2:** AI-Assisted Development
-Set up OpenShift Dev Spaces, install an AI-powered code assistant, and connect it to your private MaaS model endpoint to enhance your coding workflow.
+=== **Module 2:** Get Model Credentials
+Navigate to the OpenShift AI dashboard to view your platform team's deployed NVIDIA Nemotron model and access the endpoint details.
 
-=== **Module 3:** Game Time
-Build a simple game using AI assistance. Explore, experiment, and build confidence with AI-assisted coding through a fun, low-pressure project.
+=== **Module 3:** Agentic AI with Rocket.Chat
+Use the Gen AI Studio Playground to interact with Rocket.Chat using natural language. List channels and post messages through conversational commands backed by MCP (Model Context Protocol) servers.
 
-=== **Module 4:** System Administration with Agentic AI
-With the mindset of a site reliability engineer or DevOps practitioner, use Model Context Protocol (MCP) servers and Red Hat AI to interact with your OpenShift cluster and Rocket.Chat workspace using natural language.
+=== **Module 4:** Usage Analytics
+View a custom Grafana dashboard showing real-time token consumption, user attribution, and cost metrics from the platform's Prometheus observability stack.
 
-=== **Module 5:** Usage Analytics and Reporting
-Take on the role of a technical decision maker or platform stakeholder. Explore Grafana dashboards to monitor model usage, track costs, and understand the business impact of your AI services.
+=== **Module 5:** Summary
+Review what you've accomplished and explore next steps for implementing MaaS in your organization.
 
 == Workshop Environment
 
-For this workshop, you are in a shared Red Hat AI cluster environment with your own assigned user access. Each participant shares access to a centrally-deployed **NVIDIA Nemotron 3 Nano 30B A3B FP8** model.
+You'll work in a shared Red Hat AI cluster environment with your own assigned user access. All participants share access to a centrally-deployed **NVIDIA Nemotron 3 Nano 30B A3B FP8** model.
 
-This reflects a real-world Models-as-a-Service architecture: a platform team deploys and manages the model infrastructure, while development teams consume it via standard API endpoints. The model runs on GPU-accelerated OpenShift nodes and serves requests through Red Hat AI's inference stack.
+This reflects a real-world Models-as-a-Service architecture: a platform team deploys and manages the model infrastructure, while users consume it via standard API endpoints. The model runs on GPU-accelerated OpenShift nodes and serves requests through Red Hat AI's inference stack.
 
-**Why NVIDIA Nemotron for this workshop?**
+**Why NVIDIA Nemotron for this lab?**
 
 * **Enterprise-optimized**: FP8 quantization delivers high throughput on modern GPUs
-* **Versatile**: Handles code generation, reasoning, and tool-calling (MCP servers)
+* **Versatile**: Handles reasoning and tool-calling via MCP servers
 * **Production-ready**: Instruction-tuned for reliable, deterministic responses
 * **Cost-effective**: 30B parameters provide strong capability without excessive resource requirements
 
-You'll use this same model across all modules - from code assistance to agentic operations to usage analytics.
+You'll use this same model across all modules - from accessing credentials to agentic automation to viewing usage analytics.
+
+**Powered by Red Hat AI Factory with NVIDIA** - enterprise-grade AI infrastructure that scales from experimentation to production.
 

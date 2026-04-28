@@ -2,18 +2,19 @@
 [#model-analytics]
 = Usage Analytics
 
-Now that you've consumed the MaaS model, let's see how the platform tracks usage.
+Now that you've used the MaaS model a bit, let's see how the platform tracks usage.
 
 == View the Grafana Dashboard
 
-1. From the cluster apps menu, select **Grafana**
-
-image::grafana-app.png[]
-
-2. Select the **grafana** dashboard
-
+1. Select the **Grafana Dashboard** tab. Log in again with your credentials if prompted.
++
+Username: {user}
+Password: {password}
++
+2. Go to the **grafana** dashboard
++
 image::dashboards-grafana.png[]
-
++
 3. Select **MaaS Token Metrics Dashboard**
 
 image::maas-dashboard.png[]
@@ -31,7 +32,7 @@ Key metrics:
 * **Hourly Usage**: Usage patterns over time
 * **Cost by User**: Estimated costs based on tier pricing (Enterprise tier)
 
-**Your activity is here** - the Rocket.Chat interactions you just did in the playground generated tokens, and they're being tracked in this dashboard.
+**Your activity is here** - the conversation you just had in the playground generated tokens, and they're being tracked in this dashboard.
 
 NOTE: This is a **custom Grafana dashboard** integrating with Red Hat AI's Prometheus metrics stack. While this specific dashboard is a workshop example, it demonstrates how you can leverage the platform's built-in observability. Red Hat AI will include integrated analytics in upcoming releases.
 
