@@ -12,7 +12,7 @@ When infrastructure is self-service with no clear guardrails in place, problems 
 - Developers need model access, not GPU management complexity
 
 [.bordershadow]
-image::iaas.png[width="50%"]
+image::iaas.png[width=500]
 
 == Models-as-a-Service: A Better Abstraction for AI at Scale
 
@@ -39,7 +39,7 @@ To address these challenges as a platform engineer, you will design a centralize
 * Eliminates waste while ensuring fair access and cost control
 
 [.bordershadow]
-image::maas.png[width="50%"]
+image::maas.png[width=500]
 
 == Powered by Red Hat AI Factory with NVIDIA
 

@@ -19,7 +19,8 @@ NOTE: The OpenShift AI dashboard shows "External endpoint" for the route — thi
 
 * Navigate to the OpenShift Dev Spaces application.
 
-image::nav-devspaces.png[]
+[.bordershadow]
+image::nav-devspaces.png[width=700]
 
 When prompted for your login credentials, repeat the same OpenShift user login:
 
@@ -30,15 +31,18 @@ Once authenticated, you will see the OpenShift Dev Spaces central dashboard. We 
 
 Click `Open`:
 
-image::open-workspace.png[]
+[.bordershadow]
+image::open-workspace.png[width=700]
 
-After a moment, you'll see the VS Code interface running in your browser. If prompted, click "Trust" when asked about the authors. 
+After a moment, you'll see the VS Code interface running in your browser. If prompted, click "Trust" when asked about the authors.
 
-image::trust-vscode.png[]
+[.bordershadow]
+image::trust-vscode.png[width=700]
 
 We have pre-configured the Dev Spaces workspace to install the Continue code assistant extension. You will be prompted to `trust the Continue publisher`. Click `Trust publisher & Install`:
 
-image::trust-continue.png[]
+[.bordershadow]
+image::trust-continue.png[width=700]
 
 In our workspace you'll find a repository ready for your use. This is where you will build and refine with some AI assistance. The only thing we need to configure now is our model connection to the Continue extension.
 
@@ -68,9 +72,11 @@ NOTE: Continue is an example of an AI-powered coding assistant for this workshop
 
 Navigate to the **Continue sidebar icon** in the left-hand side navigation panel. If needed, expand the Continue app sidebar by dragging the border over.
 
-image::nav-continue.png[]
+[.bordershadow]
+image::nav-continue.png[width=700]
 
-image::continue-open.png[]
+[.bordershadow]
+image::continue-open.png[width=500]
 
 In order to connect our model to the Continue code extension we must provide the extension our model's endpoint URL and API key from our MaaS deployment from the previous module.
 
@@ -82,7 +88,8 @@ We've provided a pre-configured template file for the Continue extension. You'll
 
 Open a terminal in VS Code (Terminal > New Terminal from the menu, or `Ctrl+``)
 
-image::new-terminal.png[]
+[.bordershadow]
+image::new-terminal.png[width=500]
 
 In the terminal, run the following command:
 
@@ -100,7 +107,8 @@ Now open the configuration file to customize it with your MaaS endpoint details.
 ~/.continue/config.yaml
 ----
 
-image::search-config.png[]
+[.bordershadow]
+image::search-config.png[width=700]
 
 Hit `Enter` to open the file. You'll see the following configuration:
 
@@ -138,7 +146,8 @@ When the model is properly configured, you will be able to chat with the model i
 
 NOTE: This workshop and model configuration only support Chat mode for the Continue extension. Ensure it is set to `Chat` and not `Agent` or `Plan`.
 
-image::ready-to-chat.png[]
+[.bordershadow]
+image::ready-to-chat.png[width=700]
 
 Go ahead - test it out with the following prompt:
 

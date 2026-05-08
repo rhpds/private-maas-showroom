@@ -55,19 +55,23 @@ The Gen AI Studio Playground integrates your deployed model with MCP servers. Fo
 
 * Select `AI asset endpoints` from the navigation menu.
 
-image::nav-aiassets.png[]
+[.bordershadow]
+image::nav-aiassets.png[width=500]
 
 * Change project back to {user}.
 
-image::aiassets-changeproject.png[]
+[.bordershadow]
+image::aiassets-changeproject.png[width=700]
 
 * View MCP servers
 
-image::genaistudio-mcpservers.png[]
+[.bordershadow]
+image::genaistudio-mcpservers.png[width=700]
 
 * See what you have available, then select the Kubernetes MCP Server and click  `Try in Playground`.
 
-image::mcp-try-playground.png[]
+[.bordershadow]
+image::mcp-try-playground.png[width=700]
 
 === Using the playground
 
@@ -85,15 +89,18 @@ In the playground, you'll see a chat interface with your model preselected and a
 
 NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.0-0.3) for deterministic, accurate responses - critical when invoking tools or querying infrastructure. Higher temperatures introduce randomness, which can break tool calls.
 
-image::playground.png[]
+[.bordershadow]
+image::playground.png[width=700]
 
 **Select your MCP servers** before issuing commands to authorize and activate them. This establishes the secure connection between your agent and live infrastructure. The Kubernetes MCP server is already authorized. Select Rocket.Chat MCP Server.
 
-image::select-mcp.png[]
+[.bordershadow]
+image::select-mcp.png[width=700]
 
 You'll see a confirmation popup - click `Save`:
 
-image::mcp-auth-save.png[]
+[.bordershadow]
+image::mcp-auth-save.png[width=700]
 
 Your agent is now live and connected to both Kubernetes and Rocket.Chat. You can issue natural language commands and watch them translate into real infrastructure operations.
 
@@ -103,7 +110,8 @@ NOTE: Authorization to the MCP servers is **session-based**. If you refresh or r
 
 View the MCP servers' available tools. You can see the RocketChat MCP Server has 28 tools active and available:
 
-image::view-rc-tools.png[]
+[.bordershadow]
+image::view-rc-tools.png[width=600]
 
 NOTE: You will see an alert about **performance degradation with more than 40 active tools**. This happens because too many tools increase the model's context window size and reduce its ability to accurately select the correct tool for each task - similar to decision paralysis when faced with too many choices. The model must evaluate every available tool against each request, and more options mean more opportunity for selection errors.
 
@@ -111,7 +119,8 @@ To optimize performance and help the model focus on the most relevant operations
 
 * Select the Kubernetes MCP server tools:
 
-image::view-k8s-tools.png[]
+[.bordershadow]
+image::view-k8s-tools.png[width=600]
 
 Ensure only the following tools are selected:
 
@@ -123,7 +132,8 @@ Ensure only the following tools are selected:
 
 * Now select the Rocket.Chat MCP Server tools:
 
-image::view-rc-tools.png[]
+[.bordershadow]
+image::view-rc-tools.png[width=600]
 
 Ensure only the following tools are selected:
 
@@ -167,7 +177,7 @@ With our Rocket.Chat MCP Server, we can extend our agentic AI experience beyond 
 
 This MCP server bridges your NVIDIA Nemotron model with a Rocket.Chat workspace to fetch and post approved data.
 
-Open the Rocket.Chat application at: {rocketchat_url}
+Open the link:{rocketchat_url}[Rocket.Chat application^]
 
 Login with the following credentials:
 
@@ -176,7 +186,8 @@ Login with the following credentials:
 
 You will see a pop-up. Simply close it, or accept update configuration:
 
-image::rocketchat-popup.png[]
+[.bordershadow]
+image::rocketchat-popup.png[width=700]
 
 NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel where your AI agents will post messages. You will observe the messages there after sending them through the playground.
 

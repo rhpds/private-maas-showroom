@@ -19,7 +19,8 @@ You only need to pick one - but feel free to try more if you have time.
 
 From the file explorer, navigate to the `game_starters` directory:
 
-image::game-starters.png[width="50%"]
+[.bordershadow]
+image::game-starters.png[width=700]
 
 This folder contains a folder for each game described above. Within each game folder are two files: one for Python code, one for Bash. They contain the same instructions, so just pick the game and language you prefer.
 
@@ -47,7 +48,8 @@ Copy the prompt from the first section (the section that starts with "Create a..
 
 IMPORTANT: Remember, the Continue chat needs to be set to `Chat` mode and not Agent or Plan modes.
 
-image::add-code-to-chat.png[]
+[.bordershadow]
+image::add-code-to-chat.png[width=700]
 
 **Step 3: Add the code to your file**
 
@@ -55,7 +57,8 @@ Copy the AI-generated code from the Continue chat extension and paste it into yo
 
 You may also use the `Insert Code` button. Ensure your cursor is at the right point in the file for insertion.
 
-image::add-code-to-file.png[]
+[.bordershadow]
+image::add-code-to-file.png[width=700]
 
 IMPORTANT: Keep all instructional comments in the file. Only add actual game code below them. This way you can always refer back to the suggestions.
 
@@ -83,7 +86,8 @@ Save your file (`Cmd+S` on Mac or `Ctrl+S` on Linux).
 
 Open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press `Ctrl+``.
 
-image::new-terminal.png[]
+[.bordershadow]
+image::new-terminal.png[width=500]
 
 Navigate to your game's folder in the terminal. For example (substitute the correct path to your game file):
 
@@ -138,7 +142,8 @@ If you want to enhance your game (Step 5), here's how to use your AI assistant e
 
 Click the `Continue` extension tab on the left-hand side of the VS Code window to access the chat interface. You can toggle between the file `Explorer` and `Continue` tabs as needed.
 
-image::toggle-sidebar.png[]
+[.bordershadow]
+image::toggle-sidebar.png[width=500]
 
 === Two Ways to Get AI Help
 
@@ -154,7 +159,8 @@ Your AI assistant offers two ways to help with your code:
 
 To use this approach, highlight the code you want to work with, then right-click and select `Continue` from the pop-up menu (or use `Cmd+Shift+P` / `Ctrl+Shift+P` and search for Continue):
 
-image::continue-popup.png[width="50%"]
+[.bordershadow]
+image::continue-popup.png[width=700]
 
 **AI assistance options:**
 

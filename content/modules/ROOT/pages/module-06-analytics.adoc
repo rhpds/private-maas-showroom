@@ -37,7 +37,8 @@ This insight enables:
 
 * Go to the Grafana application from your cluster's navigation menu:
 
-image::grafana-app.png[]
+[.bordershadow]
+image::grafana-app.png[width=700]
 
 Or, navigate directly to: {grafana_url}
 
@@ -47,11 +48,13 @@ Or, navigate directly to: {grafana_url}
 
 * Select the `grafana` dashboard from the list of available dashboards.
 
-image::dashboards-grafana.png[]
+[.bordershadow]
+image::dashboards-grafana.png[width=700]
 
 * Select `MaaS Token Metrics Dashboard` to view model usage analytics.
 
-image::maas-dashboard.png[]
+[.bordershadow]
+image::maas-dashboard.png[width=700]
 
 IMPORTANT: This Grafana instance has access to view metrics from all users in the shared workshop cluster. You will see aggregated data including other workshop participants' usage (assuming others have completed earlier modules). This demonstrates multi-tenant observability - in production, you would typically configure role-based access control to limit visibility based on team or project boundaries.
 
@@ -63,7 +66,8 @@ You can filter the dashboard data by:
 * **Model** - Only one model is deployed in this workshop
 * **Time Range** - Adjust the time window to focus on recent activity (try "Last 1 hour" or "Last 3 hours" to see your workshop activity)
 
-image::use-grafana-db.png[]
+[.bordershadow]
+image::use-grafana-db.png[width=700]
 
 TIP: To see your own usage from earlier modules, search for your username in the filters or locate it in the "Top 10 Users by Hits" panel. Your activity from Module 3-4 (Continue chat sessions) and Module 5 (MCP server interactions) should appear here.
 
