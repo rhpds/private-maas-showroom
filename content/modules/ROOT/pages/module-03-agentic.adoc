@@ -15,18 +15,21 @@ The Gen AI Studio Playground lets you test these MCP server integrations interac
 1. In the **AI asset endpoints** section of the dashboard, navigate to the `MCP servers` tab:
 
 +
-image::genaistudio-mcpservers.png[]
+[.bordershadow]
+image::genaistudio-mcpservers.png[width=700]
 +
 
 2. Ensure project is set to **{user}**
 
 3. Click **Try in Playground** for the `Kubernetes-MCP-Server`
 
-image::mcp-try-playground.png[]
+[.bordershadow]
+image::mcp-try-playground.png[width=700]
 
 You'll see a chat interface with your model preselected.
 
-image::playground.png[]
+[.bordershadow]
+image::playground.png[width=700]
 
 The Kubernetes MCP server is already authorized (you clicked "Try in Playground" for it). Let's test it first, then add Rocket.Chat capabilities.
 
@@ -64,11 +67,13 @@ Now, back in the **Gen AI Studio Playground** in the **OpenShift AI Console** ta
 
 1. In the playground's **MCP servers** section, deselect the **Kubernetes MCP Server** and select the **Rocket.Chat MCP Server**:
 +
-image::select-mcp.png[]
+[.bordershadow]
+image::select-mcp.png[width=700]
 +
 2. Click **Save** on the confirmation popup
 
-image::mcp-auth-save.png[]
+[.bordershadow]
+image::mcp-auth-save.png[width=700]
 
 Your agent now has access to Rocket.Chat.
 

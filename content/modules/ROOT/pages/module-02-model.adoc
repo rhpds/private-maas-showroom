@@ -14,19 +14,23 @@ Your platform team has deployed **NVIDIA Nemotron 3 Nano 30B A3B** as a centrall
 
 . Navigate to **Gen AI Studio** → **AI asset endpoints**
 +
-image::nav-genaistudio.png[]
+[.bordershadow]
+image::nav-genaistudio.png[width=700]
 +
 . Change the project to **{user}**
 +
-image::genaistudio-changeproject.png[]
+[.bordershadow]
+image::genaistudio-changeproject.png[width=700]
 +
 . Select the **Models as a Service** tab
 +
-image::maas-tab.png[]
+[.bordershadow]
+image::maas-tab.png[width=700]
 
 You'll see the `nemotron-3-nano-30b-a3b` model deployed by your platform team.
 
-image::maas-model.png[]
+[.bordershadow]
+image::maas-model.png[width=700]
 
 == Understanding the MaaS Workflow
 

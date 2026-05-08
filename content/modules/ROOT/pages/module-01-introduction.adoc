@@ -6,12 +6,12 @@
 When AI infrastructure is self-service without guardrails, problems emerge: teams duplicate model deployments unnecessarily, GPUs sit idle or overload, and costs escalate without accountability.
 
 [.bordershadow]
-image::iaas.png[width="50%"]
+image::iaas.png[width=600]
 
 **Models-as-a-Service** solves this by centralizing model deployment and exposing them through secure, authenticated APIs. Platform teams manage models once; developers consume them without GPU complexity.
 
 [.bordershadow]
-image::maas.png[width="50%"]
+image::maas.png[width=600]
 
 == What You'll Experience
 

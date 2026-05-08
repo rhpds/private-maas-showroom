@@ -13,17 +13,20 @@ Now that you've used the MaaS model a bit, let's see how the platform tracks usa
 +
 2. Go to the **grafana** dashboard
 +
-image::dashboards-grafana.png[]
+[.bordershadow]
+image::dashboards-grafana.png[width=700]
 +
 3. Select **MaaS Token Metrics Dashboard**
 
-image::maas-dashboard.png[]
+[.bordershadow]
+image::maas-dashboard.png[width=700]
 
 == What You're Seeing
 
 This dashboard shows real usage metrics from the Prometheus observability stack:
 
-image::use-grafana-db.png[]
+[.bordershadow]
+image::use-grafana-db.png[width=700]
 
 Key metrics:
 
