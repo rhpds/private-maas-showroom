@@ -80,7 +80,7 @@ NOTE: If you didn't document your model access information, go back to the OpenS
 
 We've provided a pre-configured template file for the Continue extension. You'll need to move it to the proper location where Continue expects to find it.
 
-Open a terminal in VS Code (Terminal > New Terminal from the menu, or kbd:[Ctrl+`])
+Open a terminal in VS Code (Terminal > New Terminal from the menu, or `Ctrl+``)
 
 image::new-terminal.png[]
 
@@ -93,7 +93,7 @@ cp /projects/exercises/.vscode/config.yaml ~/.continue/config.yaml
 
 This copies the template configuration file to `~/.continue/config.yaml`, replacing the blank template that's there.
 
-Now open the configuration file to customize it with your MaaS endpoint details. Open the search bar (kbd:[Cmd+P] on Mac or kbd:[Ctrl+P] on Linux) and type:
+Now open the configuration file to customize it with your MaaS endpoint details. Open the search bar (`Ctrl+P` on Linux or `Cmd+P` on Mac) and type:
 
 [source,sh,role="execute"]
 ----
@@ -158,15 +158,3 @@ You've now:
 * Set up an AI assistant that can refactor, edit and explain your code!
 
 Next, you will use Continue to help you develop a little fun game.
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-03-code"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-03-code"></div>
-++++

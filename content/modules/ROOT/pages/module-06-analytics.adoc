@@ -145,15 +145,3 @@ Remember the infrastructure challenges we started with?
 The analytics you just explored demonstrate how MaaS transforms AI infrastructure from an unmanaged cost center into a measurable, optimized platform service.
 
 While this workshop demonstrates a custom dashboard, Red Hat AI will include integrated analytics in upcoming releases. The Prometheus metrics are available today - build dashboards tailored to your organization's KPIs.
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-06-analytics"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-06-analytics"></div>
-++++

@@ -79,9 +79,9 @@ print("Welcome to the Quiz Game!")
 
 Now let's run your game and make sure it works!
 
-Save your file (kbd:[Cmd+S] on Mac or kbd:[Ctrl+S] on Linux).
+Save your file (`Cmd+S` on Mac or `Ctrl+S` on Linux).
 
-Open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press kbd:[Ctrl+`].
+Open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press `Ctrl+``.
 
 image::new-terminal.png[]
 
@@ -152,7 +152,7 @@ Your AI assistant offers two ways to help with your code:
 
 **2. Interactive Code Assistance** - Highlight specific code and get targeted help:
 
-To use this approach, highlight the code you want to work with, then right-click and select `Continue` from the pop-up menu (or use kbd:[Cmd+Shift+P] / kbd:[Ctrl+Shift+P] and search for Continue):
+To use this approach, highlight the code you want to work with, then right-click and select `Continue` from the pop-up menu (or use `Cmd+Shift+P` / `Ctrl+Shift+P` and search for Continue):
 
 image::continue-popup.png[width="50%"]
 
@@ -186,15 +186,3 @@ You've just experienced the MaaS platform as a **developer** - consuming model e
 But the same MaaS architecture you used for Continue also powers operational automation. In the next module, you'll switch roles to become an **SRE/DevOps practitioner** and see how the same Nemotron model - deployed once, shared across the organization - can drive infrastructure operations, diagnostics, and ChatOps workflows.
 
 **Same platform. Same model. Different use case.** This is the power of Models-as-a-Service.
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-04-code"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-04-code"></div>
-++++

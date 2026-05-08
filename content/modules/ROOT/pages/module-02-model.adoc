@@ -77,7 +77,7 @@ image::view-endpoint.png[]
 
 Copy the MaaS route and save it in a note file - you'll need this in the next module.
 
-NOTE: To copy the route, highlight the text and use kbd:[Ctrl+C] (or kbd:[Cmd+C] on Mac).
+NOTE: To copy the route, highlight the text and use `Ctrl+C` (`Cmd+C` on Mac).
 
 image::copy-route.png[]
 
@@ -87,20 +87,8 @@ image::generate-token.png[]
 
 Copy this API token and save it with your route endpoint - you'll need both values in the next module.
 
-NOTE: Highlight the token text and copy with kbd:[Ctrl+C] (or kbd:[Cmd+C] on Mac).
+NOTE: Highlight the token text and copy with `Ctrl+C` (or `Cmd+C` on Mac).
 
 image::copy-token.png[]
 
 Now that we have our model connection details, we can proceed to our development environment to leverage the model.
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-02-model"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-02-model"></div>
-++++

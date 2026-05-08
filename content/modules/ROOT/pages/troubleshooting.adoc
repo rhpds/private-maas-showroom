@@ -107,9 +107,3 @@ If you encounter an issue not covered here:
 1. **Check the Continue chat interface** - Describe your error and ask for help
 2. **Review error messages carefully** - They often contain specific hints about what's wrong
 3. **Ask workshop facilitators** - They can help diagnose cluster-specific issues
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="troubleshooting"></div>
-++++

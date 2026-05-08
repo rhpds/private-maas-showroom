@@ -242,15 +242,3 @@ This agentic pattern enables on-call engineers and SREs to query infrastructure 
 * **Proactive monitoring**: Agents can watch for specific patterns and automatically notify teams when issues arise
 
 You just used AI to reduce operational complexity and speed up workflows - imagine scaling this across your entire infrastructure stack!
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-05-agentic"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-05-agentic"></div>
-++++
