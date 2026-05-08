@@ -97,15 +97,3 @@ Post a message to the #workshop channel: "Hello from {user} - testing agentic AI
 You used natural language to interact with two different systems—Kubernetes for infrastructure operations, Rocket.Chat for team communication. The model automatically translated your requests into the appropriate API calls.
 
 **This is the MaaS multiplier**: One model deployment serves multiple use cases. Platform teams manage the infrastructure once; users consume it across different workflows through simple conversational interfaces.
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-03-agentic"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-03-agentic"></div>
-++++

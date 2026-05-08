@@ -33,15 +33,3 @@ image::maas-model.png[]
 This MaaS pattern reflects best practice: platform teams centralize infrastructure management (deploying models, managing endpoints, handling credentials) while making consumption seamless for users. You get secure access without struggling with infrastructure details.
 
 In a real MaaS deployment, you'd copy these endpoint details and API keys to configure your applications. However, **for this workshop, your platform team has simply pre-configured the Gen AI Studio Playground** to use this model for us to experiment in the next module.
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="module-02-model"></div>
-++++
-
-include::common/validate-button.adoc[]
-
-++++
-<div class="validate-button-placeholder" data-module="module-02-model"></div>
-++++

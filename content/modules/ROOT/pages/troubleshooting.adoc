@@ -31,9 +31,3 @@ If you encounter an issue not covered here:
 1. **Review error messages carefully** - They often contain specific hints about what's wrong
 2. **Ask workshop facilitators** - They can help diagnose cluster-specific issues
 3. **Refresh and retry** - Many issues resolve by refreshing the page and re-authorizing MCP servers
-
-include::common/solve-button.adoc[]
-
-++++
-<div class="solve-button-placeholder" data-module="troubleshooting"></div>
-++++
