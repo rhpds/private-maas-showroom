@@ -36,8 +36,8 @@ module.exports.register = function () {
       // page-links list entries stay unresolved post-conversion; substitute
       // the domain placeholder from the component-level attribute.
       const domain = attrs.openshift_cluster_ingress_domain
-      if (Array.isArray(attrs.links) && domain) {
-        attrs.links = attrs.links.map((l) =>
+      if (Array.isArray(attrs['page-links']) && domain) {
+        attrs['page-links'] = attrs['page-links'].map((l) =>
           l && typeof l.url === 'string'
             ? { ...l, url: l.url.replaceAll('{openshift_cluster_ingress_domain}', domain) }
             : l
