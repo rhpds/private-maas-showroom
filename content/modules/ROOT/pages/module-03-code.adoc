@@ -50,7 +50,7 @@ image::trust-continue.png[width=700]
 
 In our workspace you'll find a repository ready for your use. This is where you will build and refine with some AI assistance. The only thing we need to configure now is our model connection to the Continue extension.
 
-NOTE: The repository you are in is for the https://docs.redhat.com/en/learn/ai-quickstarts/rh-maas-code-assistant[Accelerate enterprise development with NVIDIA and MaaS^] AI quickstart. 
+NOTE: The repository you are in is for the https://docs.redhat.com/en/learn/ai-quickstarts/rh-maas-code-assistant[Accelerate enterprise development with NVIDIA and MaaS^] AI quickstart.
 
 Before we dive in, let me tell you a bit about **Continue**.
 
@@ -68,7 +68,7 @@ Before we dive in, let me tell you a bit about **Continue**.
 
 Continue will execute these requests directly in your editor, with full awareness of your codebase and project context.
 
-Continue supports custom model endpoints, making it a perfect example for connecting to your private enterprise models. Continue is an **open-source** solution that gives you complete control over your AI coding workflow. 
+Continue supports custom model endpoints, making it a perfect example for connecting to your private enterprise models. Continue is an **open-source** solution that gives you complete control over your AI coding workflow.
 
 NOTE: Continue is an example of an AI-powered coding assistant for this workshop experience. You can easily imagine how this could work with any other desired code assistant extensions that allow you to customize the model used.
 
@@ -84,7 +84,7 @@ image::continue-open.png[width=500]
 
 In order to connect our model to the Continue code extension we must provide the extension our model's endpoint URL and API key from our MaaS deployment from the previous module.
 
-NOTE: If you didn't document your model access information, go back to the OpenShift AI dashboard to the **AI asset endpoints** section to retrieve the credentials: https://data-science-gateway.{openshift_cluster_ingress_domain}/
+NOTE: If you didn't document your model access information, go back to the OpenShift AI dashboard to the **AI asset endpoints** section to retrieve the credentials: https://rh-ai.{openshift_cluster_ingress_domain}/
 
 === Configure the Continue Extension
 
