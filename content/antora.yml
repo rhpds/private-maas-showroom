@@ -50,7 +50,7 @@ asciidoc:
         text: OpenShift AI Dashboard
       - url: https://console-openshift-console.{openshift_cluster_ingress_domain}
         text: OpenShift Console
-      # Verify the DevSpaces route on-cluster — diverges from bare devspaces_url (devspaces.<ingress-domain>)
-      - url: https://devspaces-openshift-devspaces.{openshift_cluster_ingress_domain}/
+      # DevSpaces route verified serving (200) on current cluster
+      - url: https://devspaces.{openshift_cluster_ingress_domain}/
         text: DevSpaces
     imagesdir: ../assets/images
