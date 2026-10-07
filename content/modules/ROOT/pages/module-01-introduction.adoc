@@ -3,13 +3,13 @@
 [#maas_introduction]
 = Introduction: The Hidden Cost of Infrastructure-as-a-Service
 
-When infrastructure is self-service with no clear guardrails in place, problems can quickly emerge:
+When infrastructure is self-service with no clear limits in place, problems can quickly emerge:
 
 - Teams struggle to correctly request and size GPU resources
 - Multiple teams may deploy identical models, duplicating effort
 - Expensive GPUs remain idle or become overloaded
 - Infrastructure costs escalate without clear accountability
-- Developers need model access, not GPU management complexity
+- Developers often need model access, not GPU management complexity
 
 [.bordershadow]
 image::iaas.png[width=500]
@@ -47,7 +47,7 @@ This workshop demonstrates a **Models-as-a-Service** architecture built on **Red
 
 Together, this joint solution enables you to deploy and manage efficient, cost-effective AI solutions across hybrid cloud environments. You'll experience an end-to-end, high-performance AI stack with unified orchestration and management, leveraging Red Hat AI Enterprise and NVIDIA AI Enterprise software for streamlined model customization, industry-leading LLM serving, and accelerated infrastructure to build, deploy, and manage AI at scale.
 
-Throughout this workshop, you'll work with components from this factory approach including optimized model serving, secure API gateways, observability dashboards, and developer-friendly tools—all running on Red Hat OpenShift AI.
+Throughout this workshop, you'll work with components from this factory approach including optimized model serving, secure API gateways, observability dashboards, and developer-friendly tools—all running on Red Hat OpenShift and OpenShift AI.
 
 == Your Multi-Persona Journey
 
@@ -59,6 +59,6 @@ As a platform team, you've already deployed a Models-as-a-Service architecture f
 
 Each persona uses the **same centrally-deployed model** - demonstrating how MaaS maximizes resource utilization, reduces duplication, and serves diverse organizational needs from a single platform.
 
-== Module 1 Goals: Step into the Developer Role
+== Next module's goals: Step into the Developer Role
 
-In this first module, you'll begin as a **developer**. You'll access your OpenShift web console and retrieve credentials for the centrally-managed model that's been deployed through the Models-as-a-Service interface. 
+In the next module, you'll begin as a **developer**. You'll access your OpenShift web console and retrieve credentials for the centrally-managed model that's been deployed through the Models-as-a-Service interface.

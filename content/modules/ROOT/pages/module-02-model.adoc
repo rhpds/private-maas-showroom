@@ -1,7 +1,7 @@
 :imagesdir: ../assets/images
 
 [#model-deployment]
-= Introduction to your environment
+= Configuring access to the MaaS-hosted model
 
 Our first step is to get accustomed to our environment and its components.
 
@@ -24,8 +24,6 @@ From here, we will navigate to and between the following environments throughout
 ** View and manage model deployments, MLOps/LLMOps workflows, and AI resources.
 * **Red Hat OpenShift Dev Spaces**
 ** Develop and code using our model-as-a-service infrastructure.
-* **Grafana**
-** Monitor model usage and performance through dashboards.
 
 You may find and go to these applications via our navigation button in the web console:
 
@@ -47,8 +45,6 @@ Click the navigation button and select **Red Hat OpenShift AI** from the drop-do
 [.bordershadow]
 image::nav-rhoai.png[width=700]
 
-If prompted, login again with your user credentials to the OpenShift AI dashboard.
-
 Once authenticated you will see the following home page:
 
 [.bordershadow]
@@ -59,45 +55,33 @@ Now, go to the `Gen AI Studio` section of the dashboard and select `AI asset end
 [.bordershadow]
 image::nav-genaistudio.png[width=700]
 
-In the AI asset endpoints page, change the project from `grafana` to {user}.
-
-[.bordershadow]
-image::genaistudio-changeproject.png[width=700]
-
 Now you may view your available asset endpoints.
 
 We currently have a model deployed in a namespace managed by our cluster admin. This admin has set up a `Models as a Service` architecture for our organization with a central model they have deployed and managed that is available for use by remote teams across the organization.
 
-We do not have access to manage the model deployment directly, but we can access its endpoint information via the `Models as a Service` tab.
+We do not have access to manage the model deployment directly, but we can access its endpoint information via the `Models as a Service` section.
 
-[.bordershadow]
-image::maas-tab.png[width=700]
-
-Select the tab. Your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
+Your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
 
 [.bordershadow]
 image::maas-model.png[width=700]
 
-Let's grab the endpoint to use in our code assistant. Select `View` under the `External endpoint` column:
+Let's grab the endpoint to use in our code assistant. Select `View` under the `Endpoints` column:
 
 [.bordershadow]
 image::view-endpoint.png[width=700]
 
 Copy the MaaS route and save it in a note file - you'll need this in the next module.
 
-NOTE: To copy the route, highlight the text and use `Ctrl+C` (`Cmd+C` on Mac).
-
 [.bordershadow]
 image::copy-route.png[width=700]
 
-Now, click `Generate API token`.
+Now, navigate to the `API keys` page in the MaaS dashboard and create a new API key. If you don't have a subscription yet, select the `maas-free-subscription` to create one.
 
 [.bordershadow]
 image::generate-token.png[width=700]
 
-Copy this API token and save it with your route endpoint - you'll need both values in the next module.
-
-NOTE: Highlight the token text and copy with `Ctrl+C` (or `Cmd+C` on Mac).
+Copy this API key and save it with your route endpoint - you'll need both values in the next module.
 
 [.bordershadow]
 image::copy-token.png[width=700]

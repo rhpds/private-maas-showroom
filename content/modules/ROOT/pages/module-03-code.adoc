@@ -11,9 +11,9 @@ AI code assistants understand full project context, edit code through natural la
 
 OpenShift Dev Spaces delivers instant access to pre-configured, containerized workspaces running on your OpenShift cluster. It ensures consistency across your team, eliminates "works on my machine" problems, and keeps your development environment in sync with your deployment target.
 
-**Why use Dev Spaces for this workshop?** While you can expose model endpoints externally and develop locally, Dev Spaces offers advantages: your code runs in the same environment where it will deploy, dependencies are pre-configured, and you can access cluster-internal services directly. For this workshop, the model is cluster-internal only, making Dev Spaces the natural choice.
+**Why use Dev Spaces for this workshop?** While you can expose model endpoints externally and develop locally, Dev Spaces offers advantages: your code runs in the same environment where it will deploy, dependencies are pre-configured, and you can access cluster-internal services directly.
 
-NOTE: The OpenShift AI dashboard shows "External endpoint" for the route — this is currently the default MaaS labeling in the UI. In this environment, the route is cluster-internal only.
+NOTE: OpenShift Dev Spaces is included with a full OpenShift Container Platform subscription.
 
 === Access OpenShift Dev Spaces
 
@@ -36,6 +36,10 @@ image::open-workspace.png[width=700]
 
 After a moment, you'll see the VS Code interface running in your browser. If prompted, click "Trust" when asked about the authors.
 
+NOTE: If your workspace fails to start, don't worry — everything was idled/shut down to free resources. Clicking `Open` again will re-start it.
+
+NOTE: The pop-ups above may appear in a different order than shown.
+
 [.bordershadow]
 image::trust-vscode.png[width=700]
 
@@ -54,13 +58,13 @@ Before we dive in, let me tell you a bit about **Continue**.
 
 **Continue** is an open-source AI code assistant that integrates into VS Code. Continue provides an interactive chat interface where you can have natural conversations about your code. You can ask Continue to perform actions like:
 
-**“Add logging to this function”**
+“Add logging to this function”
 
-**“Generate a unit test for this file”**
+“Generate a unit test for this file”
 
-**“Refactor this into smaller components”**
+“Refactor this into smaller components”
 
-**“Explain what this code does”**
+“Explain what this code does”
 
 Continue will execute these requests directly in your editor, with full awareness of your codebase and project context.
 
@@ -120,9 +124,18 @@ schema: v1
 models:
   - name: NVIDIA Nemotron 3 Nano 30B A3B FP8
     provider: openai
-    model: "nemotron-3-nano-30b-a3b"
+    model: "publishers/llm/models/nemotron-3-nano-30b-a3b"
     apiBase: "YOUR_MAAS_ROUTE/v1"
     apiKey: "YOUR_API_KEY"
+    capabilities:
+      - tool_use
+    roles:            # do not add autocomplete — FIM is not supported by this route
+      - chat
+      - edit
+      - apply
+    defaultCompletionOptions:
+      contextLength: 262144   # verify the model's real served limit
+      maxTokens: 1024
 context:
   - provider: code
   - provider: docs
@@ -137,14 +150,12 @@ IMPORTANT: Replace the `apiBase` URL with your actual MaaS endpoint URL and `YOU
 
 For example:
 
-* **apiBase**: `http://maas.apps.ocp.75d7w.sandbox114.opentlc.com/llm/nemotron-3-nano-30b-a3b/v1` (Note the `v1` at the end of the URL)
+* **apiBase**: `https://maas.{openshift_cluster_ingress_domain}/v1` (Note the `v1` at the end of the URL)
 * **apiKey**: `your-actual-api-key-here`
 
 NOTE: You may reference the complete configuration documentation here: https://docs.continue.dev/reference[Continue Documentation^]
 
 When the model is properly configured, you will be able to chat with the model in the sidebar.
-
-NOTE: This workshop and model configuration only support Chat mode for the Continue extension. Ensure it is set to `Chat` and not `Agent` or `Plan`.
 
 [.bordershadow]
 image::ready-to-chat.png[width=700]

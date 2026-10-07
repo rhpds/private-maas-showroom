@@ -35,7 +35,7 @@ If you see connection errors when chatting with the model:
 **Check your configuration file** (`~/.continue/config.yaml`):
 
 * Verify the `apiBase` URL is correct and includes `/v1` at the end
-* Ensure the `apiKey` matches exactly what was generated (no extra spaces, ensure you copied the full API key properly, etc.)
+* Ensure the `apiKey` matches the key you created on the **API keys** page in the MaaS dashboard (no extra spaces, ensure you copied the full API key properly, etc.)
 
 == Terminal and Code Execution Issues
 
@@ -91,9 +91,9 @@ After making the file executable, you can run it with:
 
 === Pod or Namespace Not Found
 
-* Ensure you're using the correct namespace name (`grafana`)
+* Ensure you're using the correct namespace name (`{user}`)
 * For pod-specific commands, use the full pod name including the generated suffix
-* Run "List all pods in the grafana namespace" first to get the exact pod name
+* Run "List all pods in the {user} namespace" first to get the exact pod name
 
 === General Recovery Steps for Playground Issues
 

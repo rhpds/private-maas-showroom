@@ -48,4 +48,6 @@ asciidoc:
     page-links: links
     page-rhoai_dashboard_url: "https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}/"
     page-openshift_cluster_console_url: "https://console-openshift-console.{openshift_cluster_ingress_domain}"
+    # Verify the DevSpaces route on-cluster (typically devspaces-openshift-devspaces.<ingress-domain>)
+    page-devspaces_url: "https://devspaces-openshift-devspaces.{openshift_cluster_ingress_domain}/"
     imagesdir: ../assets/images
