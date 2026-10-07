@@ -28,6 +28,7 @@ antora:
     - require: ./content/lib/dev-mode.js
       enabled: false
     - require: ./content/lib/inject-buttons.js
+    - require: ./content/lib/header-user-extension.js
 
 output:
   dir: ./www
