@@ -45,9 +45,12 @@ asciidoc:
     productname-long: Red Hat OpenShift AI
     productname-short: OpenShift AI
     page-user: "{user}"
-    page-links: links
-    page-rhoai_dashboard_url: "https://rhods-dashboard-redhat-ods-applications.{openshift_cluster_ingress_domain}/"
-    page-openshift_cluster_console_url: "https://console-openshift-console.{openshift_cluster_ingress_domain}"
-    # Verify the DevSpaces route on-cluster (typically devspaces-openshift-devspaces.<ingress-domain>)
-    page-devspaces_url: "https://devspaces-openshift-devspaces.{openshift_cluster_ingress_domain}/"
+    page-links:
+      - url: https://rh-ai.{openshift_cluster_ingress_domain}/
+        text: OpenShift AI Dashboard
+      - url: https://console-openshift-console.{openshift_cluster_ingress_domain}
+        text: OpenShift Console
+      # Verify the DevSpaces route on-cluster — diverges from bare devspaces_url (devspaces.<ingress-domain>)
+      - url: https://devspaces-openshift-devspaces.{openshift_cluster_ingress_domain}/
+        text: DevSpaces
     imagesdir: ../assets/images
