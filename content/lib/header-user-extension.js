@@ -12,6 +12,11 @@
 // existing partial renders it unchanged. When no resolved username is
 // available (e.g. a local build with a literal `{user}` placeholder), the
 // placeholder is dropped so the header line is simply hidden.
+//
+// Also resolves the literal `{openshift_cluster_ingress_domain}` placeholder
+// in the antora.yml page-links list, which attribute-ref resolution doesn't
+// reach (nested list structures); local builds without the attribute are left
+// as-is.
 
 module.exports.register = function () {
   // NOTE: documentsConverted, not pagesComposed — pagesComposed fires after
@@ -28,6 +33,16 @@ module.exports.register = function () {
         : attrs['page-user'] && attrs['page-user'] !== '{user}' ? attrs['page-user'] : ''
       attrs['page-user'] = resolved
       if (resolved) attrs.user = resolved
+      // page-links list entries stay unresolved post-conversion; substitute
+      // the domain placeholder from the component-level attribute.
+      const domain = attrs.openshift_cluster_ingress_domain
+      if (Array.isArray(attrs.links) && domain) {
+        attrs.links = attrs.links.map((l) =>
+          l && typeof l.url === 'string'
+            ? { ...l, url: l.url.replaceAll('{openshift_cluster_ingress_domain}', domain) }
+            : l
+        )
+      }
     })
   })
 }
