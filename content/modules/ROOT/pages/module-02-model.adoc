@@ -5,7 +5,7 @@
 
 Our first step is to get accustomed to our environment and its components.
 
-In this workshop, you'll work with **NVIDIA Nemotron 3 Nano 30B A3B FP8** - a lightweight, instruction-tuned large language model designed for enterprise deployment. With FP8 quantization, it delivers production-grade inference performance while maintaining accuracy for coding assistance, reasoning tasks, and tool-calling workflows. This makes it ideal for Models-as-a-Service architectures where multiple teams share centrally-managed model infrastructure. 
+In this workshop, you'll work with **NVIDIA Nemotron 3 Nano 30B A3B FP8** - a lightweight, instruction-tuned large language model designed for enterprise deployment. With FP8 quantization, it delivers production-grade inference performance while maintaining accuracy for coding assistance, reasoning tasks, and tool-calling workflows. This makes it ideal for Models-as-a-Service architectures where multiple teams share centrally-managed model infrastructure.
 
 Our home base will be our OpenShift cluster web console:
 
@@ -59,9 +59,9 @@ Now you may view your available asset endpoints.
 
 We currently have a model deployed in a namespace managed by our cluster admin. This admin has set up a `Models as a Service` architecture for our organization with a central model they have deployed and managed that is available for use by remote teams across the organization.
 
-We do not have access to manage the model deployment directly, but we can access its endpoint information via the `Models as a Service` section.
+We do not have access to manage the model deployment directly, but we can access its endpoint information.
 
-Your admin has deployed one NVIDIA model for you to use: `nemotron-3-nano-30b-a3b`
+Your admin has deployed one NVIDIA model for you to use: `publishers/llm/models/nemotron-3-nano-30b-a3b`
 
 [.bordershadow]
 image::maas-model.png[width=700]
@@ -71,15 +71,20 @@ Let's grab the endpoint to use in our code assistant. Select `View` under the `E
 [.bordershadow]
 image::view-endpoint.png[width=700]
 
-Copy the MaaS route and save it in a note file - you'll need this in the next module.
+Copy the MaaS endpoint and save it in a note file - you'll need this in the next module.
 
 [.bordershadow]
 image::copy-route.png[width=700]
 
-Now, navigate to the `API keys` page in the MaaS dashboard and create a new API key. If you don't have a subscription yet, select the `maas-free-subscription` to create one.
+Now, navigate to the `API keys` page in the `Gen AI Studio` section of the left navigation pane and create a new API key.
+
+[.bodershadow]
+image::api-keys-nav.png[width=700]
+
+Name it however you like, optionally fill in a description, select `maas-premium-subscription` from the dropdown, and leave the expiration at the `30 days` default (or customize it up to 90 days - any further is prevented by the policy our administrator has enforced).
 
 [.bordershadow]
-image::generate-token.png[width=700]
+image::generate-api-key.png[width=700]
 
 Copy this API key and save it with your route endpoint - you'll need both values in the next module.
 
