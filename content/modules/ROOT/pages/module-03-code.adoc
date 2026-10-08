@@ -22,7 +22,7 @@ NOTE: OpenShift Dev Spaces is included with a full OpenShift Container Platform 
 [.bordershadow]
 image::nav-devspaces.png[width=700]
 
-When prompted for your login credentials, repeat the same OpenShift user login:
+If prompted for your login credentials, repeat the same OpenShift user login:
 
 * Username: {user}
 * Password: {password}
@@ -34,11 +34,9 @@ Click `Open`:
 [.bordershadow]
 image::open-workspace.png[width=700]
 
-After a moment, you'll see the VS Code interface running in your browser. If prompted, click "Trust" when asked about the authors.
+NOTE: If your workspace shows a yellow warning triangle, saying it failed to start, don't worry — everything was idled/shut down to free resources. Clicking `Open` again will re-start it.
 
-NOTE: If your workspace fails to start, don't worry — everything was idled/shut down to free resources. Clicking `Open` again will re-start it.
-
-NOTE: The pop-ups above may appear in a different order than shown.
+After a moment, you'll see the VS Code interface running in your browser. When prompted, select to Trust the authors and the extension installation.
 
 [.bordershadow]
 image::trust-vscode.png[width=700]
@@ -47,6 +45,8 @@ We have pre-configured the Dev Spaces workspace to install the Continue code ass
 
 [.bordershadow]
 image::trust-continue.png[width=700]
+
+NOTE: The trust pop-ups above may appear in a different order than shown.
 
 In our workspace you'll find a repository ready for your use. This is where you will build and refine with some AI assistance. The only thing we need to configure now is our model connection to the Continue extension.
 
