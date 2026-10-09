@@ -86,7 +86,7 @@ Name it however you like, optionally fill in a description, select `maas-premium
 [.bordershadow]
 image::generate-api-key.png[width=700]
 
-Copy this API key and save it with your route endpoint - you'll need both values in the next module.
+Copy this API key and save it with your route endpoint - you'll need the API key in the next module, and the endpoint might be useful for you to test in other ways.
 
 [.bordershadow]
 image::copy-token.png[width=700]

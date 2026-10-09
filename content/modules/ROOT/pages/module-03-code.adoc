@@ -41,22 +41,15 @@ After a moment, you'll see the VS Code interface running in your browser. When p
 [.bordershadow]
 image::trust-vscode.png[width=700]
 
-We have pre-configured the Dev Spaces workspace to install the Continue code assistant extension. You will be prompted to `trust the Continue publisher`. Click `Trust publisher & Install`:
+We have pre-configured the Dev Spaces workspace to use VS Code's built-in AI agent harness. We need to configure it to use an alternative model endpoint for our MaaS-hosted model.
 
-[.bordershadow]
-image::trust-continue.png[width=700]
+In our workspace you'll find a repository ready for your use. This is where you will build and refine with some AI assistance.
 
-NOTE: The trust pop-ups above may appear in a different order than shown.
-
-In our workspace you'll find a repository ready for your use. This is where you will build and refine with some AI assistance. The only thing we need to configure now is our model connection to the Continue extension.
-
-NOTE: The repository you are in is for the https://docs.redhat.com/en/learn/ai-quickstarts/rh-maas-code-assistant[Accelerate enterprise development with NVIDIA and MaaS^] AI quickstart.
-
-Before we dive in, let me tell you a bit about **Continue**.
+Before we dive in, let me tell you a bit about **VS Code Chat**.
 
 == Meet Your AI Code Assistant
 
-**Continue** is an open-source AI code assistant that integrates into VS Code. Continue provides an interactive chat interface where you can have natural conversations about your code. You can ask Continue to perform actions like:
+**VS Code Chat** is the agentic harness experience integrated into VS Code, and available in OpenShift Dev Spaces. It provides an interactive chat interface where you can have natural conversations about your code. You can ask the chat to perform actions like:
 
 “Add logging to this function”
 
@@ -66,99 +59,47 @@ Before we dive in, let me tell you a bit about **Continue**.
 
 “Explain what this code does”
 
-Continue will execute these requests directly in your editor, with full awareness of your codebase and project context.
+The chat will execute these requests directly in your editor, with full awareness of your codebase and project context.
 
-Continue supports custom model endpoints, making it a perfect example for connecting to your private enterprise models. Continue is an **open-source** solution that gives you complete control over your AI coding workflow.
+VS Code Chat supports custom model endpoints, making it easy to connect to your private enterprise models.
 
-NOTE: Continue is an example of an AI-powered coding assistant for this workshop experience. You can easily imagine how this could work with any other desired code assistant extensions that allow you to customize the model used.
+NOTE: VS Code Chat is an example of an AI-powered coding assistant for this workshop experience. You can easily imagine how this could work with any other desired code assistants that allow you to customize the model used.
 
-== Connect Continue to Your MaaS Model
+== Connect VS Code Chat to Your MaaS Model
 
-Navigate to the **Continue sidebar icon** in the left-hand side navigation panel. If needed, expand the Continue app sidebar by dragging the border over.
+In order to connect our model to VS Code Chat we must provide the editor our model's endpoint URL and API key from our MaaS deployment from the previous module. The endpoint we have templated for you, but your key will need to be in your clipboard.
 
-[.bordershadow]
-image::nav-continue.png[width=700]
+NOTE: If you didn't document your model access information, go back to the OpenShift AI dashboard to the **API keys** section to generate a new token: https://rh-ai.{openshift_cluster_ingress_domain}/
 
-[.bordershadow]
-image::continue-open.png[width=500]
+Open the Command Palette in VS Code (`Ctrl+Shift+P` on Linux or `Cmd+Shift+P` on Mac) and run `Chat: Manage Language Models`, then click **+ Add Models → Custom Endpoint**.
 
-In order to connect our model to the Continue code extension we must provide the extension our model's endpoint URL and API key from our MaaS deployment from the previous module.
+Give the group a name (e.g. `MaaS`), paste your API key when prompted, and select **Chat Completions API** as the API type.
 
-NOTE: If you didn't document your model access information, go back to the OpenShift AI dashboard to the **AI asset endpoints** section to retrieve the credentials: https://rh-ai.{openshift_cluster_ingress_domain}/
+VS Code opens a `chatLanguageModels.json` file. Add your model(s) to it:
 
-=== Configure the Continue Extension
-
-We've provided a pre-configured template file for the Continue extension. You'll need to move it to the proper location where Continue expects to find it.
-
-Open a terminal in VS Code (Terminal > New Terminal from the menu, or `Ctrl+``)
-
-[.bordershadow]
-image::new-terminal.png[width=500]
-
-In the terminal, run the following command:
-
-[source,sh,role="execute"]
+[source,json,role="execute"]
 ----
-cp /projects/exercises/.vscode/config.yaml ~/.continue/config.yaml
+      {
+        "id": "publishers/llm/models/nemotron-3-nano-30b-a3b",
+        "name": "Nemotron 3 Nano 30B A3B",
+        "url": "https://maas.{openshift_cluster_ingress_domain}/v1",
+        "toolCalling": true,
+        "vision": false,
+        "maxInputTokens": 131072,
+        "maxOutputTokens": 16384
+      }
 ----
 
-This copies the template configuration file to `~/.continue/config.yaml`, replacing the blank template that's there.
+IMPORTANT: The API key entered on the form is saved in a different way, and a randomly generated reference to it is placed above the JSON snippet shown above. Do not change that reference. If you already did, you can go back to the `Chat: Manage Language Models` page and right click on Nemotron to select `Update API Key`.
 
-Now open the configuration file to customize it with your MaaS endpoint details. Open the search bar (`Ctrl+P` on Linux or `Cmd+P` on Mac) and type:
+* **vendor** must stay `customendpoint`. Rename anything else, but touching vendor makes the model silently never appear in the picker.
+* **id** must exactly match your model's ID, case-sensitive, including the namespace prefix (here, we've pre-populated it with the model from the cluster).
+* **url** is the base URL ending in `/v1` — do NOT append `/chat/completions`.
+* **toolCalling**/**vision** must match what the model actually supports, or agent mode misbehaves. Our model supports tools, but not vision, in this deployment.
 
-[source,sh,role="execute"]
-----
-~/.continue/config.yaml
-----
+The file saves automatically, but you can press `Ctrl+S` or `Cmd+S` to be sure.
 
-[.bordershadow]
-image::search-config.png[width=700]
-
-Hit `Enter` to open the file. You'll see the following configuration:
-
-[source,yaml,role="execute"]
-----
-name: Local Assistant
-version: 1.0.0
-schema: v1
-models:
-  - name: NVIDIA Nemotron 3 Nano 30B A3B FP8
-    provider: openai
-    model: "publishers/llm/models/nemotron-3-nano-30b-a3b"
-    apiBase: "YOUR_MAAS_ROUTE/v1"
-    apiKey: "YOUR_API_KEY"
-    capabilities:
-      - tool_use
-    roles:            # do not add autocomplete — FIM is not supported by this route
-      - chat
-      - edit
-      - apply
-    defaultCompletionOptions:
-      contextLength: 262144   # verify the model's real served limit
-      maxTokens: 1024
-context:
-  - provider: code
-  - provider: docs
-  - provider: diff
-  - provider: terminal
-  - provider: problems
-  - provider: folder
-  - provider: codebase
-----
-
-IMPORTANT: Replace the `apiBase` URL with your actual MaaS endpoint URL and `YOUR_API_KEY` with the API key from your MaaS application. Ensure you retain the `v1` at the end of the path.
-
-For example:
-
-* **apiBase**: `https://maas.{openshift_cluster_ingress_domain}/v1` (Note the `v1` at the end of the URL)
-* **apiKey**: `your-actual-api-key-here`
-
-NOTE: You may reference the complete configuration documentation here: https://docs.continue.dev/reference[Continue Documentation^]
-
-When the model is properly configured, you will be able to chat with the model in the sidebar.
-
-[.bordershadow]
-image::ready-to-chat.png[width=700]
+With the model properly configured, you will be able to chat with the model in the right pane.
 
 Go ahead - test it out with the following prompt:
 
@@ -167,14 +108,12 @@ Go ahead - test it out with the following prompt:
 Explain the software company Red Hat in a short paragraph.
 ----
 
-NOTE: If you get an error when chatting with the model, double check your API key and route details. Ensure you have left the `/v1` at the end of the URL string.
-
 == You're Ready to Code with AI
 
 You've now:
 
 * Set up a cloud IDE
-* Installed Continue and configured it to connect to your private Nemotron model
+* Configured VS Code Chat to connect to your private Nemotron model
 * Set up an AI assistant that can refactor, edit and explain your code!
 
-Next, you will use Continue to help you develop a little fun game.
+Next, you will use the AI chat to help you develop a little fun game.
