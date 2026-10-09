@@ -3,7 +3,7 @@
 [#code-game]
 = Game Time
 
-Now that your AI assistant is wired up, it's time to get your hands dirty - by building a simple game using Continue's help. In this module, you're not solving a business-critical problem… yet! You're exploring, experimenting, and building confidence with AI-assisted coding through something fun: a simple game.
+Now that your AI assistant is wired up, it's time to get your hands dirty - by building a simple game using the AI chat's help. In this module, you're not solving a business-critical problem... yet! You're exploring, experimenting, and building confidence with AI-assisted coding through something fun: a simple game.
 
 == Choose a Game to Build
 
@@ -17,22 +17,21 @@ You only need to pick one - but feel free to try more if you have time.
 
 == Open Your Starter File
 
-From the file explorer, navigate to the `game_starters` directory:
+From the file explorer, navigate to the `fun-and-games/game_starters` directory:
 
-[.bordershadow]
-image::game-starters.png[width=700]
+== TODO: Screenshot
 
 This folder contains a folder for each game described above. Within each game folder are two files: one for Python code, one for Bash. They contain the same instructions, so just pick the game and language you prefer.
 
 === Understanding the Starter File Structure
 
-Each game starter file is organized into **three sections** (all as comments):
+Each game starter file is organized into **two sections** (all as comments):
 
-1. **🎯 Initial Prompt Section** - A ready-to-use prompt you can copy and paste directly into the AI chat interface to generate your first working version of the game
+1. **🎯 Initial Prompt Section** - A high level goal for the model to accomplish
 
-2. **🛠️ AI Assistance Techniques** - Instructions on how to use AI assistance to refine, debug, and improve your code
+2. **💡 Enhancement Ideas Section** - Suggestions for features you can ask the AI to add once your basic game is working
 
-3. **💡 Enhancement Ideas Section** - Suggestions for features you can ask the AI to add once your basic game is working
+And a marker to let the agent know where to put the code it will be generating.
 
 === How to Use the Starter Files
 
@@ -40,60 +39,55 @@ Follow this workflow:
 
 **Step 1: Read the entire file**
 
-Open your chosen game file and read through all the commented instructions to understand what you'll be building.
+Open your chosen game file and read through all the commented instructions to understand what you'll be asking the model to build.
 
 **Step 2: Generate your first version**
 
-Copy the prompt from the first section (the section that starts with "Create a..." and includes a prompt in quotes) and paste it into the Continue chat interface in the left sidebar. The Nemotron model will generate working code for you.
+With the file open, at the bottom of the right hand window click the `+` icon next to the file name and say "Implement this game from scratch in this file only." The Nemotron model will generate working code for you.
 
-IMPORTANT: Remember, the Continue chat needs to be set to `Chat` mode and not Agent or Plan modes.
+== TODO: Screenshot
 
-[.bordershadow]
-image::add-code-to-chat.png[width=700]
+You will be prompted to approve file edits by selecting "Keep" in the bottom right.
 
-**Step 3: Add the code to your file**
+== TODO: Screenshot
 
-Copy the AI-generated code from the Continue chat extension and paste it into your game file, **below all the commented instructions**. Keep the instructions as comments - they'll help you remember what to do next!
+Nemotron may spend a lot of time reasoning about these easy tasks because it's not sure this is all you're wanting it to do, but it should get a functional game written before long.
 
-You may also use the `Insert Code` button. Ensure your cursor is at the right point in the file for insertion.
-
-[.bordershadow]
-image::add-code-to-file.png[width=700]
-
-IMPORTANT: Keep all instructional comments in the file. Only add actual game code below them. This way you can always refer back to the suggestions.
-
-**Example of what your file should look like:**
+**Example of what your file might look like:**
 
 [source,python]
 ----
+#!/usr/bin/env python3
+
 # === 🎯 SIMPLE QUIZ GAME - PYTHON VERSION ===
 #
-# Start by asking Continue's chat:
-# "Create a Python quiz game that..."
+# == GOAL ==
+# Create a Python quiz game that:
 # (all the instructional comments stay here)
 
-# Your actual working code starts here:
 score = 0
-print("Welcome to the Quiz Game!")
+
+questions = [
 # ... rest of your generated code ...
 ----
 
+== TODO: Screenshot
+
 **Step 4: Test your game**
 
-Now let's run your game and make sure it works!
+Now let's run your game and make sure it works! If your agent decided to give you an easy link, you can just click the button like shown:
 
-Save your file (`Cmd+S` on Mac or `Ctrl+S` on Linux).
+== TODO: Screenshot
 
-Open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press `Ctrl+``.
+If your agent didn't give you an easy command you can click to run the program, you can open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press `Ctrl+``.
 
-[.bordershadow]
-image::new-terminal.png[width=500]
+== TODO: Screenshot
 
 Navigate to your game's folder in the terminal. For example (substitute the correct path to your game file):
 
 [source,console]
 ----
-cd ./coding-exercises/game_starters/rock_paper_scissors/
+cd ./fun-and-games/game_starters/rock_paper_scissors/
 ----
 
 Now run your game based on the language you chose:
@@ -109,26 +103,19 @@ python your_filename.py
 
 **For Bash (.sh files):**
 
-First, make the file executable (you only need to do this once):
-
 [source,console]
 ----
-chmod +x your_filename.sh
+bash ./your_filename.sh
 ----
 
-Then run it:
+== TODO: Screenshot
 
-[source,console]
-----
-./your_filename.sh
-----
-
-Play your game! If it works, congratulations - you just built something with AI assistance!
+Play your game! If it works, congratulations - you just did agentic engineering!
 
 **If you see errors:**
 
-* **"command not found" or "permission denied"**: Double-check the filename is spelled correctly, ensure you're in the correct directory (use `ls` to list files), or for .sh files try `bash yourfile.sh`
-* **Other errors**: Copy the error message and paste it into the Continue chat - ask "I got this error, can you help me fix it?" The AI can help you debug!
+* **"command not found" or "permission denied"**: Double-check the filename is spelled correctly and ensure you're in the correct directory (use `ls` to list files).
+* **Other errors**: Copy the error message and paste it into the AI chat - ask "I got this error, can you help me fix it?" The AI can help you debug!
 
 **Step 5 (Optional): Enhance your game**
 
@@ -138,37 +125,47 @@ Look at the enhancement ideas in the comment sections of your starter file. Use 
 
 == Using AI Assistance for Enhancement
 
-If you want to enhance your game (Step 5), here's how to use your AI assistant effectively to iterate and improve your code.
+If you want to enhance your game, here's how to use your AI assistant effectively to iterate and improve your code.
 
-Click the `Continue` extension tab on the left-hand side of the VS Code window to access the chat interface. You can toggle between the file `Explorer` and `Continue` tabs as needed.
+Open the AI chat panel in VS Code (focus the cursor in the editor then press `Ctrl+Alt+I` on Linux or `Cmd+Ctrl+I` on Mac).
 
-[.bordershadow]
-image::toggle-sidebar.png[width=500]
+=== Ways to Get AI Help
 
-=== Two Ways to Get AI Help
+Your AI assistant offers several ways to help with your code:
 
-Your AI assistant offers two ways to help with your code:
+**1. Ask mode**
 
-**1. Chat Interface** - Type questions directly into the AI chat sidebar:
+== TODO: Screenshot
+
+Change the Chat window into Ask mode using the selector next to the model name, then type questions directly into the AI chat sidebar:
 
 * "How can I add more questions to my quiz?"
 * "Explain what this code does"
 * "How do I make this more efficient?"
 
-**2. Interactive Code Assistance** - Highlight specific code and get targeted help:
+== TODO: Screenshot
 
-To use this approach, highlight the code you want to work with, then right-click and select `Continue` from the pop-up menu (or use `Cmd+Shift+P` / `Ctrl+Shift+P` and search for Continue):
+**2. Context-aware help**
 
-[.bordershadow]
-image::continue-popup.png[width=700]
+== TODO: Screenshot
 
-**AI assistance options:**
+Highlight specific code and get targeted help:
 
-* **Add to Chat** - Shares the highlighted code with the AI so you can ask questions about it (e.g., "How does this section work?" or "Can you suggest improvements?"). We used this function already to copy the prompt text from the file into the chat.
+To use this approach, highlight the code or comment line you want to work with, then use Inline Chat (`Ctrl+I` on Linux or `Cmd+I` on Mac) to open an inline chat directly about the highlighted code:
 
-* **Add to Edit** - Opens an Edit-mode where you describe changes you want the AI to make to the highlighted code (e.g., "add error handling" or "make this function accept any number of questions")
+== TODO: Screenshot
 
-TIP: A typical AI-assisted workflow: use chat to generate initial code, then use "Add to Edit" on specific sections to refine them. Use "Add to Chat" when you want to understand code or get suggestions before making changes.
+You can also right-click a highlighted section for a menu of options you can take.
+
+**3. Agentic coding**
+
+== TODO: Screenshot
+
+In Agent mode, VS Code Chat is equipped with the tools it needs to edit files directly and you can give it objectives and approve its actions, like we did at first.
+
+Try it! In Agent mode, ask it to implement all of our optional ideas at once.
+
+== TODO: Screenshot
 
 == Want to Go Further?
 
@@ -180,7 +177,7 @@ Reference solutions are available in the `game_solutions` directory. From the fi
 
 [source,console]
 ----
-game_solutions/
+fun-and-games/game_solutions/
 ----
 
 You can run these solutions using the same Python or Bash commands from Step 4 above to see how they work.
@@ -189,6 +186,6 @@ You can run these solutions using the same Python or Bash commands from Step 4 a
 
 You've just experienced the MaaS platform as a **developer** - consuming model endpoints to build applications with AI assistance.
 
-But the same MaaS architecture you used for Continue also powers operational automation. In the next module, you'll switch roles to become an **SRE/DevOps practitioner** and see how the same Nemotron model - deployed once, shared across the organization - can drive infrastructure operations, diagnostics, and ChatOps workflows.
+But the same MaaS architecture you used with your AI assistant also powers operational automation. In the next module, you'll switch roles to become an **SRE/DevOps practitioner** and see how the same Nemotron model - deployed once, shared across the organization - can drive infrastructure operations, diagnostics, and ChatOps workflows.
 
 **Same platform. Same model. Different use case.** This is the power of Models-as-a-Service.

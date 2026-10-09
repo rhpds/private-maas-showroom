@@ -19,8 +19,7 @@ NOTE: OpenShift Dev Spaces is included with a full OpenShift Container Platform 
 
 * Navigate to the OpenShift Dev Spaces application.
 
-[.bordershadow]
-image::nav-devspaces.png[width=700]
+== TODO: Screenshot
 
 If prompted for your login credentials, repeat the same OpenShift user login:
 
@@ -49,6 +48,8 @@ Before we dive in, let me tell you a bit about **VS Code Chat**.
 
 == Meet Your AI Code Assistant
 
+== TODO: Screenshot
+
 **VS Code Chat** is the agentic harness experience integrated into VS Code, and available in OpenShift Dev Spaces. It provides an interactive chat interface where you can have natural conversations about your code. You can ask the chat to perform actions like:
 
 “Add logging to this function”
@@ -73,7 +74,11 @@ NOTE: If you didn't document your model access information, go back to the OpenS
 
 Open the Command Palette in VS Code (`Ctrl+Shift+P` on Linux or `Cmd+Shift+P` on Mac) and run `Chat: Manage Language Models`, then click **+ Add Models → Custom Endpoint**.
 
+== TODO: Screenshot
+
 Give the group a name (e.g. `MaaS`), paste your API key when prompted, and select **Chat Completions API** as the API type.
+
+== TODO: Screenshot
 
 VS Code opens a `chatLanguageModels.json` file. Add your model(s) to it:
 
@@ -90,6 +95,8 @@ VS Code opens a `chatLanguageModels.json` file. Add your model(s) to it:
       }
 ----
 
+== TODO: Screenshot
+
 IMPORTANT: The API key entered on the form is saved in a different way, and a randomly generated reference to it is placed above the JSON snippet shown above. Do not change that reference. If you already did, you can go back to the `Chat: Manage Language Models` page and right click on Nemotron to select `Update API Key`.
 
 * **vendor** must stay `customendpoint`. Rename anything else, but touching vendor makes the model silently never appear in the picker.
@@ -101,12 +108,16 @@ The file saves automatically, but you can press `Ctrl+S` or `Cmd+S` to be sure.
 
 With the model properly configured, you will be able to chat with the model in the right pane.
 
+== TODO: Screenshot
+
 Go ahead - test it out with the following prompt:
 
 [source,sh,role="execute"]
 ----
 Explain the software company Red Hat in a short paragraph.
 ----
+
+== TODO: Screenshot
 
 == You're Ready to Code with AI
 

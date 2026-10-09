@@ -27,8 +27,7 @@ From here, we will navigate to and between the following environments throughout
 
 You may find and go to these applications via our navigation button in the web console:
 
-[.bordershadow]
-image::apps-menu.png[width=700]
+== TODO: Screenshot
 
 Now that you know how to get around, your adventure begins!
 
@@ -42,18 +41,15 @@ Let's get connected.
 
 Click the navigation button and select **Red Hat OpenShift AI** from the drop-down menu.
 
-[.bordershadow]
-image::nav-rhoai.png[width=700]
+== TODO: Screenshot
 
 Once authenticated you will see the following home page:
 
-[.bordershadow]
-image::rhoai-dashboard.png[width=700]
+== TODO: Screenshot
 
 Now, go to the `Gen AI Studio` section of the dashboard and select `AI asset endpoints`.
 
-[.bordershadow]
-image::nav-genaistudio.png[width=700]
+== TODO: Screenshot
 
 Now you may view your available asset endpoints.
 
@@ -63,32 +59,26 @@ We do not have access to manage the model deployment directly, but we can access
 
 Your admin has deployed one NVIDIA model for you to use: `publishers/llm/models/nemotron-3-nano-30b-a3b`
 
-[.bordershadow]
-image::maas-model.png[width=700]
+== TODO: Screenshot
 
 Let's grab the endpoint to use in our code assistant. Select `View` under the `Endpoints` column:
 
-[.bordershadow]
-image::view-endpoint.png[width=700]
+== TODO: Screenshot
 
-Copy the MaaS endpoint and save it in a note file - you'll need this in the next module.
+Copy the MaaS endpoint and save it in a note file - you'll want this for exploring beyond the next module.
 
-[.bordershadow]
-image::copy-route.png[width=700]
+== TODO: Screenshot
 
 Now, navigate to the `API keys` page in the `Gen AI Studio` section of the left navigation pane and create a new API key.
 
-[.bodershadow]
-image::api-keys-nav.png[width=700]
+== TODO: Screenshot
 
 Name it however you like, optionally fill in a description, select `maas-premium-subscription` from the dropdown, and leave the expiration at the `30 days` default (or customize it up to 90 days - any further is prevented by the policy our administrator has enforced).
 
-[.bordershadow]
-image::generate-api-key.png[width=700]
+== TODO: Screenshot
 
 Copy this API key and save it with your route endpoint - you'll need the API key in the next module, and the endpoint might be useful for you to test in other ways.
 
-[.bordershadow]
-image::copy-token.png[width=700]
+== TODO: Screenshot
 
 Now that we have our model connection details, we can proceed to our development environment to leverage the model.
