@@ -82,7 +82,7 @@ Give the group a name (e.g. `MaaS`), paste your API key when prompted, and selec
 
 VS Code opens a `chatLanguageModels.json` file. Add your model(s) to it:
 
-[source,json,role="execute"]
+[source,json,role="execute",subs=attributes+]
 ----
       {
         "id": "publishers/llm/models/nemotron-3-nano-30b-a3b",
