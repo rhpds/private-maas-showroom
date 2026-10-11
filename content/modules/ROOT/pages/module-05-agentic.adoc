@@ -118,7 +118,7 @@ Ensure only the following tools are selected:
 * `resources_list`
 * `resources_get`
 
-* Now select the Rocket.Chat MCP Server tools:
+Now select the Rocket.Chat MCP Server tools:
 
 == TODO: Screenshot
 
