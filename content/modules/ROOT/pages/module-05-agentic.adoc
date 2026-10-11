@@ -143,7 +143,7 @@ List all pods in the redhat-ods-monitoring namespace.
 
 Response output will vary slightly, but you should see it correctly list the active pod in the `redhat-ods-monitoring` namespace (which the MCP server has access to, even though you don't). The pods listed are part of the OpenShift AI observability stack and handle collecting, storing, querying, and displaying dashboards for AI workloads like the model we're talking to right now.
 
-✓ **Success indicator**: You should see output listing several pods with names like with `data-science-perses-0` and `prometheus-data-science-monitoringstack-0` and showing their status as `Running` with all containers ready.
+✓ **Success indicator**: You should see output listing several pods with names like with `data-science-perses-0` and `prometheus-data-science-monitoringstack-0`. The agent may or may not give you more details, like pod health or ready container count.
 
 Let's try something else:
 
@@ -199,7 +199,7 @@ Go check the `#workshop` channel in the Rocket.Chat application to see your mess
 
 ✓ **Success indicator**: Your message should appear in the #workshop channel within a few seconds, posted by the mcp-bot user account.
 
-==== Send logs to Rocket.Chat
+==== ChatOps debugging of problem applications
 
 Now, let's try out a real use case for this! Our playground is just the kind of place we'd want to validate our prompts and tool behavior for an agentic. In a production environment, you would likely use a more robust automation to send logs or other information from your Red Hat AI cluster to Rocket.Chat, but the Playground will help you get the feel.
 
