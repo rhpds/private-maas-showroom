@@ -52,7 +52,7 @@ For this workshop, your Nemotron model is already configured to communicate with
 
 * Go back to the Red Hat OpenShift AI dashboard.
 
-** https://data-science-gateway.{openshift_cluster_ingress_domain}/
+** https://rh-ai.{openshift_cluster_ingress_domain}/
 
 * Select `Gen AI studio` then `Playground` from the left-side navigation menu.
 

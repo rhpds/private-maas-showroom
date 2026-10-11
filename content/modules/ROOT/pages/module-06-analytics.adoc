@@ -10,119 +10,109 @@ You've deployed, exposed, and consumed a model. Now it's time to ask:
 * Who's using it the most?
 * What's the cost and what's the return?
 
-Let's walk through how to leverage a Grafana dashboard and platform level metrics from the Prometheus observability stack to answer those questions.
-
-NOTE: For this workshop, we've created a **custom Grafana dashboard** that integrates with Red Hat AI's built-in observability data sources, specifically the Prometheus metrics stack included with the product. While this particular dashboard is a custom workshop example and not a product feature, it demonstrates how you can leverage the platform's existing Prometheus metrics to build usage analytics and reporting. Red Hat AI will include integrated analytics capabilities in upcoming releases.
+Let's walk through how to leverage OpenShift AI's built-in dashboards and observability stack to answer those questions.
 
 == Why This Matters
 
-As AI adoption grows, visibility is critical. Organizations need to track: 
+As AI adoption grows, visibility is critical. Organizations need to track:
 
 * Model/API usage by team or model
-* Call volume over time
-* Popular endpoints
+* Key metrics on model health and performance
 * Cost-to-value
 * Infrastructure impact (e.g. GPU usage)
 
 This insight enables:
 
 * Cost attribution (per team, per model, per environment)
-
 * Capacity planning (predict future infrastructure scaling needs)
-
 * Understanding ROI for AI workloads
 
-[#analytics-overview]
-== Access the Grafana Dashboard
+== Access the Dashboard
 
-* Go to the Grafana application from your cluster's navigation menu:
+* Go back to the Red Hat OpenShift AI dashboard.
 
-[.bordershadow]
-image::grafana-app.png[width=700]
+** https://rh-ai.{openshift_cluster_ingress_domain}/
 
-Or, navigate directly to: {grafana_url}
+* Select `Observe & monitor` then `Dashboard` from the left-side navigation menu.
 
-* Log in with OpenShift if prompted.
+== TODO: Screenshot
 
-✓ **Success indicator**: You should see the Grafana home page.
+The default dashboard view you get dropped onto is the `Cluster` dashboard. This shows low-level infrastructure details about our OpenShift AI cluster, highlighting basic GPU usage up front.
 
-* Select the `grafana` dashboard from the list of available dashboards.
+== TODO: Screenshot
 
-[.bordershadow]
-image::dashboards-grafana.png[width=700]
+There's only one other built-in dashboard that your user has permissions to see the data for in this workshop, so let's head there (we've deliberately given you a minimal permission set).
 
-* Select `MaaS Token Metrics Dashboard` to view model usage analytics.
+* Select the `Usage` dashboard.
 
-[.bordershadow]
-image::maas-dashboard.png[width=700]
-
-IMPORTANT: This Grafana instance has access to view metrics from all users in the shared workshop cluster. You will see aggregated data including other workshop participants' usage (assuming others have completed earlier modules). This demonstrates multi-tenant observability - in production, you would typically configure role-based access control to limit visibility based on team or project boundaries.
+IMPORTANT: This dashboard has access to view metrics from all users in the shared workshop cluster, and we have explicitly granted permission to all workshop attendees to view it. You will see aggregated data including other workshop participants' usage (assuming others have completed earlier modules). This demonstrates multi-tenant observability - in production, you would typically configure role-based access control to limit visibility based on team or project boundaries. OpenShift AI observability uses different mechanisms for reporting on a more granular basis.
 
 === Filter and Explore Your Data
 
 You can filter the dashboard data by:
 
 * **User** - Look for your username ({user}) to see your specific activity
-* **Model** - Only one model is deployed in this workshop
-* **Time Range** - Adjust the time window to focus on recent activity (try "Last 1 hour" or "Last 3 hours" to see your workshop activity)
+* **Subscription** - We only have a couple of subscriptions configured for the workshop, but you can test out using the one we didn't have you using to see the separation here (or maybe someone else already did!)
+* **Model** - Only one model is deployed in this workshop, so this is maybe less exciting for us right now
+* **Time period** - In the top right, you can adjust the window to look further into the past, or pick a custom window to check just a certain time period.
 
-[.bordershadow]
-image::use-grafana-db.png[width=700]
+== TODO: Screenshot
 
-TIP: To see your own usage from earlier modules, search for your username in the filters or locate it in the "Top 10 Users by Hits" panel. Your activity from Module 3-4 (Continue chat sessions) and Module 5 (MCP server interactions) should appear here.
+TIP: To see your own usage from earlier modules, search for your username in the filters or locate it in the "Token consumption table" panel.
 
 === Understanding the Dashboard Metrics
 
-**Total Authorized Hits**
+**Total tokens**
 
-This represents the total token count (both input and output tokens combined) for all authorized requests to the model.
+This represents the total token count (both input and output tokens combined) for all authorized requests through MaaS.
 
-**Authorized Hits by User and Tier**
+**Total requests**
 
-Breaks down token usage by individual user and their assigned tier. For this workshop, all users are assigned to the Enterprise tier.
+The number of individual requests made to the model, including each through through an agentic process such as handling tool call results, responding to user feedback, etc.
 
-**Top 10 Users by Hits**
+**Total rate limited**
 
-Displays the top users ranked by total token usage. Look for your username to see where you rank compared to other workshop participants.
+The number of requests that were denied due to reaching the rate limit for that user on that subscription (you will probably not see many of these on our "Premium" subscription)
 
-**Hourly Authorized Hits by User**
+**Success rate**
 
-Shows token usage over time in hourly increments, filtered by user. This helps identify usage patterns and peak activity periods.
+The ratio of the inverse of the above over the total requests
 
-**Total Authorized Hits by Tier (Time Range)**
+**Active users**
 
-Aggregates token usage by tier within the selected time range. Useful for understanding tier-level consumption.
+The number of OpenShift AI users who have made any kind of request to the model over the time period selected (should be about the size of your workshop attendance!)
 
-**Top 5 Users by Cost (Based on Tier Pricing)**
+**Token consumption chart**
 
-Ranks users by estimated cost based on tier pricing models. In enterprise environments, this metric drives chargeback and cost attribution decisions.
+A rolling average window over token consumption, showcasing peaks and periods of relative high demand easily.
 
-**Detailed Metrics Table**
+**Token consumption table**
 
-Provides granular per-user metrics including total tokens, costs, and activity timestamps. Use this table to audit specific user activity or investigate usage anomalies. 
+A detailed breakdown per user, subscription, and model of token counts, total requests, and rate-limited requests.
 
 == See Real-Time Usage Tracking (Optional)
 
 Want to see these metrics update in real time? Try this:
 
-1. Keep the Grafana dashboard open in one browser tab
+1. Keep the dashboard open in one browser tab
 2. In another tab, open either:
-   * **Gen AI Studio Playground**: Navigate to Gen AI Studio → Playground (ensure you are in the right project) (see Module 5)
-   * **Dev Spaces Continue extension**: {devspaces_url} (see Module 3)
+   * **Gen AI Studio Playground**: Navigate to Gen AI studio → Playground (ensure you are in the right project) (see Module 5)
+   * **Dev Spaces IDE**: {devspaces_url} (see Module 3)
 3. Send a few messages to the model
-4. Refresh the Grafana dashboard and watch your token count increase
+4. Filter by your username, and set the time window to something narrow like "Last 5 minutes"
+5. Refresh the dashboard data with the dedicated refresh button and you should see your request within 15-30 seconds
 
-This demonstrates the immediate visibility platform administrators have into AI service consumption - essential for monitoring, alerting, and capacity management.
+NOTE: The delay between the request and it showing up on the dashboard is the scrape interval for collecting and viewing metrics. MaaS rate limits don't depend on this scrape interval, and only visibility into consumption is trailing by this small amount.
 
 == Making Data-Driven Decisions
 
-This dashboard enables critical business and operational decisions:
+These dashboards enables critical business and operational decisions:
 
 **Capacity Planning**: If token usage doubles month-over-month, you need proportional GPU scaling. Identifying growth trends early prevents performance degradation and justifies infrastructure investment.
 
-**Cost Attribution**: The "Top 5 Users by Cost" metric enables chargeback models. If one team consumes 80% of tokens, that data justifies dedicated capacity allocation and budget decisions.
+**Cost Attribution**: Mapping consumption metrics per user and subscription enables building a showback and/or chargeback reporting chain based on how your organization consumes models. If one team consumes 80% of tokens on their subscription, that data justifies dedicated capacity allocation and budget decisions.
 
-**ROI Demonstration**: Correlate token usage with business outcomes. High adoption rates combined with faster development cycles (from earlier modules) prove clear return on investment - use this to justify expansion.
+**ROI Demonstration**: Correlate token usage with business outcomes. High adoption rates combined with faster development cycles (from earlier modules) prove clear return on investment. Measuring AI implementations effect on business outcomes needs at least this level of visibility.
 
 **Optimization**: Hourly usage spikes might indicate batch processing, inefficient prompting, or peak adoption periods. This insight drives optimization strategies and resource scheduling.
 
@@ -130,7 +120,7 @@ This dashboard enables critical business and operational decisions:
 
 In this module, you:
 
-* **Accessed usage analytics** through a custom Grafana dashboard integrated with Red Hat AI's Prometheus metrics
+* **Accessed usage analytics** through built-in dashboards in OpenShift AI, backed by the industry-standard observability stack
 * **Explored multi-tenant observability** across workshop participants
 * **Connected metrics to business decisions** - capacity planning, chargeback, and ROI analysis
 
@@ -143,9 +133,7 @@ Platform visibility transforms AI from an experimental tool into a managed servi
 Remember the infrastructure challenges we started with?
 
 * ❌ "Expensive GPUs remain idle or become overloaded" → ✅ Token usage metrics show actual utilization patterns, enabling right-sizing and capacity planning
-* ❌ "Infrastructure costs escalate without clear accountability" → ✅ Per-user cost attribution enables chargeback models and budget ownership
+* ❌ "Infrastructure costs escalate without clear accountability" → ✅ Per-user, team, or project cost attribution enables chargeback models and budget ownership
 * ❌ "Multiple teams may deploy identical models, duplicating effort" → ✅ Usage across multiple personas (developer, SRE, stakeholder) proves the value of shared, centralized deployment
 
 The analytics you just explored demonstrate how MaaS transforms AI infrastructure from an unmanaged cost center into a measurable, optimized platform service.
-
-While this workshop demonstrates a custom dashboard, Red Hat AI will include integrated analytics in upcoming releases. The Prometheus metrics are available today - build dashboards tailored to your organization's KPIs.
