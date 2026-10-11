@@ -163,7 +163,7 @@ You can also right-click a highlighted section for a menu of options you can tak
 
 In Agent mode, VS Code Chat is equipped with the tools it needs to edit files directly and you can give it objectives and approve its actions, like we did at first.
 
-Try it! In Agent mode, ask it to implement all of our optional ideas at once.
+Try it! In Agent mode, ask it to implement all of our optional ideas, one at a time. Just be warned, this will probably take a bit longer than more targeted help.
 
 == TODO: Screenshot
 
