@@ -47,7 +47,7 @@ Once authenticated you will see the following home page:
 
 == TODO: Screenshot
 
-Now, go to the `Gen AI Studio` section of the dashboard and select `AI asset endpoints`.
+Now, close the tour dialog and go to the `Gen AI Studio` section of the dashboard and select `AI asset endpoints`.
 
 == TODO: Screenshot
 

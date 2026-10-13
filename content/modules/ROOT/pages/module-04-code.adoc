@@ -43,7 +43,7 @@ Open your chosen game file and read through all the commented instructions to un
 
 **Step 2: Generate your first version**
 
-With the file open, at the bottom of the right hand window click the `+` icon next to the file name and say "Implement this game from scratch in this file only." The Nemotron model will generate working code for you.
+With the file open, at the bottom of the right hand window say "Implement this game from scratch in this file only, using only the basic goal. Skip the optional ideas." The Nemotron model will generate working code for you.
 
 == TODO: Screenshot
 
@@ -52,6 +52,8 @@ You will be prompted to approve file edits by selecting "Keep" in the bottom rig
 == TODO: Screenshot
 
 Nemotron may spend a lot of time reasoning about these easy tasks because it's not sure this is all you're wanting it to do, but it should get a functional game written before long.
+
+NOTE: If it fails after reasoning too long and then exceeding your rate limits, give it a minute and then use the "Try Again" button. We have pretty low rate limits on this relatively small model, so you might need a try or two.
 
 **Example of what your file might look like:**
 
@@ -75,9 +77,7 @@ questions = [
 
 **Step 4: Test your game**
 
-Now let's run your game and make sure it works! If your agent decided to give you an easy link, you can just click the button like shown:
-
-== TODO: Screenshot
+Now let's run your game and make sure it works! If your agent decided to give you an easy link, you can just click the button. It might not have, though!
 
 If your agent didn't give you an easy command you can click to run the program, you can open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press `Ctrl+``.
 
@@ -147,11 +147,7 @@ Change the Chat window into Ask mode using the selector next to the model name, 
 
 **2. Context-aware help**
 
-== TODO: Screenshot
-
-Highlight specific code and get targeted help:
-
-To use this approach, highlight the code or comment line you want to work with, then use Inline Chat (`Ctrl+I` on Linux or `Cmd+I` on Mac) to open an inline chat directly about the highlighted code:
+To use this approach, highlight the code or comment line you want to work with, then use Inline Chat (`Cmd+I` on Mac) or the chat bar in the bottom right to chat directly about the highlighted code:
 
 == TODO: Screenshot
 

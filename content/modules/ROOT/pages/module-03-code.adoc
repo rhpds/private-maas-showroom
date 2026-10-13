@@ -35,7 +35,7 @@ image::open-workspace.png[width=700]
 
 NOTE: If your workspace shows a yellow warning triangle, saying it failed to start, don't worry — everything was idled/shut down to free resources. Clicking `Open` again will re-start it.
 
-After a moment, you'll see the VS Code interface running in your browser. When prompted, select to Trust the authors and the extension installation.
+After a moment, you'll see the VS Code interface running in your browser. If prompted, select to Trust the authors and the extension installation.
 
 [.bordershadow]
 image::trust-vscode.png[width=700]
