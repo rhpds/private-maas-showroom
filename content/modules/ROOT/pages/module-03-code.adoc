@@ -19,7 +19,8 @@ NOTE: OpenShift Dev Spaces is included with a full OpenShift Container Platform 
 
 * Navigate to the OpenShift Dev Spaces application.
 
-== TODO: Screenshot
+[.bordershadow]
+image::dev-spaces-nav.png[]
 
 If prompted for your login credentials, repeat the same OpenShift user login:
 
@@ -31,14 +32,14 @@ Once authenticated, you will see the OpenShift Dev Spaces central dashboard. We 
 Click `Open`:
 
 [.bordershadow]
-image::open-workspace.png[width=700]
+image::dev-spaces-open.png[]
 
 NOTE: If your workspace shows a yellow warning triangle, saying it failed to start, don't worry — everything was idled/shut down to free resources. Clicking `Open` again will re-start it.
 
 After a moment, you'll see the VS Code interface running in your browser. If prompted, select to Trust the authors and the extension installation.
 
 [.bordershadow]
-image::trust-vscode.png[width=700]
+image::vscode-trust.png[]
 
 We have pre-configured the Dev Spaces workspace to use VS Code's built-in AI agent harness. We need to configure it to use an alternative model endpoint for our MaaS-hosted model.
 
@@ -48,7 +49,8 @@ Before we dive in, let me tell you a bit about **VS Code Chat**.
 
 == Meet Your AI Code Assistant
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat.png[]
 
 **VS Code Chat** is the agentic harness experience integrated into VS Code, and available in OpenShift Dev Spaces. It provides an interactive chat interface where you can have natural conversations about your code. You can ask the chat to perform actions like:
 
@@ -74,15 +76,17 @@ NOTE: If you didn't document your model access information, go back to the OpenS
 
 Open the Command Palette in VS Code (`Ctrl+Shift+P` on Linux or `Cmd+Shift+P` on Mac) and run `Chat: Manage Language Models`, then click **+ Add Models → Custom Endpoint**.
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-settings.png[]
 
 Give the group a name (e.g. `MaaS`), paste your API key when prompted, and select **Chat Completions API** as the API type.
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-completions.png[]
 
 VS Code opens a `chatLanguageModels.json` file. Add your model(s) to it:
 
-[source,json,role="execute",subs=attributes+]
+[source,json,subs=attributes+]
 ----
       {
         "id": "publishers/llm/models/nemotron-3-nano-30b-a3b",
@@ -95,7 +99,8 @@ VS Code opens a `chatLanguageModels.json` file. Add your model(s) to it:
       }
 ----
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chatlanguagemodels-json.png[]
 
 IMPORTANT: The API key entered on the form is saved in a different way, and a randomly generated reference to it is placed above the JSON snippet shown above. Do not change that reference. If you already did, you can go back to the `Chat: Manage Language Models` page and right click on Nemotron to select `Update API Key`.
 
@@ -108,16 +113,18 @@ The file saves automatically, but you can press `Ctrl+S` or `Cmd+S` to be sure.
 
 With the model properly configured, you will be able to chat with the model in the right pane.
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-model.png[]
 
 Go ahead - test it out with the following prompt:
 
-[source,sh,role="execute"]
+[source]
 ----
 Explain the software company Red Hat in a short paragraph.
 ----
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-red-hat.png[]
 
 == You're Ready to Code with AI
 

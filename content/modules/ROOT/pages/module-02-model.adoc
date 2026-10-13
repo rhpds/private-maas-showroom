@@ -27,7 +27,8 @@ From here, we will navigate to and between the following environments throughout
 
 You may find and go to these applications via our navigation button in the web console:
 
-== TODO: Screenshot
+[.bordershadow]
+image::waffle-icon.png[]
 
 Now that you know how to get around, your adventure begins!
 
@@ -41,15 +42,18 @@ Let's get connected.
 
 Click the navigation button and select **Red Hat OpenShift AI** from the drop-down menu.
 
-== TODO: Screenshot
+[.bordershadow]
+image::rh-ai-app-nav.png[]
 
 Once authenticated you will see the following home page:
 
-== TODO: Screenshot
+[.bordershadow]
+image::rh-ai-welcome.png[width=700]
 
 Now, close the tour dialog and go to the `Gen AI Studio` section of the dashboard and select `AI asset endpoints`.
 
-== TODO: Screenshot
+[.bordershadow]
+image::ai-asset-endpoints.png[]
 
 Now you may view your available asset endpoints.
 
@@ -59,26 +63,32 @@ We do not have access to manage the model deployment directly, but we can access
 
 Your admin has deployed one NVIDIA model for you to use: `publishers/llm/models/nemotron-3-nano-30b-a3b`
 
-== TODO: Screenshot
+[.bordershadow]
+image::ai-asset-endpoints-model.png[]
 
 Let's grab the endpoint to use in our code assistant. Select `View` under the `Endpoints` column:
 
-== TODO: Screenshot
+[.bordershadow]
+image::ai-asset-endpoints-model-endpoint.png[]
 
 Copy the MaaS endpoint and save it in a note file - you'll want this for exploring beyond the next module.
 
-== TODO: Screenshot
+[.bordershadow]
+image::ai-asset-endpoints-copy.png[]
 
 Now, navigate to the `API keys` page in the `Gen AI Studio` section of the left navigation pane and create a new API key.
 
-== TODO: Screenshot
+[.bordershadow]
+image::api-key-create.png[]
 
 Name it however you like, optionally fill in a description, select `maas-premium-subscription` from the dropdown, and leave the expiration at the `30 days` default (or customize it up to 90 days - any further is prevented by the policy our administrator has enforced).
 
-== TODO: Screenshot
+[.bordershadow]
+image::create-api-key-dialog.png[]
 
-Copy this API key and save it with your route endpoint - you'll need the API key in the next module, and the endpoint might be useful for you to test in other ways.
+Copy this API key and save it with your route endpoint - you'll need the API key in the next module.
 
-== TODO: Screenshot
+[.bordershadow]
+image::api-key-copy.png[]
 
 Now that we have our model connection details, we can proceed to our development environment to leverage the model.
