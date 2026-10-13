@@ -1,12 +1,12 @@
 :imagesdir: ../assets/images
 [#agentic-ai]
-= System Administration with Agentic AI 
+= System Administration with Agentic AI
 
 In the last module, you stepped into the developer role building applications using private LLM endpoints. Now, you'll become a **site reliability engineer (SRE) or DevOps practitioner** focused on observability, diagnostics, and operational scale.
 
 But you won't go at it alone, you'll work with agentic AI tooling to navigate your OpenShift environment in real time - just like a modern SRE team building insight-driven automation.
 
-NOTE: You're still using the **same Nemotron model** from the MaaS deployment you accessed in earlier modules. The difference? Instead of consuming it through Continue for coding assistance, you'll now interact with it through the Gen AI Studio Playground with MCP server integrations for infrastructure operations. This demonstrates how a single, centrally-managed model serves multiple personas and use cases across your organization.
+NOTE: You're still using the **same Nemotron model** from the MaaS deployment you accessed in earlier modules. The difference? Instead of consuming it through the VS Code Chat interface, you'll now interact with it through the Gen AI Studio Playground with MCP server integrations for infrastructure operations. You can use other clients that integrate with MCP, including coding harnesses like VS Code Chat, but we're just going to use the playground for this section to get familiar with it. This demonstrates how a single, centrally-managed model serves multiple personas and use cases across your organization.
 
 == Why Agentic AI for Admins?
 
@@ -28,99 +28,90 @@ That's an example of the power of agentic AI.
 
 In this module, we'll use a preconfigured stack that includes:
 
-* **Gen AI Studio Playground** - an integrated UI feature in Red Hat AI for testing model responses, MCP server integrations, and tool invocations before committing to production code. Use it to validate that models, prompts, and external connections work together correctly, then export the validated configuration to your application.
+* **Gen AI Studio Playground** - an integrated UI feature in Red Hat AI for testing model responses, MCP server integrations, and tool invocations before exporting agents as production code. Use it to validate that models, prompts, and external connections work together correctly, then export the validated configuration to your application.
 
-* **Kubernetes MCP Server**  - allows our LLM agent to interact with our live OpenShift cluster and deployed resources.
+* **Kubernetes MCP Server** - allows our LLM agent to interact with our live OpenShift cluster and deployed resources. OpenShift includes support for a variant of this MCP server, and OpenShift AI can manage its lifecycle for you from a trusted catalog, but we're not exploring these interfaces in the lab today.
 
-* **Rocket.Chat MCP Server** - allows our LLM agent to interact with a Rocket.Chat workspace. We will use it to interact with a specific Rocket.Chat workspace for which we have authorization configured.
+* **Rocket.Chat MCP Server** - allows our LLM agent to interact with a Rocket.Chat workspace. We will use it to interact with a specific Rocket.Chat workspace as a stand-in for your organization's own chat platform, whatever it may be.
 
 * **NVIDIA Nemotron 3 Nano 30B A3B FP8 Model** - a lightweight, instruction-tuned model optimized for agentic workflows and tool calling. This model drives the agent's decision-making as it translates natural language into MCP server tool invocations.
 
-IMPORTANT: This agent will have real access to your OpenShift cluster and Rocket.Chat workspace. When experimenting:
+IMPORTANT: This agent will have real access to the OpenShift cluster and Rocket.Chat workspace you're sharing with everybody else in this lab. The MCP integration is read-only, but it is cluster-wide. The Rocket.Chat workspace is shared with everyone in the lab, agentically and otherwise. When experimenting:
 
-* Avoid deleting resources unless explicitly instructed
-* Do not modify resources outside the namespaces specified in exercises
-* Be cautious when sharing logs - they may contain sensitive information
-* Always validate tool outputs before acting on them in production scenarios 
+* Be courteous and kind
+* Do not add information that you do not want everyone else to have access to
+* Do not attempt to break out of the sandbox we've dropped you into
+    * There's nothing particularly valuable in this ephemeral environment you could get access to even if you succeed
+    * Attempting to will just disrupt the experience for everyone else
 
-== Connect Your Model to MCP Servers
+== Accessing the Gen AI studio Playground
 
-The Gen AI Studio Playground integrates your deployed model with MCP servers. For this workshop, your Nemotron model is already configured to communicate with the Kubernetes and Rocket.Chat MCP servers. 
+The Gen AI Studio Playground integrates your deployed model with MCP servers configured by the cluster administrator, and enables vector search across documents with built-in integration with the `pg_vector` extension in PostgreSQL.
 
-== Test model + MCP server functionality in the playground
+For this workshop, your Nemotron model is already configured to communicate with the Kubernetes and Rocket.Chat MCP servers in a Playground instance in your Workspace project.
 
-* Go back to the Red Hat OpenShift AI dashboard. 
-
-** https://data-science-gateway.{openshift_cluster_ingress_domain}/
-
-* Select `AI asset endpoints` from the navigation menu.
+* Go back to the link:https://rh-ai.{openshift_cluster_ingress_domain}/[OpenShift AI Dashboard,window=_blank].
+* Select `Gen AI studio` then `Playground` from the left-side navigation menu.
 
 [.bordershadow]
-image::nav-aiassets.png[width=500]
+image::gen-ai-playground-nav.png[]
 
-* Change project back to {user}.
-
-[.bordershadow]
-image::aiassets-changeproject.png[width=700]
-
-* View MCP servers
+* Change the Project pull-down to "Workspace {user}".
 
 [.bordershadow]
-image::genaistudio-mcpservers.png[width=700]
-
-* See what you have available, then select the Kubernetes MCP Server and click  `Try in Playground`.
-
-[.bordershadow]
-image::mcp-try-playground.png[width=700]
+image::gen-ai-playground-project.png[]
 
 === Using the playground
 
-This is where the magic happens. The playground lets you test-drive your entire agentic AI stack - model, prompts, MCP servers, and tool calls - **before writing a single line of application code**.
+This is where the magic happens. The playground lets you test-drive your entire agentic AI stack - model, prompts, MCP servers, and even vector data for RAG - **before writing a single line of application code**.
 
-Think of it as your **sandbox for operational automation**. Instead of deploying blind and debugging in production, you validate the whole chain here:
+Think of it as your **sandbox for engineering agents**. Instead of deploying blind and debugging in production, you validate the whole chain here:
 
 * Does the model understand my prompts correctly?
 * Are the MCP servers responding with the right data?
-* Can I get pod logs, list namespaces, or post to chat channels reliably?
+* Does the combination of model, prompts, and tools behave correctly in the context I need the final agent to?
 
-**The workflow:** Experiment here → validate behavior → export configuration → integrate into automation.
+**The workflow:** Experiment here → validate behavior → export configuration → deploy applications with the agentic workflow baked in, behind an industry-standard OpenAI Responses API.
 
 In the playground, you'll see a chat interface with your model preselected and a default system prompt. You can adjust the system prompt or temperature as needed.
 
-NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.0-0.3) for deterministic, accurate responses - critical when invoking tools or querying infrastructure. Higher temperatures introduce randomness, which can break tool calls.
+[.bordershadow]
+image::gen-ai-playground.png[]
+
+NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.0-0.3) for deterministic, accurate responses - the kind of behavior you probably want when querying infrastructure. Higher temperatures introduce randomness, which can break tool calls, but might be useful for debugging or design work.
+
+Click on the "MCP" tab to view MCP servers
 
 [.bordershadow]
-image::playground.png[width=700]
+image::gen-ai-playground-mcp.png[]
 
-**Select your MCP servers** before issuing commands to authorize and activate them. This establishes the secure connection between your agent and live infrastructure. The Kubernetes MCP server is already authorized. Select Rocket.Chat MCP Server.
-
-[.bordershadow]
-image::select-mcp.png[width=700]
-
-You'll see a confirmation popup - click `Save`:
+See what you have available, then click the checkbox to select the "Kubernetes-MCP-Server" and click "Save" to enable all of the Kubernetes tools.
 
 [.bordershadow]
-image::mcp-auth-save.png[width=700]
+image::gen-ai-playground-kubernetes-mcp.png[]
+
+[.bordershadow]
+image::gen-ai-playground-kubernetes-save.png[]
+
+NOTE: Authorization to the MCP servers is **session-based**. If you refresh or reopen the playground, you might need to re-select the MCP servers and reconfigure your settings. Your permissions are granted to these servers by your log-in to the Dashboard and Playground.
+
+Check the box on the "RocketChat-MCP-Server" also, and once again hit "Save."
 
 Your agent is now live and connected to both Kubernetes and Rocket.Chat. You can issue natural language commands and watch them translate into real infrastructure operations.
 
-NOTE: Authorization to the MCP servers is **session-based**. If you refresh or reopen the playground, you'll need to re-select the MCP servers and reconfigure your settings.
-
-**View Tools**
-
-View the MCP servers' available tools. You can see the RocketChat MCP Server has 28 tools active and available:
+Notice the warning shown by the Playground here:
 
 [.bordershadow]
-image::view-rc-tools.png[width=600]
+image::gen-ai-playground-tool-warning.png[]
 
-NOTE: You will see an alert about **performance degradation with more than 40 active tools**. This happens because too many tools increase the model's context window size and reduce its ability to accurately select the correct tool for each task - similar to decision paralysis when faced with too many choices. The model must evaluate every available tool against each request, and more options mean more opportunity for selection errors.
+NOTE: Depending on what model you're using, you might start to experience a condition called "tool confusion" with too many tools and a model that's not built to handle it. This decision paralysis might manifest as reasoning loops arguing about the right tool to pick, or it might simply pick the wrong one more often than it should.
 
-To optimize performance and help the model focus on the most relevant operations, we'll deselect some of the less frequently used tools. This improves response accuracy and reduces latency for tool invocation.
+To optimize performance and help the model focus on the most relevant operations, we'll deselect some of the less frequently used tools. This improves response accuracy and reduces the amount of reasoning required to complete tasks. Some models might do well with more tools, but here we're using a "Nano" model variant, so we'll help it out a bit.
 
 * Select the Kubernetes MCP server tools:
 
 [.bordershadow]
-image::view-k8s-tools.png[width=600]
+image::gen-ai-playground-kubernetes-tools.png[]
 
 Ensure only the following tools are selected:
 
@@ -129,65 +120,67 @@ Ensure only the following tools are selected:
 * `pods_list`
 * `pods_list_in_namespace`
 * `pods_log`
+* `resources_list`
+* `resources_get`
 
-* Now select the Rocket.Chat MCP Server tools:
-
-[.bordershadow]
-image::view-rc-tools.png[width=600]
-
-Ensure only the following tools are selected:
+Now select the Rocket.Chat MCP Server tools and ensure only the following tools are selected:
 
 * `get_channel_info`
 * `list_channels`
 * `send_message`
 
-NOTE: Feel free to experiment with other tools! For the purposes of the following steps, the above configuration is ideal to ensure consistent behavior.
+[.bordershadow]
+image::gen-ai-playground-10-tools.png[]
+
+NOTE: Feel free to experiment with other tools! For the purposes of the following steps, the above configuration is all we need.
 
 == Investigate our OpenShift Resources
 
-The tool information will give you guidance into how to interact with the model in chat to activate the tool calls correctly. You will need to utilize the right keywords so that you're engaging with the appropriate tools.
+Keep in mind that you might need to utilize the right keywords so that you're engaging with the appropriate tools, so here are some prompts we've seen work correctly without much fine-tuning on the system prompt.
 
 In the chat, enter:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
-List all pods in the grafana namespace.
+List all pods in the redhat-ods-monitoring namespace.
 ----
 
-Response output will vary slightly, but you should see it correctly list the active pod in the `grafana` namespace. The pod name will start with `grafana-deployment-` followed by a generated suffix (e.g., `grafana-deployment-7d8f9c5b4-xyz12`).
+Response output will vary slightly, but you should see it correctly list the active pods in the `redhat-ods-monitoring` namespace (which the MCP server has access to, even though you don't). The pods listed are part of the OpenShift AI observability stack and handle collecting, storing, querying, and displaying dashboards for AI workloads like the model we're talking to right now.
 
-✓ **Success indicator**: You should see output listing one or more pods with names starting with `grafana-deployment-` and showing their status as `Running`.
+✓ **Success indicator**: You should see output listing several pods with names like with `data-science-perses-0` and `prometheus-data-science-monitoringstack-0`. The agent may or may not give you more details, like pod health or ready container count.
 
 Let's try something else:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
-Get logs for the grafana-deployment pod in the grafana namespace.
+Get the last few lines of logs from the only running Pod in the llm namespace.
 ----
 
-NOTE: You may need to use the exact pod name from the previous command (including the generated suffix). If the model cannot find the pod, copy the full pod name from the previous output and specify it in your request.
-
-✓ **Success indicator**: You should see log output including timestamps. The logs will show the application's runtime activity.
+✓ **Success indicator**: You should see log output including timestamps. The logs are from the very vLLM instance that's serving your requests for this lab! You can probably see how busy it is processing requests for everyone right now.
 
 Feel free to experiment further with the tools available before moving to the next step.
 
 === Post a Message to our Rocket.Chat Workspace
 
-With our Rocket.Chat MCP Server, we can extend our agentic AI experience beyond Kubernetes and into team collaboration tools (among many other possibilities!).
+With our Rocket.Chat MCP Server, we can extend our agentic AI experience beyond Kubernetes and into team collaboration tools (among many other possibilities).
 
-This MCP server bridges your NVIDIA Nemotron model with a Rocket.Chat workspace to fetch and post approved data.
+This MCP server bridges your NVIDIA Nemotron model with a Rocket.Chat workspace to fetch and post messages, even those related to context it gathered from our other tools.
 
-Open the link:{rocketchat_url}[Rocket.Chat application^]
+Open the link:{rocketchat_url}[Rocket.Chat application,window=_blank] and log in with the following credentials:
 
-Login with the following credentials:
+**User**:
 
-* **Username**: {user}
-* **Password**: {password}
+[source,subs=attributes+]
+----
+{user}
+----
 
-You will see a pop-up. Simply close it, or accept update configuration:
+**Password**:
 
-[.bordershadow]
-image::rocketchat-popup.png[width=700]
+[source,subs=attributes+]
+----
+{password}
+----
 
 NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel where your AI agents will post messages. You will observe the messages there after sending them through the playground.
 
@@ -201,7 +194,7 @@ NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel whe
 
 ==== In the Gen AI Studio Playground chat interface, type:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
 List all Rocket.Chat channels in our workspace.
 ----
@@ -210,37 +203,37 @@ List all Rocket.Chat channels in our workspace.
 
 Now, let's post a message to our Rocket.Chat workspace:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
-Post a message to the #workshop channel: "Hi from <insert name>".
+Post a message to the #workshop channel: "Hi from {user}".
 ----
 
 Go check the `#workshop` channel in the Rocket.Chat application to see your message.
 
-✓ **Success indicator**: Your message should appear in the #workshop channel within a few seconds, posted by your bot user account.
+[.bordershadow]
+image::rocket-chat-hello.png[]
 
-==== Send logs to Rocket.Chat
+==== ChatOps debugging of problem applications
 
-Now, let's try out a real use case for this! It may not be done through a chat UI like the playground, but it's a good example of how you can use agentic AI to help you with your work. In a production environment, you would likely use a more robust automation to send logs or other information from your Red Hat AI cluster to Rocket.Chat.
+Now, let's try out a real use case for this! Our playground is just the kind of place we'd want to validate our prompts and tool behavior for an agentic. In a production environment, you would likely use a more robust automation to send logs or other information from your Red Hat AI cluster to Rocket.Chat, but the Playground will help you get the feel.
 
-Let's send pod logs from your workspace to the `#workshop` channel, where you and your team can view them in the Rocket.Chat interface.
+We have an example app deployed to the `demo` namespace. This application is a simple polling monitor application for another notional application in your infrastructure, just doing a health check for that external application. Your OpenShift cluster's AlertManager warned you that there was a problem with your health check pod, but it didn't tell you why. Let's use your prototype agent harness in the Playground to figure out what's gone wrong with it.
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
-Get the pod logs for the grafana-deployment pod in the grafana namespace. Review the logs for any errors or warnings, then post a summary highlighting any issues found along with the recent log entries to the #workshop channel in Rocket.Chat.
+Get the Pod logs for the demo-app Deployment in the demo Namespace. Review the logs for any errors or warnings, then investigate any issues found and post a diagnosis to the #workshop channel in Rocket.Chat. Preface the message with the marker `**{user}**` so I can find it.
 ----
 
-✓ **Success indicator**: Check the #workshop channel in Rocket.Chat - you should see a message containing both a summary of the log analysis and relevant log excerpts from the Grafana pod.
-
-NOTE: If you encounter issues with MCP server authorization, tool selection, or message posting, see the xref:troubleshooting.adoc#module-05-issues[Module 05 troubleshooting section].
+[.bordershadow]
+image::rocket-chat-diagnosis.png[]
 
 == Summary: What You Did
 
 In this module, you:
 
-* **Integrated your own LLM with a tool-using agent** - connecting NVIDIA Nemotron with MCP servers for live infrastructure interaction
+* **Integrated the centralized LLM with a tool-using agent in the Playground** - connecting NVIDIA Nemotron with MCP servers for live infrastructure interaction
 * **Explored OpenShift resources with natural language** - querying pods, namespaces, and logs without writing kubectl commands
-* **Interacted with a Rocket.Chat workspace using natural language** - posting operational data directly to team collaboration channels
+* **Diagnosed a failing application with agentic assistance** - posting infrastructure and operational diagnosis directly to team collaboration channels
 
 **Why This Matters:**
 
@@ -248,7 +241,7 @@ This agentic pattern enables on-call engineers and SREs to query infrastructure 
 
 **Real-World Applications:**
 
-* **Automated incident response**: Query cluster health, retrieve logs, and post findings to Slack/Teams without leaving your chat window
+* **Automated incident response**: Query cluster health, retrieve logs, and post findings to Slack/Teams without leaving your chat window or agent harness
 * **Self-service infrastructure queries**: Enable non-technical team members to ask "Is the API healthy?" and get real answers
 * **Proactive monitoring**: Agents can watch for specific patterns and automatically notify teams when issues arise
 

@@ -11,7 +11,7 @@ You'll work through three operational perspectives:
 
 * **Platform Engineer/SRE**: Test agentic workflows with MCP servers for Kubernetes and Rocket.Chat. Use the integrated UI to query cluster resources, retrieve pod logs, and push operational data to team channels—all via natural language prompts backed by real-time API calls.
 
-* **Platform Stakeholder**: Analyze model usage through a custom Grafana dashboard: token consumption, request latency, user attribution, and cost allocation. Understand production utilization patterns before scaling investment.
+* **Platform Stakeholder**: Analyze model usage through the integrated observability dashboards in Red Hat OpenShift AI: token consumption, request latency, user attribution, and cost allocation. Understand production utilization patterns before scaling investment.
 
 By the end, you'll have hands-on experience across model deployment, developer integration, operational automation, and usage analytics.
 
@@ -30,7 +30,7 @@ Build a simple game using AI assistance. Explore, experiment, and build confiden
 With the mindset of a site reliability engineer or DevOps practitioner, use Model Context Protocol (MCP) servers and Red Hat AI to interact with your OpenShift cluster and Rocket.Chat workspace using natural language.
 
 === **Module 5:** Usage Analytics and Reporting
-Take on the role of a technical decision maker or platform stakeholder. Explore Grafana dashboards to monitor model usage, track costs, and understand the business impact of your AI services.
+Take on the role of a technical decision maker or platform stakeholder. Explore the integrated observability dashboards in Red Hat OpenShift AI to monitor model usage, track costs, and understand the business impact of your AI services.
 
 == Workshop Environment
 
