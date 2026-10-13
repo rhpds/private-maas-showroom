@@ -19,7 +19,8 @@ You only need to pick one - but feel free to try more if you have time.
 
 From the file explorer, navigate to the `fun-and-games/game_starters` directory:
 
-== TODO: Screenshot
+[.bordershadow]
+image::game-starters.png[]
 
 This folder contains a folder for each game described above. Within each game folder are two files: one for Python code, one for Bash. They contain the same instructions, so just pick the game and language you prefer.
 
@@ -43,37 +44,27 @@ Open your chosen game file and read through all the commented instructions to un
 
 **Step 2: Generate your first version**
 
-With the file open, at the bottom of the right hand window say "Implement this game from scratch in this file only, using only the basic goal. Skip the optional ideas." The Nemotron model will generate working code for you.
+With the file open, at the bottom of the right hand window say:
 
-== TODO: Screenshot
+[source]
+----
+Implement this game from scratch in this file only, using only the basic goal. Skip the optional ideas.
+----
 
-You will be prompted to approve file edits by selecting "Keep" in the bottom right.
+The Nemotron model will generate working code for you.
 
-== TODO: Screenshot
+[.bordershadow]
+image::game-prompt.png[]
+
 
 Nemotron may spend a lot of time reasoning about these easy tasks because it's not sure this is all you're wanting it to do, but it should get a functional game written before long.
 
 NOTE: If it fails after reasoning too long and then exceeding your rate limits, give it a minute and then use the "Try Again" button. We have pretty low rate limits on this relatively small model, so you might need a try or two.
 
-**Example of what your file might look like:**
+You will be prompted to approve file edits by selecting "Keep" in the bottom right.
 
-[source,python]
-----
-#!/usr/bin/env python3
-
-# === 🎯 SIMPLE QUIZ GAME - PYTHON VERSION ===
-#
-# == GOAL ==
-# Create a Python quiz game that:
-# (all the instructional comments stay here)
-
-score = 0
-
-questions = [
-# ... rest of your generated code ...
-----
-
-== TODO: Screenshot
+[.bordershadow]
+image::game-keep.png[]
 
 **Step 4: Test your game**
 
@@ -81,7 +72,8 @@ Now let's run your game and make sure it works! If your agent decided to give yo
 
 If your agent didn't give you an easy command you can click to run the program, you can open a terminal in VS Code by navigating to `Terminal` → `New Terminal` from the hamburger menu, or press `Ctrl+``.
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-new-terminal.png[]
 
 Navigate to your game's folder in the terminal. For example (substitute the correct path to your game file):
 
@@ -108,7 +100,8 @@ python your_filename.py
 bash ./your_filename.sh
 ----
 
-== TODO: Screenshot
+[.bordershadow]
+image::game-execute.png[]
 
 Play your game! If it works, congratulations - you just did agentic engineering!
 
@@ -135,7 +128,8 @@ Your AI assistant offers several ways to help with your code:
 
 **1. Ask mode**
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-ask-mode.png[]
 
 Change the Chat window into Ask mode using the selector next to the model name, then type questions directly into the AI chat sidebar:
 
@@ -143,25 +137,29 @@ Change the Chat window into Ask mode using the selector next to the model name, 
 * "Explain what this code does"
 * "How do I make this more efficient?"
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-ask-response.png[]
 
 **2. Context-aware help**
 
 To use this approach, highlight the code or comment line you want to work with, then use Inline Chat (`Cmd+I` on Mac) or the chat bar in the bottom right to chat directly about the highlighted code:
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-ask-context.png[]
 
 You can also right-click a highlighted section for a menu of options you can take.
 
-**3. Agentic coding**
+[.bordershadow]
+image::vs-code-chat-selection.png[]
 
-== TODO: Screenshot
+**3. Agentic coding**
 
 In Agent mode, VS Code Chat is equipped with the tools it needs to edit files directly and you can give it objectives and approve its actions, like we did at first.
 
 Try it! In Agent mode, ask it to implement all of our optional ideas, one at a time. Just be warned, this will probably take a bit longer than more targeted help.
 
-== TODO: Screenshot
+[.bordershadow]
+image::vs-code-chat-agent-mode.png[]
 
 == Want to Go Further?
 
@@ -171,7 +169,7 @@ If you want to enhance your game with the ideas from the starter file comments, 
 
 Reference solutions are available in the `game_solutions` directory. From the file explorer, navigate to:
 
-[source,console]
+[source]
 ----
 fun-and-games/game_solutions/
 ----

@@ -50,17 +50,16 @@ The Gen AI Studio Playground integrates your deployed model with MCP servers con
 
 For this workshop, your Nemotron model is already configured to communicate with the Kubernetes and Rocket.Chat MCP servers in a Playground instance in your Workspace project.
 
-* Go back to the Red Hat OpenShift AI dashboard.
-
-** https://rh-ai.{openshift_cluster_ingress_domain}/
-
+* Go back to the link:https://rh-ai.{openshift_cluster_ingress_domain}/[OpenShift AI Dashboard,window=_blank].
 * Select `Gen AI studio` then `Playground` from the left-side navigation menu.
 
-== TODO: Screenshot
+[.bordershadow]
+image::gen-ai-playground-nav.png[]
 
 * Change the Project pull-down to "Workspace {user}".
 
-== TODO: Screenshot
+[.bordershadow]
+image::gen-ai-playground-project.png[]
 
 === Using the playground
 
@@ -76,29 +75,34 @@ Think of it as your **sandbox for engineering agents**. Instead of deploying bli
 
 In the playground, you'll see a chat interface with your model preselected and a default system prompt. You can adjust the system prompt or temperature as needed.
 
-NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.0-0.3) for deterministic, accurate responses - the kind of behavior you probably want when querying infrastructure. Higher temperatures introduce randomness, which can break tool calls, but might be useful for debugging or design work.
+[.bordershadow]
+image::gen-ai-playground.png[]
 
-== TODO: Screenshot
+NOTE: The **temperature** setting controls model creativity. Keep it **low** (0.0-0.3) for deterministic, accurate responses - the kind of behavior you probably want when querying infrastructure. Higher temperatures introduce randomness, which can break tool calls, but might be useful for debugging or design work.
 
 Click on the "MCP" tab to view MCP servers
 
-== TODO: Screenshot
+[.bordershadow]
+image::gen-ai-playground-mcp.png[]
 
 See what you have available, then click the checkbox to select the "Kubernetes-MCP-Server" and click "Save" to enable all of the Kubernetes tools.
 
-== TODO: Screenshot
+[.bordershadow]
+image::gen-ai-playground-kubernetes-mcp.png[]
+
+[.bordershadow]
+image::gen-ai-playground-kubernetes-save.png[]
 
 NOTE: Authorization to the MCP servers is **session-based**. If you refresh or reopen the playground, you might need to re-select the MCP servers and reconfigure your settings. Your permissions are granted to these servers by your log-in to the Dashboard and Playground.
 
 Check the box on the "RocketChat-MCP-Server" also, and once again hit "Save."
 
-== TODO: Screenshot
-
 Your agent is now live and connected to both Kubernetes and Rocket.Chat. You can issue natural language commands and watch them translate into real infrastructure operations.
 
 Notice the warning shown by the Playground here:
 
-== TODO: Screenshot
+[.bordershadow]
+image::gen-ai-playground-tool-warning.png[]
 
 NOTE: Depending on what model you're using, you might start to experience a condition called "tool confusion" with too many tools and a model that's not built to handle it. This decision paralysis might manifest as reasoning loops arguing about the right tool to pick, or it might simply pick the wrong one more often than it should.
 
@@ -106,7 +110,8 @@ To optimize performance and help the model focus on the most relevant operations
 
 * Select the Kubernetes MCP server tools:
 
-== TODO: Screenshot
+[.bordershadow]
+image::gen-ai-playground-kubernetes-tools.png[]
 
 Ensure only the following tools are selected:
 
@@ -118,15 +123,14 @@ Ensure only the following tools are selected:
 * `resources_list`
 * `resources_get`
 
-Now select the Rocket.Chat MCP Server tools:
-
-== TODO: Screenshot
-
-Ensure only the following tools are selected:
+Now select the Rocket.Chat MCP Server tools and ensure only the following tools are selected:
 
 * `get_channel_info`
 * `list_channels`
 * `send_message`
+
+[.bordershadow]
+image::gen-ai-playground-10-tools.png[]
 
 NOTE: Feel free to experiment with other tools! For the purposes of the following steps, the above configuration is all we need.
 
@@ -136,18 +140,18 @@ Keep in mind that you might need to utilize the right keywords so that you're en
 
 In the chat, enter:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
 List all pods in the redhat-ods-monitoring namespace.
 ----
 
-Response output will vary slightly, but you should see it correctly list the active pod in the `redhat-ods-monitoring` namespace (which the MCP server has access to, even though you don't). The pods listed are part of the OpenShift AI observability stack and handle collecting, storing, querying, and displaying dashboards for AI workloads like the model we're talking to right now.
+Response output will vary slightly, but you should see it correctly list the active pods in the `redhat-ods-monitoring` namespace (which the MCP server has access to, even though you don't). The pods listed are part of the OpenShift AI observability stack and handle collecting, storing, querying, and displaying dashboards for AI workloads like the model we're talking to right now.
 
 ✓ **Success indicator**: You should see output listing several pods with names like with `data-science-perses-0` and `prometheus-data-science-monitoringstack-0`. The agent may or may not give you more details, like pod health or ready container count.
 
 Let's try something else:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
 Get the last few lines of logs from the only running Pod in the llm namespace.
 ----
@@ -162,12 +166,21 @@ With our Rocket.Chat MCP Server, we can extend our agentic AI experience beyond 
 
 This MCP server bridges your NVIDIA Nemotron model with a Rocket.Chat workspace to fetch and post messages, even those related to context it gathered from our other tools.
 
-Open the link:{rocketchat_url}[Rocket.Chat application^]
+Open the link:{rocketchat_url}[Rocket.Chat application,window=_blank] and log in with the following credentials:
 
-Login with the following credentials:
+**User**:
 
-* **Username**: {user}
-* **Password**: {password}
+[source,subs=attributes+]
+----
+{user}
+----
+
+**Password**:
+
+[source,subs=attributes+]
+----
+{password}
+----
 
 NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel where your AI agents will post messages. You will observe the messages there after sending them through the playground.
 
@@ -181,7 +194,7 @@ NOTE: The Rocket.Chat workspace is pre-configured with a `#workshop` channel whe
 
 ==== In the Gen AI Studio Playground chat interface, type:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
 List all Rocket.Chat channels in our workspace.
 ----
@@ -190,14 +203,15 @@ List all Rocket.Chat channels in our workspace.
 
 Now, let's post a message to our Rocket.Chat workspace:
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
 Post a message to the #workshop channel: "Hi from {user}".
 ----
 
 Go check the `#workshop` channel in the Rocket.Chat application to see your message.
 
-✓ **Success indicator**: Your message should appear in the #workshop channel within a few seconds, posted by the mcp-bot user account.
+[.bordershadow]
+image::rocket-chat-hello.png[]
 
 ==== ChatOps debugging of problem applications
 
@@ -205,12 +219,13 @@ Now, let's try out a real use case for this! Our playground is just the kind of 
 
 We have an example app deployed to the `demo` namespace. This application is a simple polling monitor application for another notional application in your infrastructure, just doing a health check for that external application. Your OpenShift cluster's AlertManager warned you that there was a problem with your health check pod, but it didn't tell you why. Let's use your prototype agent harness in the Playground to figure out what's gone wrong with it.
 
-[source,console,role=execute,subs=attributes+]
+[source]
 ----
 Get the Pod logs for the demo-app Deployment in the demo Namespace. Review the logs for any errors or warnings, then investigate any issues found and post a diagnosis to the #workshop channel in Rocket.Chat. Preface the message with the marker `**{user}**` so I can find it.
 ----
 
-✓ **Success indicator**: Check the #workshop channel in Rocket.Chat - you should see a message starting with your username ({user}) and describing what's wrong with the `demo-app` Pod, probably including a recommended fix.
+[.bordershadow]
+image::rocket-chat-diagnosis.png[]
 
 == Summary: What You Did
 

@@ -24,8 +24,19 @@ image::dev-spaces-nav.png[]
 
 If prompted for your login credentials, repeat the same OpenShift user login:
 
-* Username: {user}
-* Password: {password}
+**User**:
+
+[source,subs=attributes+]
+----
+{user}
+----
+
+**Password**:
+
+[source,subs=attributes+]
+----
+{password}
+----
 
 Once authenticated, you will see the OpenShift Dev Spaces central dashboard. We have prepared a workspace for you to access. This is a VS Code IDE workspace with a prepared repository already cloned in and necessary dependencies configured.
 
@@ -72,7 +83,7 @@ NOTE: VS Code Chat is an example of an AI-powered coding assistant for this work
 
 In order to connect our model to VS Code Chat we must provide the editor our model's endpoint URL and API key from our MaaS deployment from the previous module. The endpoint we have templated for you, but your key will need to be in your clipboard.
 
-NOTE: If you didn't document your model access information, go back to the OpenShift AI dashboard to the **API keys** section to generate a new token: https://rh-ai.{openshift_cluster_ingress_domain}/
+NOTE: If you didn't document your model access information, go back to the **API keys** section of the link:https://rh-ai.{openshift_cluster_ingress_domain}/[OpenShift AI Dashboard,window=_blank] to generate a new token.
 
 Open the Command Palette in VS Code (`Ctrl+Shift+P` on Linux or `Cmd+Shift+P` on Mac) and run `Chat: Manage Language Models`, then click **+ Add Models → Custom Endpoint**.
 

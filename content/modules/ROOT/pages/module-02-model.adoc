@@ -11,12 +11,23 @@ Our home base will be our OpenShift cluster web console:
 
 // NOTE: If you are accessing these instructions through our Red Hat Demo Platform workshop, the information below will render properly with unique values. If you are accessing the instructions separately for your own cluster, from the GitHub repository, you will instead see placeholder values.
 
-**Console URL**: https://console-openshift-console.{openshift_cluster_ingress_domain}/[https://console-openshift-console.{openshift_cluster_ingress_domain}/,window=_blank].
+**Console URL**: link:https://console-openshift-console.{openshift_cluster_ingress_domain}/[https://console-openshift-console.{openshift_cluster_ingress_domain}/,window=_blank].
 
 **Login Credentials**:
 
-. **User**: {user}
-. **Password**: {password}
+**User**:
+
+[source,subs=attributes+]
+----
+{user}
+----
+
+**Password**:
+
+[source,subs=attributes+]
+----
+{password}
+----
 
 From here, we will navigate to and between the following environments throughout our workshop:
 
@@ -81,7 +92,7 @@ Now, navigate to the `API keys` page in the `Gen AI Studio` section of the left 
 [.bordershadow]
 image::api-key-create.png[]
 
-Name it however you like, optionally fill in a description, select `maas-premium-subscription` from the dropdown, and leave the expiration at the `30 days` default (or customize it up to 90 days - any further is prevented by the policy our administrator has enforced).
+Name it however you like, optionally fill in a description, select `maas-premium-subscription` from the dropdown, and leave the expiration at the `30 days` default (or customize it up to 90 days - any further is prevented by the policy our administrator has enforced). Click "Create API key" when done.
 
 [.bordershadow]
 image::create-api-key-dialog.png[]
