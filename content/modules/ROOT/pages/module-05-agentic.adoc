@@ -203,7 +203,7 @@ List all Rocket.Chat channels in our workspace.
 
 Now, let's post a message to our Rocket.Chat workspace:
 
-[source]
+[source,subs=attributes+]
 ----
 Post a message to the #workshop channel: "Hi from {user}".
 ----
@@ -219,7 +219,7 @@ Now, let's try out a real use case for this! Our playground is just the kind of 
 
 We have an example app deployed to the `demo` namespace. This application is a simple polling monitor application for another notional application in your infrastructure, just doing a health check for that external application. Your OpenShift cluster's AlertManager warned you that there was a problem with your health check pod, but it didn't tell you why. Let's use your prototype agent harness in the Playground to figure out what's gone wrong with it.
 
-[source]
+[source,subs=attributes+]
 ----
 Get the Pod logs for the demo-app Deployment in the demo Namespace. Review the logs for any errors or warnings, then investigate any issues found and post a diagnosis to the #workshop channel in Rocket.Chat. Preface the message with the marker `**{user}**` so I can find it.
 ----
